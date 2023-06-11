@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String               @id @db.VarChar(100)
+  username           String               @unique @db.VarChar(100)
+  password           String               @db.VarChar(255)
+  email              String?              @unique @db.VarChar(255)
+  role               Role
+  badges             Badge[]
+  PasswordResetToken PasswordResetToken[]
+
+  @@map("users")
+}
+
+model Student {
+  id             String  @id @db.VarChar(100)
+  studentId      String  @unique @db.VarChar(25)
+  clinicId       String? @db.VarChar(25)
+  preClinicId    String? @db.VarChar(25)
+  graduationDate Int?    @db.UnsignedInt
+  phoneNumber    String? @db.VarChar(50)
+  address        String? @db.VarChar(255)
+
+  @@map("students")
+}
+
+model Badge {
+  id    String @id @db.VarChar(100)
+  name  Badges @unique
+  users User[]
+
+  @@map("badges")
+}
+
+model PasswordResetToken {
+  username String  @db.VarChar(30)
+  token    String  @unique() @db.VarChar(128)
+  tokenExp BigInt  @db.UnsignedBigInt
+  otp      String? @db.VarChar(5)
+  user     User    @relation(fields: [username], references: [username], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([username, token])
+  @@map("password_reset_tokens")
+}
+
+enum Badges {
+  CEU
+  ER
+  HEAD_DIV
+}
+
+enum Role {
+  SUPERVISOR
+  STUDENT
+}
