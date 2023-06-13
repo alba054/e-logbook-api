@@ -37,4 +37,14 @@ export const constants = {
   ACCESS_TOKEN_EXP: 60, // * 1 minute
   REFRESH_TOKEN_EXP: 24 * 60 * 60 * 30, // * 1 month
   PASSWORD_RESET_TOKEN_EXP: 5 * 60 * 1000,
+  INVALID_TOKEN: "token is invalid",
+  MALFORMED_TOKEN:
+    "token is not formed correctly. JWT format is xxxx.yyyyy.zzzz",
+  SIGNATURE_REQUIRED: "provide secret key to verify token",
+  INVALID_SIGNATURE: "secret key is not valid",
+  STUDENT_ROLE: "STUDENT",
+  SUPERVISOR_ROLE: "SUPERVISOR",
+  ER_BADGE: "ER",
+  CEU_BADGE: "CEU",
+  HEAD_DIV_BADGE: "HEAD_DIV",
 };

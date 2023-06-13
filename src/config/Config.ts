@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 interface IConfig {
+  ACCESS_SECRET_KEY?: string;
+  REFRESH_SECRET_KEY?: string;
   TOKEN_ISSUER?: string;
   ACCESS_TOKEN_CLAIMS?: {
     expiresIn: number;
@@ -45,6 +47,8 @@ class Config {
       this.config.ADMIN_USERNAME = process.env.ADMIN_USERNAME;
       this.config.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
       this.config.FRONTEND_HOST = process.env.FRONTEND_HOST;
+      this.config.ACCESS_SECRET_KEY = process.env.ACCESS_SECRET_KEY;
+      this.config.REFRESH_SECRET_KEY = process.env.REFRESH_SECRET_KEY;
     }
   }
 }

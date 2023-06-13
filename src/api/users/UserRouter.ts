@@ -17,7 +17,7 @@ export class UserRouter {
     // * login
     this.router.post(
       this.path + "/login",
-      BasicAuthMiddleware.checkBasicAuth(),
+      BasicAuthMiddleware.authenticate(),
       this.userHandler.postUserLogin
     );
     // * refresh access token

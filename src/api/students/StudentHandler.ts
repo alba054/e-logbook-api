@@ -5,8 +5,6 @@ import {
   IPostStudentResetPasswordPayload,
 } from "../../utils/interfaces/Student";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
-import { AuthenticationService } from "../../services/facade/AuthenticationService";
-import { UnauthenticatedError } from "../../exceptions/httpError/UnauthenticatedError";
 import { constants, createResponse } from "../../utils";
 import { UserStudentRegistrationService } from "../../services/facade/UserStudentRegistrationService";
 import { PasswordResetTokenService } from "../../services/database/PasswordResetTokenService";
@@ -17,13 +15,11 @@ import { UserStudentResetPasswordService } from "../../services/facade/UserStude
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
-  private authenticationService: AuthenticationService;
   private userStudentRegistrationService: UserStudentRegistrationService;
   private passwordResetTokenService: PasswordResetTokenService;
   private userStudentResetPasswordService: UserStudentResetPasswordService;
 
   constructor() {
-    this.authenticationService = new AuthenticationService();
     this.studentPayloadValidator = new StudentPayloadValidator();
     this.userStudentRegistrationService = new UserStudentRegistrationService();
     this.passwordResetTokenService = new PasswordResetTokenService();
@@ -33,6 +29,20 @@ export class StudentHandler {
     this.postStudent = this.postStudent.bind(this);
     this.getStudentForgetPassword = this.getStudentForgetPassword.bind(this);
     this.postStudentResetPassword = this.postStudentResetPassword.bind(this);
+    this.getTestAuthorizationStudent =
+      this.getTestAuthorizationStudent.bind(this);
+  }
+
+  async getTestAuthorizationStudent(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    return res
+      .status(200)
+      .json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, res.locals.user)
+      );
   }
 
   async postStudentResetPassword(
@@ -44,14 +54,14 @@ export class StudentHandler {
     const payload: IPostStudentResetPasswordPayload = req.body;
 
     try {
-      if (
-        !this.authenticationService.authenticateAdmin(
-          res.locals.credential.username,
-          res.locals.credential.password
-        )
-      ) {
-        throw new UnauthenticatedError("provide valid credential");
-      }
+      // if (
+      //   !this.authenticationService.authenticateAdmin(
+      //     res.locals.credential.username,
+      //     res.locals.credential.password
+      //   )
+      // ) {
+      //   throw new UnauthenticatedError("provide valid credential");
+      // }
 
       const testValidate =
         this.studentPayloadValidator.validateStudentResetPasswordPayload(
@@ -108,9 +118,9 @@ export class StudentHandler {
       if ("error" in token) {
         switch (token.error) {
           case 400:
-            throw new BadRequestError(token.message ?? "");
+            throw new BadRequestError(token.message);
           case 404:
-            throw new NotFoundError(token.message ?? "");
+            throw new NotFoundError(token.message);
           default:
             throw new InternalServerError();
         }
@@ -133,14 +143,15 @@ export class StudentHandler {
     const payload: IPostStudentPayload = req.body;
 
     try {
-      if (
-        !this.authenticationService.authenticateAdmin(
-          res.locals.credential.username,
-          res.locals.credential.password
-        )
-      ) {
-        throw new UnauthenticatedError("provide valid credential");
-      }
+      // if (
+      //   !this.authenticationService.authenticateAdmin(
+      //     res.locals.credential.username,
+      //     res.locals.credential.password
+      //   )
+      // ) {
+      //   throw new UnauthenticatedError("provide valid credential");
+      // }
+
       const testValidate =
         this.studentPayloadValidator.validatePostPayload(payload);
 
@@ -156,9 +167,9 @@ export class StudentHandler {
       if (testError && "error" in testError) {
         switch (testError.error) {
           case 400:
-            throw new BadRequestError(testError.message ?? "");
+            throw new BadRequestError(testError.message);
           case 404:
-            throw new NotFoundError(testError.message ?? "");
+            throw new NotFoundError(testError.message);
           default:
             throw new InternalServerError();
         }

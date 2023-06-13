@@ -1,5 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
+import { config } from "../../config/Config";
+import { UnauthenticatedError } from "../../exceptions/httpError/UnauthenticatedError";
+import { UserService } from "../../services/database/UserService";
+import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
+import bcryptjs from "bcryptjs";
+import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 
 export class BasicAuthMiddleware {
   static checkBasicAuth() {
@@ -43,6 +49,62 @@ export class BasicAuthMiddleware {
 
       res.locals.credential = { username, password };
       next();
+    };
+  }
+
+  static authenticateAdmin() {
+    return function (req: Request, res: Response, next: NextFunction) {
+      BasicAuthMiddleware.checkBasicAuth()(req, res, () => {
+        if (!res.locals.credential) {
+          return next(new BadRequestError("provide credential"));
+        }
+
+        if (
+          res.locals.credential.username === config.config.ADMIN_USERNAME &&
+          res.locals.credential.password === config.config.ADMIN_PASSWORD
+        ) {
+          return next();
+        }
+
+        return next(new UnauthenticatedError("admin credential is incorrect"));
+      });
+    };
+  }
+
+  static authenticate() {
+    return function (req: Request, res: Response, next: NextFunction) {
+      BasicAuthMiddleware.checkBasicAuth()(req, res, async () => {
+        if (!res.locals.credential) {
+          return next(new BadRequestError("provide credential"));
+        }
+
+        const userService = new UserService();
+        const user = await userService.getUserByUsername(
+          res.locals.credential.username
+        );
+
+        if (!user) {
+          return next(new NotFoundError("user's not found"));
+        }
+
+        const passwordIsCorrect = await bcryptjs.compare(
+          res.locals.credential.password,
+          user.password
+        );
+
+        if (!passwordIsCorrect) {
+          return next(new UnauthenticatedError("password is incorrect"));
+        }
+
+        res.locals.user = {
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          badges: user.badges.map((badge) => badge.name),
+        } as ITokenPayload;
+
+        next();
+      });
     };
   }
 }
