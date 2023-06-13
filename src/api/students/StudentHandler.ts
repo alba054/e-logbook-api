@@ -72,9 +72,9 @@ export class StudentHandler {
       if (resetPassword && "error" in resetPassword) {
         switch (resetPassword.error) {
           case 400:
-            throw new BadRequestError(resetPassword.message ?? "");
+            throw new BadRequestError(resetPassword.message);
           case 404:
-            throw new NotFoundError(resetPassword.message ?? "");
+            throw new NotFoundError(resetPassword.message);
           default:
             throw new InternalServerError();
         }

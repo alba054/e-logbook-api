@@ -58,19 +58,20 @@ export class AuthenticationService {
 
     let accessTokenClaims = { subject: payload.username };
     let refreshTokenClaims = { subject: payload.username };
+
     Object.assign(accessTokenClaims, config.config.ACCESS_TOKEN_CLAIMS);
     Object.assign(refreshTokenClaims, config.config.REFRESH_TOKEN_CLAIMS);
 
     const accessToken = await tokenGenerator.sign(
       payload,
       process.env.ACCESS_SECRET_KEY,
-      accessTokenClaims
+      "exp" in payload || "iss" in payload ? undefined : accessTokenClaims
     );
 
     const refreshToken = await tokenGenerator.sign(
       payload,
       process.env.REFRESH_SECRET_KEY,
-      refreshTokenClaims
+      "exp" in payload || "iss" in payload ? undefined : refreshTokenClaims
     );
 
     return { accessToken, refreshToken };

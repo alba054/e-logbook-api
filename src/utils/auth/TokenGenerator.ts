@@ -12,9 +12,7 @@ dotenv.config();
 
 class TokenGenerator {
   options: any;
-  constructor(options?: { issuer: string | undefined }) {
-    this.options = options;
-  }
+  constructor() {}
 
   sign(
     payload: Buffer | string | object,
@@ -22,11 +20,10 @@ class TokenGenerator {
     options?: SignOptions
   ): Promise<string | undefined> {
     return new Promise((resolve, reject) => {
-      Object.assign(this.options, options);
       jwt.sign(
         payload,
         secretKey,
-        this.options,
+        options ?? {},
         (err: any, encoded: string | undefined) => {
           if (err) {
             reject(err);
@@ -58,6 +55,4 @@ class TokenGenerator {
   }
 }
 
-export const tokenGenerator = new TokenGenerator({
-  issuer: process.env.ISSUER,
-});
+export const tokenGenerator = new TokenGenerator();

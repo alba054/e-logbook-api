@@ -71,7 +71,7 @@ export class UserHandler {
           case 404:
             throw new NotFoundError(token.message);
           case 401:
-            throw new UnauthenticatedError("password's incorrect");
+            throw new UnauthenticatedError(token.message);
           default:
             throw new InternalServerError();
         }
