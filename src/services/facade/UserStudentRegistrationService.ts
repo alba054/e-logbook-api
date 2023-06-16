@@ -33,7 +33,7 @@ export class UserStudentRegistrationService {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(
           400,
-          "failed transaction  of creating user and student"
+          "failed transaction of creating user and student"
         );
       } else {
         return createErrorObject(500);

@@ -15,6 +15,8 @@ model User {
   username           String               @unique @db.VarChar(100)
   password           String               @db.VarChar(255)
   email              String?              @unique @db.VarChar(255)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
   role               Role
   badges             Badge[]
   PasswordResetToken PasswordResetToken[]
@@ -23,13 +25,17 @@ model User {
 }
 
 model Student {
-  id             String  @id @db.VarChar(100)
-  studentId      String  @unique @db.VarChar(25)
-  clinicId       String? @db.VarChar(25)
-  preClinicId    String? @db.VarChar(25)
-  graduationDate Int?    @db.UnsignedInt
-  phoneNumber    String? @db.VarChar(50)
-  address        String? @db.VarChar(255)
+  id              String           @id @db.VarChar(100)
+  studentId       String           @unique @db.VarChar(25)
+  clinicId        String?          @db.VarChar(25)
+  preClinicId     String?          @db.VarChar(25)
+  graduationDate  Int?             @db.UnsignedInt
+  phoneNumber     String?          @db.VarChar(50)
+  address         String?          @db.VarChar(255)
+  fullName        String?          @db.VarChar(255)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  clinicalRecords ClinicalRecord[]
 
   @@map("students")
 }
@@ -43,14 +49,140 @@ model Badge {
 }
 
 model PasswordResetToken {
-  username String  @db.VarChar(30)
-  token    String  @unique() @db.VarChar(128)
-  tokenExp BigInt  @db.UnsignedBigInt
-  otp      String? @db.VarChar(5)
-  user     User    @relation(fields: [username], references: [username], onDelete: Cascade, onUpdate: Cascade)
+  username  String   @db.VarChar(30)
+  token     String   @unique() @db.VarChar(128)
+  tokenExp  BigInt   @db.UnsignedBigInt
+  otp       String?  @db.VarChar(5)
+  user      User     @relation(fields: [username], references: [username], onDelete: Cascade, onUpdate: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@id([username, token])
   @@map("password_reset_tokens")
+}
+
+model Unit {
+  id               String            @id @db.VarChar(100)
+  name             String            @db.VarChar(100)
+  clinicalRecords  ClinicalRecord[]
+  affectedParts    AffectedPart[]
+  examinationTypes ExaminationType[]
+  DiagnosisType    DiagnosisType[]
+  ManagementType   ManagementType[]
+
+  @@map("units")
+}
+
+model ClinicalRecord {
+  id                        String                      @id @db.VarChar(100)
+  recordId                  Int                         @default(1) @db.UnsignedInt
+  patientName               String                      @db.VarChar(255)
+  patientAge                Int                         @db.UnsignedInt
+  gender                    Gender
+  notes                     String?                     @db.Text
+  attachment                String?                     @db.VarChar(255)
+  verificationStatus        VerificationStatus          @default(INPROCESS)
+  createdAt                 DateTime                    @default(now())
+  updatedAt                 DateTime                    @updatedAt
+  Student                   Student?                    @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId                 String?                     @db.VarChar(100)
+  Unit                      Unit?                       @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId                    String?                     @db.VarChar(100)
+  studentFeedback           String?                     @db.Text
+  supervisorFeedback        String?                     @db.Text
+  ClinicalRecordExamination ClinicalRecordExamination[]
+  ClinicalRecordDiagnosis   ClinicalRecordDiagnosis[]
+  ClinicalRecordManagement  ClinicalRecordManagement[]
+
+  @@map("clinical_records")
+}
+
+model AffectedPart {
+  id                        String                      @id @db.VarChar(100)
+  partName                  String                      @db.VarChar(100)
+  Unit                      Unit?                       @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId                    String?                     @db.VarChar(100)
+  ClinicalRecordExamination ClinicalRecordExamination[]
+  ClinicalRecordDiagnosis   ClinicalRecordDiagnosis[]
+  ClinicalRecordManagement  ClinicalRecordManagement[]
+
+  @@map("affected_parts")
+}
+
+model ExaminationType {
+  id                        String                      @id @db.VarChar(100)
+  typeName                  String                      @db.VarChar(100)
+  Unit                      Unit?                       @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId                    String?                     @db.VarChar(100)
+  ClinicalRecordExamination ClinicalRecordExamination[]
+
+  @@map("examination_types")
+}
+
+model ClinicalRecordExamination {
+  affectedPart      AffectedPart    @relation(fields: [affectedPartId], references: [id])
+  examinationType   ExaminationType @relation(fields: [examinationTypeId], references: [id])
+  clinicalRecord    ClinicalRecord  @relation(fields: [clinicalRecordId], references: [id])
+  affectedPartId    String          @db.VarChar(100)
+  examinationTypeId String          @db.VarChar(100)
+  clinicalRecordId  String          @db.VarChar(100)
+
+  @@id([affectedPartId, examinationTypeId, clinicalRecordId])
+  @@map("clinical_record_examinations")
+}
+
+model DiagnosisType {
+  id                      String                    @id @db.VarChar(100)
+  typeName                String                    @db.VarChar(100)
+  Unit                    Unit?                     @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId                  String?                   @db.VarChar(100)
+  ClinicalRecordDiagnosis ClinicalRecordDiagnosis[]
+
+  @@map("diagnosis_types")
+}
+
+model ClinicalRecordDiagnosis {
+  affectedPart     AffectedPart   @relation(fields: [affectedPartId], references: [id])
+  DiagnosisType    DiagnosisType  @relation(fields: [DiagnosisTypeId], references: [id])
+  clinicalRecord   ClinicalRecord @relation(fields: [clinicalRecordId], references: [id])
+  affectedPartId   String         @db.VarChar(100)
+  DiagnosisTypeId  String         @db.VarChar(100)
+  clinicalRecordId String         @db.VarChar(100)
+
+  @@id([affectedPartId, DiagnosisTypeId, clinicalRecordId])
+  @@map("clinical_record_diagnosis")
+}
+
+model ManagementType {
+  id                       String                     @id @db.VarChar(100)
+  typeName                 String                     @db.VarChar(100)
+  Unit                     Unit?                      @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId                   String?                    @db.VarChar(100)
+  ClinicalRecordmanagement ClinicalRecordManagement[]
+
+  @@map("management_types")
+}
+
+model ManagementRole {
+  id                       String                     @id @db.VarChar(100)
+  roleName                 String                     @db.VarChar(100)
+  ClinicalRecordManagement ClinicalRecordManagement[]
+
+  @@map("management_roles")
+}
+
+model ClinicalRecordManagement {
+  affectedPart     AffectedPart   @relation(fields: [affectedPartId], references: [id])
+  managementType   ManagementType @relation(fields: [managementTypeId], references: [id])
+  managementRole   ManagementRole @relation(fields: [managementRoleId], references: [id])
+  clinicalRecord   ClinicalRecord @relation(fields: [clinicalRecordId], references: [id])
+  affectedPartId   String         @db.VarChar(100)
+  managementTypeId String         @db.VarChar(100)
+  clinicalRecordId String         @db.VarChar(100)
+  managementRoleId String         @db.VarChar(100)
+
+  @@id([affectedPartId, managementTypeId, clinicalRecordId, managementRoleId])
+  @@map("clinical_record_managements")
 }
 
 enum Badges {
@@ -62,4 +194,15 @@ enum Badges {
 enum Role {
   SUPERVISOR
   STUDENT
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum VerificationStatus {
+  VERIFIED
+  INPROCESS
+  UNVERIFIED
 }

@@ -17,11 +17,14 @@ export class UserRouter {
     // * login
     this.router.post(
       this.path + "/login",
-      BasicAuthMiddleware.checkBasicAuth(),
+      BasicAuthMiddleware.authenticate(),
       this.userHandler.postUserLogin
     );
     // * refresh access token
-    this.router.post("/refresh-token", this.userHandler.postRefreshToken);
+    this.router.post(
+      this.path + "/refresh-token",
+      this.userHandler.postRefreshToken
+    );
 
     return this.router;
   }

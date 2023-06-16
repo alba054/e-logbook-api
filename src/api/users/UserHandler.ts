@@ -5,6 +5,7 @@ import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
 import { UnauthenticatedError } from "../../exceptions/httpError/UnauthenticatedError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
+import { config } from "../../config/Config";
 
 export class UserHandler {
   private authenticationService: AuthenticationService;
@@ -24,13 +25,16 @@ export class UserHandler {
         throw new BadRequestError("provide refresh token in body");
       }
 
-      if (!process.env.ACCESS_SECRET_KEY || !process.env.REFRESH_SECRET_KEY) {
+      if (
+        !config.config.ACCESS_SECRET_KEY ||
+        !config.config.REFRESH_SECRET_KEY
+      ) {
         throw new InternalServerError();
       }
 
       const decoded = await this.authenticationService.verifyToken(
         refreshToken,
-        process.env.REFRESH_SECRET_KEY
+        config.config.REFRESH_SECRET_KEY
       );
 
       if (decoded && "error" in decoded) {
@@ -59,23 +63,10 @@ export class UserHandler {
 
   async postUserLogin(req: Request, res: Response, next: NextFunction) {
     try {
-      const payload = await this.authenticationService.authenticate(
-        res.locals.credential.username,
-        res.locals.credential.password
+      const token = await this.authenticationService.generateToken(
+        res.locals.user
       );
 
-      const token = await this.authenticationService.generateToken(payload);
-
-      if (token && "error" in token) {
-        switch (token.error) {
-          case 404:
-            throw new NotFoundError(token.message);
-          case 401:
-            throw new UnauthenticatedError("password's incorrect");
-          default:
-            throw new InternalServerError();
-        }
-      }
       return res
         .status(200)
         .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, token));

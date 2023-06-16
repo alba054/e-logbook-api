@@ -3,6 +3,9 @@ import { UserPayloadSchema } from "../users/UserSchema";
 
 export const StudentPayloadSchema = UserPayloadSchema.append({
   studentId: Joi.string().required(),
+  email: Joi.string()
+    .required()
+    .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/),
 });
 
 export const StudentResetPasswordPayloadSchema = Joi.object({
