@@ -16,8 +16,7 @@ export const createErrorObject = (
 };
 
 export const generateRandomString = (length: number) => {
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const characters = "0123456789";
   const charactersLength = characters.length;
   let randomString = "";
 

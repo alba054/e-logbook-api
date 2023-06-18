@@ -6,7 +6,8 @@
     "start::dev": "nodemon ./src/index.ts",
     "migrate::dev": "prisma migrate dev --name",
     "build": "rimraf ./dist && tsc",
-    "start": "npm run build && node ./dist/index.js"
+    "start": "npm run build && node ./dist/index.js",
+    "test": "ts-node ./test/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -18,9 +19,12 @@
     "@types/express": "^4.17.17",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^20.2.5",
+    "@types/supertest": "^2.0.12",
     "@types/uuid": "^9.0.2",
+    "jest": "^29.5.0",
     "nodemon": "^2.0.22",
     "prisma": "^4.15.0",
+    "supertest": "^6.3.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.3"
   },

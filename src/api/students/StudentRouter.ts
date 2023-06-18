@@ -23,16 +23,30 @@ export class StudentRouter {
       this.studentHandler.postStudent
     );
     // * send otp and token for reset password
-    this.router.get(
-      this.path + "/:username/reset-password",
+    this.router.post(
+      this.path + "/reset-password",
       BasicAuthMiddleware.authenticateAdmin(),
-      this.studentHandler.getStudentForgetPassword
+      this.studentHandler.postStudentForgetPassword
     );
     // * reset password based on token and otp
     this.router.post(
-      this.path + "/:username/reset-password/:token",
+      this.path + "/reset-password/:token",
       BasicAuthMiddleware.authenticateAdmin(),
       this.studentHandler.postStudentResetPassword
+    );
+
+    // * set active unit
+    this.router.put(
+      this.path + "/units/set-unit",
+      AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+      this.studentHandler.putActiveUnit
+    );
+
+    // * get active unit
+    this.router.get(
+      this.path + "/unit",
+      AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+      this.studentHandler.getActiveUnit
     );
 
     // * test authorization for student

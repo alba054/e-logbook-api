@@ -1,10 +1,15 @@
+import { createErrorObject } from "../../utils";
 import {
   IPostStudentPayload,
   IPostStudentResetPasswordPayload,
+  IPostStudentTokenResetPassword,
+  IPutStudentActiveUnit,
 } from "../../utils/interfaces/Student";
 import {
+  StudentActiveUnitPayloadSchema,
   StudentPayloadSchema,
   StudentResetPasswordPayloadSchema,
+  StudentTokenResetPasswordPayloadSchema,
 } from "./StudentSchema";
 
 export class StudentPayloadValidator {
@@ -12,7 +17,7 @@ export class StudentPayloadValidator {
     const validationResult = StudentPayloadSchema.validate(payload);
 
     if (validationResult.error) {
-      return { error: validationResult.error };
+      return createErrorObject(400, validationResult.error.message);
     }
 
     return null;
@@ -25,7 +30,30 @@ export class StudentPayloadValidator {
       StudentResetPasswordPayloadSchema.validate(payload);
 
     if (validationResult.error) {
-      return { error: validationResult.error };
+      return createErrorObject(400, validationResult.error.message);
+    }
+
+    return null;
+  }
+
+  validateStudentActiveUnitPayload(payload: IPutStudentActiveUnit) {
+    const validationResult = StudentActiveUnitPayloadSchema.validate(payload);
+
+    if (validationResult.error) {
+      return createErrorObject(400, validationResult.error.message);
+    }
+
+    return null;
+  }
+
+  validateStudentTokenResetPasswordPayload(
+    payload: IPostStudentTokenResetPassword
+  ) {
+    const validationResult =
+      StudentTokenResetPasswordPayloadSchema.validate(payload);
+
+    if (validationResult.error) {
+      return createErrorObject(400, validationResult.error.message);
     }
 
     return null;

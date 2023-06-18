@@ -9,10 +9,11 @@ import { UnitRouter } from "./api/units/UnitRouter";
 dotenv.config();
 
 class Server {
-  private app: express.Application;
+  app: express.Application;
 
   constructor() {
     this.app = express();
+    this.config();
   }
 
   config() {
@@ -38,9 +39,6 @@ class Server {
   }
 
   start() {
-    // this.registerRoutes();
-    this.config();
-
     this.app.listen(
       Number(process.env.PORT) || 5000,
       process.env.HOST || "127.0.0.1",
