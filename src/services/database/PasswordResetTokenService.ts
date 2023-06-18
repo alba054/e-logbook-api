@@ -14,8 +14,8 @@ export class PasswordResetTokenService {
     this.passwordResetTokenModel = new PasswordResetToken();
   }
 
-  async generateTokenResetPassword(username: string) {
-    const user = await this.userService.getUserByUsername(username);
+  async generateTokenResetPassword(email: string) {
+    const user = await this.userService.getUserByEmail(email);
 
     if (!user) {
       return { error: 404, message: "user's not found" };
@@ -31,7 +31,7 @@ export class PasswordResetTokenService {
       await this.passwordResetTokenModel.insertPasswordResetToken({
         otp: generateRandomString(5),
         token: uuidv4(),
-        username,
+        username: user.username,
       } as IPasswordResetTokenData);
 
     return testError;

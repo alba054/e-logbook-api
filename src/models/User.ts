@@ -9,4 +9,12 @@ export class User {
       include: { badges: true },
     });
   }
+
+  async getUserByEmail(email: string) {
+    return db.user.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
 }

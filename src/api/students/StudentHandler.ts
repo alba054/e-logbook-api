@@ -3,21 +3,25 @@ import { StudentPayloadValidator } from "../../validator/students/StudentValidat
 import {
   IPostStudentPayload,
   IPostStudentResetPasswordPayload,
+  IPostStudentTokenResetPassword,
+  IPutStudentActiveUnit,
 } from "../../utils/interfaces/Student";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { constants, createResponse } from "../../utils";
 import { UserStudentRegistrationService } from "../../services/facade/UserStudentRegistrationService";
 import { PasswordResetTokenService } from "../../services/database/PasswordResetTokenService";
-import { config } from "../../config/Config";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
 import { UserStudentResetPasswordService } from "../../services/facade/UserStudentResetPasswordService";
+import { StudentService } from "../../services/database/StudentService";
+import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
   private userStudentRegistrationService: UserStudentRegistrationService;
   private passwordResetTokenService: PasswordResetTokenService;
   private userStudentResetPasswordService: UserStudentResetPasswordService;
+  private studentService: StudentService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -25,12 +29,76 @@ export class StudentHandler {
     this.passwordResetTokenService = new PasswordResetTokenService();
     this.userStudentResetPasswordService =
       new UserStudentResetPasswordService();
+    this.studentService = new StudentService();
 
     this.postStudent = this.postStudent.bind(this);
-    this.getStudentForgetPassword = this.getStudentForgetPassword.bind(this);
+    this.postStudentForgetPassword = this.postStudentForgetPassword.bind(this);
     this.postStudentResetPassword = this.postStudentResetPassword.bind(this);
     this.getTestAuthorizationStudent =
       this.getTestAuthorizationStudent.bind(this);
+    this.putActiveUnit = this.putActiveUnit.bind(this);
+    this.getActiveUnit = this.getActiveUnit.bind(this);
+  }
+
+  async getActiveUnit(req: Request, res: Response, next: NextFunction) {
+    const { studentId } = res.locals.user as ITokenPayload;
+
+    try {
+      if (!studentId) {
+        throw new InternalServerError();
+      }
+
+      return res
+        .status(200)
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE));
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async putActiveUnit(req: Request, res: Response, next: NextFunction) {
+    const payload: IPutStudentActiveUnit = req.body;
+    const { studentId } = res.locals.user as ITokenPayload;
+
+    try {
+      if (!studentId) {
+        throw new InternalServerError();
+      }
+
+      const testValidate =
+        this.studentPayloadValidator.validateStudentActiveUnitPayload(payload);
+
+      if (testValidate && "error" in testValidate) {
+        throw new BadRequestError(testValidate.message);
+      }
+
+      const result = await this.studentService.setActiveUnit(
+        studentId,
+        payload
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            `succesfully change active unit to ${result.unitId}`
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getTestAuthorizationStudent(
@@ -50,7 +118,7 @@ export class StudentHandler {
     res: Response,
     next: NextFunction
   ) {
-    const { username, token } = req.params;
+    const { token } = req.params;
     const payload: IPostStudentResetPasswordPayload = req.body;
 
     try {
@@ -69,12 +137,11 @@ export class StudentHandler {
         );
 
       if (testValidate && "error" in testValidate) {
-        throw new BadRequestError(testValidate.error.message);
+        throw new BadRequestError(testValidate.message);
       }
 
       const resetPassword =
-        await this.userStudentResetPasswordService.resetPasswordByUsername(
-          username,
+        await this.userStudentResetPasswordService.resetPasswordByToken(
           token,
           payload
         );
@@ -103,16 +170,25 @@ export class StudentHandler {
     }
   }
 
-  async getStudentForgetPassword(
+  async postStudentForgetPassword(
     req: Request,
     res: Response,
     next: NextFunction
   ) {
-    const { username } = req.params;
+    const payload: IPostStudentTokenResetPassword = req.body;
     try {
+      const validationResult =
+        this.studentPayloadValidator.validateStudentTokenResetPasswordPayload(
+          payload
+        );
+
+      if (validationResult && "error" in validationResult) {
+        throw new BadRequestError(validationResult.message);
+      }
+
       const token =
         await this.passwordResetTokenService.generateTokenResetPassword(
-          username
+          payload.email
         );
 
       if ("error" in token) {
@@ -126,14 +202,12 @@ export class StudentHandler {
         }
       }
 
-      return res
-        .status(201)
-        .json(
-          createResponse(
-            constants.SUCCESS_RESPONSE_MESSAGE,
-            `${config.config.FRONTEND_HOST}/${token.token}`
-          )
-        );
+      return res.status(201).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          token: token.token,
+          otp: token.otp,
+        })
+      );
     } catch (error) {
       return next(error);
     }
@@ -156,7 +230,7 @@ export class StudentHandler {
         this.studentPayloadValidator.validatePostPayload(payload);
 
       if (testValidate && "error" in testValidate) {
-        throw new BadRequestError(testValidate.error.message);
+        throw new BadRequestError(testValidate.message);
       }
 
       const testError =

@@ -17,9 +17,11 @@ model User {
   email              String?              @unique @db.VarChar(255)
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
+  student            Student?             @relation(fields: [studentId], references: [studentId], onUpdate: Cascade, onDelete: Cascade)
   role               Role
   badges             Badge[]
   PasswordResetToken PasswordResetToken[]
+  studentId          String               @db.VarChar(100)
 
   @@map("users")
 }
@@ -35,8 +37,11 @@ model Student {
   fullName        String?           @db.VarChar(255)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+  activeUnit      Unit?              @relation(fields: [unitId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   clinicalRecords ClinicalRecord[]
   CheckInCheckOut CheckInCheckOut[]
+  unitId          String?            @db.VarChar(100)
+  User            User[]
 
   @@map("students")
 }
@@ -71,24 +76,25 @@ model Unit {
   DiagnosisType    DiagnosisType[]
   ManagementType   ManagementType[]
   CheckInCheckOut  CheckInCheckOut[]
+  Student          Student[]
 
   @@map("units")
 }
 
 model CheckInCheckOut {
-  id           String   @id @db.VarChar(100)
-  checkIn      Boolean  @default(false)
-  checkOut     Boolean  @default(false)
-  checkInTime  BigInt   @db.UnsignedBigInt
-  checkOutTime BigInt   @db.UnsignedBigInt
-  checkInStatus VerificationStatus @default(INPROCESS)
+  id             String             @id @db.VarChar(100)
+  checkIn        Boolean            @default(false)
+  checkOut       Boolean            @default(false)
+  checkInTime    BigInt             @db.UnsignedBigInt
+  checkOutTime   BigInt             @db.UnsignedBigInt
+  checkInStatus  VerificationStatus @default(INPROCESS)
   checkOutStatus VerificationStatus @default(INPROCESS)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  unit         Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  unitId       String   @db.VarChar(100)
-  studentId    String   @db.VarChar(100)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  unit           Unit               @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  student        Student            @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId         String             @db.VarChar(100)
+  studentId      String             @db.VarChar(100)
 }
 
 model ClinicalRecord {

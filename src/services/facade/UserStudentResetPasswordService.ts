@@ -12,8 +12,7 @@ export class UserStudentResetPasswordService {
     this.passwordResetTokenModel = new PasswordResetToken();
   }
 
-  async resetPasswordByUsername(
-    username: string,
+  async resetPasswordByToken(
     token: string,
     payload: IPostStudentResetPasswordPayload
   ) {
@@ -29,21 +28,19 @@ export class UserStudentResetPasswordService {
       return createErrorObject(400, "token's expired");
     }
 
-    if (tokenResetPassword.username !== username) {
-      return createErrorObject(400, "you are not who you declare");
-    }
-
     if (tokenResetPassword.otp !== payload.otp) {
       return createErrorObject(400, "otp's incorrect");
     }
 
     try {
-      await db.$transaction([
+      const resetPasswordOp = await db.$transaction([
         db.user.update({
-          where: { username },
+          where: { username: tokenResetPassword.username },
           data: { password: await bcryptjs.hash(payload.newPassword, 10) },
         }),
-        db.passwordResetToken.delete({ where: { token } }),
+        db.passwordResetToken.delete({
+          where: { token },
+        }),
       ]);
       return null;
     } catch (error) {

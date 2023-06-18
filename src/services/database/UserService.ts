@@ -10,4 +10,8 @@ export class UserService {
   async getUserByUsername(username: string) {
     return this.userModel.getUserByUsername(username);
   }
+
+  async getUserByEmail(email: string) {
+    return this.userModel.getUserByEmail(email);
+  }
 }
