@@ -3,4 +3,5 @@ export interface ITokenPayload {
   readonly email?: string;
   readonly role: "SUPERVISOR" | "STUDENT";
   readonly badges?: string[];
+  readonly studentId?: string;
 }
