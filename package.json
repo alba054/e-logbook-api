@@ -7,7 +7,7 @@
     "migrate::dev": "prisma migrate dev --name",
     "build": "rimraf ./dist && tsc",
     "start": "npm run build && node ./dist/index.js",
-    "test": "ts-node ./test/index.ts"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -18,10 +18,10 @@
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
     "@types/jsonwebtoken": "^9.0.2",
+    "@types/mocha": "^10.0.1",
     "@types/node": "^20.2.5",
     "@types/supertest": "^2.0.12",
     "@types/uuid": "^9.0.2",
-    "jest": "^29.5.0",
     "nodemon": "^2.0.22",
     "prisma": "^4.15.0",
     "supertest": "^6.3.3",

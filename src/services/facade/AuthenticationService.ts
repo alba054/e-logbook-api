@@ -2,13 +2,9 @@ import { config } from "../../config/Config";
 import { createErrorObject } from "../../utils";
 import { tokenGenerator } from "../../utils/auth/TokenGenerator";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
-import { UserService } from "../database/UserService";
 
 export class AuthenticationService {
-  private userService: UserService;
-  constructor() {
-    this.userService = new UserService();
-  }
+  constructor() {}
 
   async generateToken(
     payload: ITokenPayload | { error: number; message: string }

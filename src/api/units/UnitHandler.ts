@@ -25,7 +25,7 @@ export class UnitHandler {
       const validationResult = this.unitValidator.validatePostPayload(payload);
 
       if (validationResult && "error" in validationResult) {
-        throw new BadRequestError(validationResult.error.message);
+        throw new BadRequestError(validationResult.message);
       }
       const testError = await this.unitService.insertNewUnit(payload);
 

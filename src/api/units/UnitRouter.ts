@@ -1,8 +1,6 @@
 import { Router } from "express";
 import { UnitHandler } from "./UnitHandler";
 import { BasicAuthMiddleware } from "../../middleware/auth/BasicAuth";
-import { AuthorizationBearer } from "../../middleware/auth/AuthorizationBearer";
-import { constants } from "../../utils";
 
 export class UnitRouter {
   unitHandler: UnitHandler;

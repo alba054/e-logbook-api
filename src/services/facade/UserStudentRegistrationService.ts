@@ -20,17 +20,19 @@ export class UserStudentRegistrationService {
             password: hashedPassword,
             role: "STUDENT",
             email: payload.email,
-          },
-        }),
-        db.student.create({
-          data: {
-            id: uuidv4(),
-            studentId: payload.studentId,
+            student: {
+              create: {
+                id: uuidv4(),
+                studentId: payload.studentId,
+              },
+            },
           },
         }),
       ]);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
+        console.log(error.message);
+
         return createErrorObject(
           400,
           "failed transaction of creating user and student"
