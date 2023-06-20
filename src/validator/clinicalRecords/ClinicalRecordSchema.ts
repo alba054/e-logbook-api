@@ -1,9 +1,8 @@
 import Joi from "joi";
 export const ClinicalRecordPayloadSchema = Joi.object({
-  unitId: Joi.string().required(),
   patientName: Joi.string().required(),
   patientAge: Joi.number().min(1),
-  gender: Joi.string().valid(["FEMALE", "MALE"]).required(),
+  gender: Joi.string().valid("FEMALE", "MALE").required(),
   notes: Joi.string().optional(),
   recordId: Joi.number().required(),
   attachment: Joi.string().optional(),

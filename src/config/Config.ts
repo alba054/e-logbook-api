@@ -19,6 +19,8 @@ interface IConfig {
   ADMIN_USERNAME?: string;
   ADMIN_PASSWORD?: string;
   FRONTEND_HOST?: string;
+  ELOGBOOK_MAIL_USERNAME?: string;
+  ELOGBOOK_MAIL_PASSWORD?: string;
 }
 
 class Config {
@@ -49,6 +51,8 @@ class Config {
       this.config.FRONTEND_HOST = process.env.FRONTEND_HOST;
       this.config.ACCESS_SECRET_KEY = process.env.ACCESS_SECRET_KEY;
       this.config.REFRESH_SECRET_KEY = process.env.REFRESH_SECRET_KEY;
+      this.config.ELOGBOOK_MAIL_USERNAME = process.env.ELOGBOOK_MAIL_USERNAME;
+      this.config.ELOGBOOK_MAIL_PASSWORD = process.env.ELOGBOOK_MAIL_PASSWORD;
     }
   }
 }

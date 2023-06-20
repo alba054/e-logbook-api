@@ -5,6 +5,8 @@ import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 import { ClinicalRecordService } from "../../services/database/ClinicalRecordService";
 import { IPostClinicalRecord } from "../../utils/interfaces/ClinicalRecord";
+import { constants, createResponse } from "../../utils";
+import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 
 export class ClinicalRecordHandler {
   private clinicalRecordValidator: ClinicalRecordPayloadValidator;
@@ -13,9 +15,12 @@ export class ClinicalRecordHandler {
   constructor() {
     this.clinicalRecordService = new ClinicalRecordService();
     this.clinicalRecordValidator = new ClinicalRecordPayloadValidator();
+
+    this.postClinicalRecord = this.postClinicalRecord.bind(this);
   }
 
   async postClinicalRecord(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
     const payload: IPostClinicalRecord = req.body;
 
     try {
@@ -32,7 +37,19 @@ export class ClinicalRecordHandler {
         }
       }
 
-      await this.clinicalRecordService.insertNewClinicalRecord(payload);
+      await this.clinicalRecordService.insertNewClinicalRecord(
+        tokenPayload,
+        payload
+      );
+
+      return res
+        .status(201)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully post clinical record"
+          )
+        );
     } catch (error) {
       return next(error);
     }

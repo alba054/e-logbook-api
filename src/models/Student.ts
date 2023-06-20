@@ -6,6 +6,17 @@ import { createErrorObject } from "../utils";
 export class Student {
   constructor() {}
 
+  async getActiveUnit(studentId: string) {
+    return db.student.findUnique({
+      where: {
+        studentId,
+      },
+      select: {
+        activeUnit: true,
+      },
+    });
+  }
+
   async updateStudentActiveUnitByStudentId(
     studentId: string,
     payload: IPutStudentActiveUnit

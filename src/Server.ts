@@ -5,6 +5,7 @@ import { ErrorHandler } from "./middleware/error/ErrorHandler";
 import { UserRouter } from "./api/users/UserRouter";
 import { StudentRouter } from "./api/students/StudentRouter";
 import { UnitRouter } from "./api/units/UnitRouter";
+import { ClinicalRecordRouter } from "./api/clinicalRecords/ClinicalRecordRouter";
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ class Server {
     this.app.use("/api", new UserRouter().register());
     this.app.use("/api", new StudentRouter().register());
     this.app.use("/api", new UnitRouter().register());
+    this.app.use("/api", new ClinicalRecordRouter().register());
     // * error handling
     this.app.use(ErrorHandler);
   }

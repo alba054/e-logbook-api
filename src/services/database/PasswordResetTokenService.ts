@@ -1,7 +1,7 @@
 import { PasswordResetToken } from "../../models/PasswordResetToken";
 import { generateRandomString } from "../../utils";
+import { EmailHelper } from "../../utils/helper/EmailHelper";
 import { IPasswordResetTokenData } from "../../utils/interfaces/PasswordResetToken";
-import { IPostStudentResetPasswordPayload } from "../../utils/interfaces/Student";
 import { UserService } from "./UserService";
 import { v4 as uuidv4 } from "uuid";
 
@@ -25,14 +25,22 @@ export class PasswordResetTokenService {
       return { error: 400, message: "user has no email" };
     }
 
-    // todo: send link to mail
-    // todo ---
     const testError =
       await this.passwordResetTokenModel.insertPasswordResetToken({
         otp: generateRandomString(5),
         token: uuidv4(),
         username: user.username,
       } as IPasswordResetTokenData);
+
+    if (!("error" in testError)) {
+      const emailHelper = new EmailHelper();
+      emailHelper.sendEmail({
+        html: `<h3>OTP: ${testError.otp}</h3><br>OTP hanya berlaku selama 5 menit`,
+        subject: "RESIDENT RESET PASSWORD",
+        text: "",
+        to: user.email,
+      });
+    }
 
     return testError;
   }

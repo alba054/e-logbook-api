@@ -8,6 +8,10 @@ export class StudentService {
     this.studentModel = new Student();
   }
 
+  async getActiveUnit(studentId: string) {
+    return this.studentModel.getActiveUnit(studentId);
+  }
+
   async setActiveUnit(studentId: string, payload: IPutStudentActiveUnit) {
     return this.studentModel.updateStudentActiveUnitByStudentId(
       studentId,
