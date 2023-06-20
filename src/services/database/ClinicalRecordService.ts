@@ -4,16 +4,27 @@ import { IPostClinicalRecord } from "../../utils/interfaces/ClinicalRecord";
 import { v4 as uuidv4 } from "uuid";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { createErrorObject } from "../../utils";
+import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
+import { StudentService } from "./StudentService";
 
 export class ClinicalRecordService {
   private clinicalRecordModel: ClinicalRecord;
+  private studentService: StudentService;
 
   constructor() {
+    this.studentService = new StudentService();
     this.clinicalRecordModel = new ClinicalRecord();
   }
 
-  async insertNewClinicalRecord(payload: IPostClinicalRecord) {
+  async insertNewClinicalRecord(
+    tokenPayload: ITokenPayload,
+    payload: IPostClinicalRecord
+  ) {
     try {
+      const studentActiveUnit = await this.studentService.getActiveUnit(
+        tokenPayload.studentId ?? ""
+      );
+
       const examinations = [];
       const diagnosiss = [];
       const managements = [];
@@ -27,7 +38,8 @@ export class ClinicalRecordService {
           notes: payload.notes,
           recordId: payload.recordId,
           studentFeedback: payload.studentFeedback,
-          unitId: payload.unitId,
+          unitId: studentActiveUnit?.activeUnit?.id,
+          studentId: tokenPayload.studentId,
           id: clinicalRecordId,
         },
       });

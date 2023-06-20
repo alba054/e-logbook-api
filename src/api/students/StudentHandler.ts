@@ -15,6 +15,7 @@ import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
 import { UserStudentResetPasswordService } from "../../services/facade/UserStudentResetPasswordService";
 import { StudentService } from "../../services/database/StudentService";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
+import { StudentCheckInCheckOutService } from "../../services/facade/StudentCheckInCheckOutService";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -22,6 +23,7 @@ export class StudentHandler {
   private passwordResetTokenService: PasswordResetTokenService;
   private userStudentResetPasswordService: UserStudentResetPasswordService;
   private studentService: StudentService;
+  private studentCheckInCheckOutService: StudentCheckInCheckOutService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -30,6 +32,7 @@ export class StudentHandler {
     this.userStudentResetPasswordService =
       new UserStudentResetPasswordService();
     this.studentService = new StudentService();
+    this.studentCheckInCheckOutService = new StudentCheckInCheckOutService();
 
     this.postStudent = this.postStudent.bind(this);
     this.postStudentForgetPassword = this.postStudentForgetPassword.bind(this);
@@ -38,6 +41,44 @@ export class StudentHandler {
       this.getTestAuthorizationStudent.bind(this);
     this.putActiveUnit = this.putActiveUnit.bind(this);
     this.getActiveUnit = this.getActiveUnit.bind(this);
+    this.postCheckInActiveUnit = this.postCheckInActiveUnit.bind(this);
+  }
+
+  async postCheckInActiveUnit(req: Request, res: Response, next: NextFunction) {
+    const { studentId } = res.locals.user as ITokenPayload;
+
+    try {
+      if (!studentId) {
+        throw new InternalServerError();
+      }
+
+      const result =
+        await this.studentCheckInCheckOutService.studentCheckInActiveUnit(
+          studentId
+        );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(201)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully check in"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getActiveUnit(req: Request, res: Response, next: NextFunction) {
@@ -48,9 +89,10 @@ export class StudentHandler {
         throw new InternalServerError();
       }
 
+      const result = await this.studentService.getActiveUnit(studentId);
       return res
         .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE));
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, result));
     } catch (error) {
       return next(error);
     }

@@ -1,5 +1,4 @@
 export interface IPostClinicalRecord {
-  unitId: string;
   patientName: string;
   patientAge: number;
   gender: "FEMALE" | "MALE";

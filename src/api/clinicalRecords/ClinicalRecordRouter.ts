@@ -2,11 +2,12 @@ import { Router } from "express";
 import { ClinicalRecordHandler } from "./ClinicalRecordHandler";
 import { AuthorizationBearer } from "../../middleware/auth/AuthorizationBearer";
 import { constants } from "../../utils";
+import { UnitCheckIn } from "../../middleware/unitActivity/UnitCheckIn";
 
-export class UnitRouter {
-  clinicalRecordHandler: ClinicalRecordHandler;
-  path: string;
-  router: Router;
+export class ClinicalRecordRouter {
+  private clinicalRecordHandler: ClinicalRecordHandler;
+  private path: string;
+  private router: Router;
 
   constructor() {
     this.path = "/clinical-records";
@@ -19,8 +20,10 @@ export class UnitRouter {
     this.router.post(
       this.path,
       AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
-
+      UnitCheckIn.restrictUncheckInActiveUnit(),
       this.clinicalRecordHandler.postClinicalRecord
     );
+
+    return this.router;
   }
 }

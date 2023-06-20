@@ -8,7 +8,7 @@ import bcryptjs from "bcryptjs";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 
 export class BasicAuthMiddleware {
-  static checkBasicAuth() {
+  private static checkBasicAuth() {
     return function (req: Request, res: Response, next: NextFunction) {
       const { authorization } = req.headers;
       const basicSchema = authorization?.split(" ");
