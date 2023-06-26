@@ -38,7 +38,7 @@ export class ClinicalRecordService {
           notes: payload.notes,
           recordId: payload.recordId,
           studentFeedback: payload.studentFeedback,
-          unitId: studentActiveUnit?.activeUnit?.id,
+          unitId: studentActiveUnit?.unitId,
           studentId: tokenPayload.studentId,
           id: clinicalRecordId,
         },

@@ -5,7 +5,7 @@ export const createResponse = (status: string, data: any = null) => {
     return { status, data };
   }
 
-  return { status, message: data };
+  return { status, data: data };
 };
 
 export const createErrorObject = (

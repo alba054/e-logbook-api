@@ -95,6 +95,8 @@ model CheckInCheckOut {
   student        Student            @relation(fields: [studentId], references: [studentId], onDelete: Cascade, onUpdate: Cascade)
   unitId         String             @db.VarChar(100)
   studentId      String             @db.VarChar(100)
+
+  @@unique([unitId, studentId])
 }
 
 model ClinicalRecord {

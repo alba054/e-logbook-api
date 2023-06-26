@@ -6,6 +6,7 @@ import { tokenGenerator } from "../../utils/auth/TokenGenerator";
 import { config } from "../../config/Config";
 import { UnauthorizedError } from "../../exceptions/httpError/UnauthorizedError";
 import { constants } from "../../utils";
+import { UnauthenticatedError } from "../../exceptions/httpError/UnauthenticatedError";
 
 export class AuthorizationBearer {
   static authorize(roles: string[]) {
@@ -66,7 +67,7 @@ export class AuthorizationBearer {
         next();
       } catch (error: any) {
         if (error instanceof TokenExpiredError) {
-          return next(new BadRequestError(error.message));
+          return next(new UnauthenticatedError(error.message));
         } else if (error instanceof JsonWebTokenError) {
           if (error.message === "invalid token") {
             // todo: BadRequestError with custom invalid token message
