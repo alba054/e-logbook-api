@@ -6,7 +6,7 @@ export class User {
   async getUserByUsername(username: string) {
     return db.user.findUnique({
       where: { username },
-      include: { badges: true },
+      include: { badges: true, student: true },
     });
   }
 

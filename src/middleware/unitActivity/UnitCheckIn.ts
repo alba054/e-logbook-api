@@ -23,7 +23,7 @@ export class UnitCheckIn {
         const checkedIn =
           await checkInCheckOutService.getCheckInCheckOutByUnitIdAndStudentId(
             studentId,
-            studentActiveUnit?.unitId
+            studentActiveUnit?.activeUnit.activeUnit?.id
           );
 
         if (checkedIn && "error" in checkedIn) {

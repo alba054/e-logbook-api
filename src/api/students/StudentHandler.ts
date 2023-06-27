@@ -16,6 +16,8 @@ import { UserStudentResetPasswordService } from "../../services/facade/UserStude
 import { StudentService } from "../../services/database/StudentService";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentCheckInCheckOutService } from "../../services/facade/StudentCheckInCheckOutService";
+import { IActiveUnitDTO } from "../../utils/dto/ActiveUnitDTO";
+import { CheckInCheckOutService } from "../../services/database/CheckInCheckOutService";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -24,6 +26,7 @@ export class StudentHandler {
   private userStudentResetPasswordService: UserStudentResetPasswordService;
   private studentService: StudentService;
   private studentCheckInCheckOutService: StudentCheckInCheckOutService;
+  private checkInCheckOutService: CheckInCheckOutService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -33,6 +36,7 @@ export class StudentHandler {
       new UserStudentResetPasswordService();
     this.studentService = new StudentService();
     this.studentCheckInCheckOutService = new StudentCheckInCheckOutService();
+    this.checkInCheckOutService = new CheckInCheckOutService();
 
     this.postStudent = this.postStudent.bind(this);
     this.postStudentForgetPassword = this.postStudentForgetPassword.bind(this);
@@ -42,6 +46,18 @@ export class StudentHandler {
     this.putActiveUnit = this.putActiveUnit.bind(this);
     this.getActiveUnit = this.getActiveUnit.bind(this);
     this.postCheckInActiveUnit = this.postCheckInActiveUnit.bind(this);
+    this.getAllCheckInsStudent = this.getAllCheckInsStudent.bind(this);
+  }
+
+  async getAllCheckInsStudent(req: Request, res: Response, next: NextFunction) {
+    const studentCheckIns =
+      await this.checkInCheckOutService.getAllCheckInStudents();
+
+    return res
+      .status(200)
+      .json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, studentCheckIns)
+      );
   }
 
   async postCheckInActiveUnit(req: Request, res: Response, next: NextFunction) {
@@ -90,9 +106,14 @@ export class StudentHandler {
       }
 
       const result = await this.studentService.getActiveUnit(studentId);
-      return res
-        .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, result));
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          checkInStatus: result?.checkInCheckOutUnit?.checkInStatus,
+          checkOutStatus: result?.checkInCheckOutUnit?.checkOutStatus,
+          unitId: result?.activeUnit.activeUnit?.id,
+          unitName: result?.activeUnit.activeUnit?.name,
+        } as IActiveUnitDTO)
+      );
     } catch (error) {
       return next(error);
     }

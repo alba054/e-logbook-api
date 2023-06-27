@@ -6,15 +6,42 @@ import { UnauthenticatedError } from "../../exceptions/httpError/Unauthenticated
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { config } from "../../config/Config";
+import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
+import { UserService } from "../../services/database/UserService";
+import { IUserProfileDTO } from "../../utils/dto/UserProfileDTO";
 
 export class UserHandler {
   private authenticationService: AuthenticationService;
+  private userService: UserService;
 
   constructor() {
     this.authenticationService = new AuthenticationService();
+    this.userService = new UserService();
 
     this.postRefreshToken = this.postRefreshToken.bind(this);
     this.postUserLogin = this.postUserLogin.bind(this);
+    this.getUserProfile = this.getUserProfile.bind(this);
+    this.postUser = this.postUser.bind(this);
+  }
+
+  async postUser(req: Request, res: Response, next: NextFunction) {}
+
+  async getUserProfile(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const user = await this.userService.getUserByUsername(
+      tokenPayload.username
+    );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        badges: user?.badges,
+        id: user?.id,
+        role: user?.role,
+        username: user?.username,
+        email: user?.email,
+        student: user?.student,
+      } as IUserProfileDTO)
+    );
   }
 
   async postRefreshToken(req: Request, res: Response, next: NextFunction) {
