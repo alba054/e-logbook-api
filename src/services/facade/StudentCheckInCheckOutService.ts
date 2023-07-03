@@ -19,4 +19,21 @@ export class StudentCheckInCheckOutService {
       studentActiveUnit?.activeUnit?.id
     );
   }
+
+  async verifyStudentCheckIn(
+    studentId: string,
+    userId: string,
+    payload: { verified: boolean }
+  ) {
+    const studentActiveUnit = await this.studentModel.getActiveUnitByStudentId(
+      studentId
+    );
+
+    return this.checkInCheckOutModel.verifyInProcessCheckIn(
+      payload.verified,
+      userId,
+      studentActiveUnit?.id,
+      studentActiveUnit?.activeUnit?.id
+    );
+  }
 }

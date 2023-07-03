@@ -17,8 +17,9 @@ import { StudentService } from "../../services/database/StudentService";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentCheckInCheckOutService } from "../../services/facade/StudentCheckInCheckOutService";
 import { IActiveUnitDTO } from "../../utils/dto/ActiveUnitDTO";
-import { CheckInCheckOutService } from "../../services/database/CheckInCheckOutService";
 import { IListInProcessCheckInDTO } from "../../utils/dto/StudentCheckInDTO";
+import { CheckInCheckOutValidator } from "../../validator/checkInCheckOut/CheckInCheckOutValidator";
+import { CheckInCheckOutService } from "../../services/database/CheckInCheckOutService";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -27,10 +28,12 @@ export class StudentHandler {
   private userStudentResetPasswordService: UserStudentResetPasswordService;
   private studentService: StudentService;
   private studentCheckInCheckOutService: StudentCheckInCheckOutService;
+  private checkInCheckOutValidator: CheckInCheckOutValidator;
   private checkInCheckOutService: CheckInCheckOutService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
+    this.checkInCheckOutValidator = new CheckInCheckOutValidator();
     this.userStudentRegistrationService = new UserStudentRegistrationService();
     this.passwordResetTokenService = new PasswordResetTokenService();
     this.userStudentResetPasswordService =
@@ -48,6 +51,57 @@ export class StudentHandler {
     this.getActiveUnit = this.getActiveUnit.bind(this);
     this.postCheckInActiveUnit = this.postCheckInActiveUnit.bind(this);
     this.getAllCheckInsStudent = this.getAllCheckInsStudent.bind(this);
+    this.putVerificationCheckIn = this.putVerificationCheckIn.bind(this);
+  }
+
+  async putVerificationCheckIn(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const { studentId } = req.params;
+    const payload: { verified: boolean } = req.body;
+
+    try {
+      const validationResult =
+        this.checkInCheckOutValidator.validateCheckInVerificationPayload(
+          payload
+        );
+
+      if (validationResult && "error" in validationResult) {
+        throw new BadRequestError(validationResult.message);
+      }
+
+      const result =
+        await this.studentCheckInCheckOutService.verifyStudentCheckIn(
+          studentId,
+          tokenPayload.userId,
+          payload
+        );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully verify checkin"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getAllCheckInsStudent(req: Request, res: Response, next: NextFunction) {
