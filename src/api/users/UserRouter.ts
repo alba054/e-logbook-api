@@ -26,6 +26,7 @@ export class UserRouter {
         constants.HEAD_DIV_BADGE,
         constants.SUPERVISOR_ROLE,
         constants.ADMIN_ROLE,
+        constants.DPK_ROLE,
       ]),
       this.userHandler.getUserProfile
     );

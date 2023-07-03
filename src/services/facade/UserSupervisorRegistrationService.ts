@@ -21,6 +21,13 @@ export class UserSupervisorRegistrationService {
             role: "SUPERVISOR",
             email: payload.email,
             studentId: undefined,
+            badges: {
+              connect: payload.badges.map((b) => {
+                return {
+                  id: b,
+                };
+              }),
+            },
             supervisor: {
               create: {
                 id: uuidv4(),

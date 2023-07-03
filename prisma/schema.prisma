@@ -235,6 +235,7 @@ enum Role {
   SUPERVISOR
   STUDENT
   ADMIN
+  DPK
 }
 
 enum Gender {

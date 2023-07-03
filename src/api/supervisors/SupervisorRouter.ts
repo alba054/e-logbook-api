@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { AuthorizationBearer } from "../../middleware/auth/AuthorizationBearer";
-import { BasicAuthMiddleware } from "../../middleware/auth/BasicAuth";
 import { constants } from "../../utils";
 import { SupervisorHandler } from "./SupervisorHandler";
 
@@ -25,7 +24,7 @@ export class SupervisorRouter {
     // * post new supervisor
     this.router.post(
       this.path,
-      BasicAuthMiddleware.authenticateAdmin(),
+      AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
       this.supervisorHandler.postSupervisor
     );
     // * register a badge to supervisor
