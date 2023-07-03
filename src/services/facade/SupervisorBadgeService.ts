@@ -23,25 +23,22 @@ export class SupervisorBadgeService {
         return createErrorObject(400, "this user isn't supervisor");
       }
 
-      const ops = [];
-      for (let i = 0; i < payload.badges.length; i++) {
-        ops.push(
-          db.user.update({
-            where: {
-              id: payload.supervisorId,
+      await db.$transaction([
+        db.user.update({
+          where: {
+            id: payload.supervisorId,
+          },
+          data: {
+            badges: {
+              connect: payload.badges.map((b) => {
+                return {
+                  id: b,
+                };
+              }),
             },
-            data: {
-              badges: {
-                connect: {
-                  id: payload.badges[i],
-                },
-              },
-            },
-          })
-        );
-      }
-
-      await db.$transaction(ops);
+          },
+        }),
+      ]);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         console.log(error.message);
