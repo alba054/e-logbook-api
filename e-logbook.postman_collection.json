@@ -1,0 +1,318 @@
+{
+	"info": {
+		"_postman_id": "42fa7833-1daa-4652-a3a5-a54ea7bcb2c0",
+		"name": "e-logbook",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "user.login",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "admin",
+						"username": "admin"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"url": "{{BASE_URL}}/api/users/login"
+			},
+			"response": []
+		},
+		{
+			"name": "student.registerStudent",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{ADMIN}}",
+						"username": "{{ADMIN}}"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"student1\",\n    \"password\": \"randompassword\",\n    \"studentId\": \"H071191000\",\n    \"email\": \"random@mail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/api/students"
+			},
+			"response": []
+		},
+		{
+			"name": "student.resetPassword",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{ADMIN}}",
+						"username": "{{ADMIN}}"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"random@mail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/api/students/reset-password"
+			},
+			"response": []
+		},
+		{
+			"name": "student.createNewPassword",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{ADMIN}}",
+						"username": "{{ADMIN}}"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"otp\": \"97461\",\n    \"newPassword\": \"randompassword\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/api/students/reset-password/9d1864c7-018f-4fff-a565-e0b51d4ebd06"
+			},
+			"response": []
+		},
+		{
+			"name": "student.setActiveUnit",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0dWRlbnQxIiwiZW1haWwiOiJyYW5kb21AbWFpbC5jb20iLCJyb2xlIjoiU1RVREVOVCIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6IkgwNzExOTEwMDAiLCJpYXQiOjE2ODc5MjMzNzYsImV4cCI6MTY4NzkyMzU1NiwiaXNzIjoiYXBpLmxvY2FsaG9zdCIsInN1YiI6InN0dWRlbnQxIn0.2exsrHJtWB-uST1F7WSXHxLyxQ5zQrWzaFPNvH1TUjI"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"unitId\": \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/api/students/units"
+			},
+			"response": []
+		},
+		{
+			"name": "supervisor.registerSupervisor",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{ADMIN}}",
+						"username": "{{ADMIN}}"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"supervisor1\",\n    \"password\": \"randompassword\",\n    \"firstName\": \"john\",\n    \"lastName\": \"doe\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/api/supervisors"
+			},
+			"response": []
+		},
+		{
+			"name": "user.registerAdmin",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{ADMIN}}",
+						"username": "{{ADMIN}}"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"randompassword\",\n    \"role\": \"ADMIN\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/api/users"
+			},
+			"response": []
+		},
+		{
+			"name": "user.getCredential",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "user.refreshToken",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "{{BASE_URL}}/api/users/refresh-token"
+			},
+			"response": []
+		},
+		{
+			"name": "unit.getUnits",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "admin",
+						"username": "admin"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": "{{BASE_URL}}/api/units"
+			},
+			"response": []
+		},
+		{
+			"name": "unit.createUnit",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "admin",
+						"username": "admin"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"ANESTESI\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/api/units"
+			},
+			"response": []
+		},
+		{
+			"name": "student.getActiveUnit",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "student.studentCheckInActiveUnit",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0dWRlbnQxIiwiZW1haWwiOiJyYW5kb21AbWFpbC5jb20iLCJyb2xlIjoiU1RVREVOVCIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6IjA1ZTY5MjMyLTNiMDItNDMyMy1iMzg5LTFlMGQzN2ZmMTEwYiIsImlhdCI6MTY4ODM1NjY0NywiZXhwIjoxNjkwOTQ4NjQ3LCJpc3MiOiJhcGkubG9jYWxob3N0Iiwic3ViIjoic3R1ZGVudDEifQ.Uu-kgWFYJKAJj6YB0ORcvbxbqZvAvekzCZkeGHWx0Io"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"url": "{{BASE_URL}}/api/students/units/check-in"
+			},
+			"response": []
+		},
+		{
+			"name": "badge.getAllBadges",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "supervisor.assignBadge",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0dWRlbnQxIiwiZW1haWwiOiJyYW5kb21AbWFpbC5jb20iLCJyb2xlIjoiU1RVREVOVCIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6IjA1ZTY5MjMyLTNiMDItNDMyMy1iMzg5LTFlMGQzN2ZmMTEwYiIsImlhdCI6MTY4ODM1NjY0NywiZXhwIjoxNjkwOTQ4NjQ3LCJpc3MiOiJhcGkubG9jYWxob3N0Iiwic3ViIjoic3R1ZGVudDEifQ.Uu-kgWFYJKAJj6YB0ORcvbxbqZvAvekzCZkeGHWx0Io"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"url": "{{BASE_URL}}/api/supervisors/badges"
+			},
+			"response": []
+		},
+		{
+			"name": "supervisor.getAllSupervisors",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "student.getInProcessCheckInStudents",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "student.verifyCheckInStudent",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN1cGVydmlzb3IxIiwiZW1haWwiOiJzdXBlcnZpc29yMUBtYWlsLmNvbSIsInJvbGUiOiJTVVBFUlZJU09SIiwiYmFkZ2VzIjpbIkNFVSIsIkVSIiwiSEVBRF9ESVYiXSwic3R1ZGVudElkIjpudWxsLCJpYXQiOjE2ODgzODcyNTIsImV4cCI6MTY4ODM4Nzg1MiwiaXNzIjoiYXBpLmxvY2FsaG9zdCIsInN1YiI6InN1cGVydmlzb3IxIn0.HZeiZvxxSOJmaZzRk4AKb1WKwasODR6tH7_LMDbN_ss"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"verified\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/api/students/checkins/H071191000"
+			},
+			"response": []
+		}
+	]
+}
