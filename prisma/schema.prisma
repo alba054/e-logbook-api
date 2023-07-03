@@ -17,12 +17,14 @@ model User {
   email              String?              @unique @db.VarChar(255)
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
-  student            Student?             @relation(fields: [studentId], references: [studentId], onUpdate: Cascade, onDelete: Cascade)
+  student            Student?             @relation(fields: [studentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   role               Role
   badges             Badge[]
   PasswordResetToken PasswordResetToken[]
-  studentId          String               @db.VarChar(100)
+  studentId          String?              @db.VarChar(100)
   CheckInCheckOut    CheckInCheckOut[]
+  supervisor         Supervisor?          @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  supervisorId       String?              @db.VarChar(100)
 
   @@map("users")
 }
@@ -47,9 +49,17 @@ model Student {
   @@map("students")
 }
 
+model Supervisor {
+  id           String  @id @db.VarChar(100)
+  fullname     String? @db.VarChar(255)
+  supervisorId String? @unique @db.VarChar(50)
+  User         User[]
+
+  @@map("supervisors")
+}
 
 model Badge {
-  id    String @id @db.VarChar(100)
+  id    Int    @id @default(autoincrement())
   name  Badges @unique
   users User[]
 
@@ -94,7 +104,7 @@ model CheckInCheckOut {
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   unit               Unit                @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  student            Student             @relation(fields: [studentId], references: [studentId], onDelete: Cascade, onUpdate: Cascade)
+  student            Student             @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   unitId             String              @db.VarChar(100)
   studentId          String              @db.VarChar(100)
   headDivVerificator User?               @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -224,6 +234,7 @@ enum Badges {
 enum Role {
   SUPERVISOR
   STUDENT
+  ADMIN
 }
 
 enum Gender {

@@ -1,5 +1,6 @@
 import { Badge } from "@prisma/client";
 import { IStudentProfileDTO } from "./StudentProfileDTO";
+import { ISupervisorProfileDTO } from "./SupervisorDTO";
 
 export interface IUserProfileDTO {
   id: string;
@@ -8,4 +9,5 @@ export interface IUserProfileDTO {
   role: "SUPERVISOR" | "STUDENT";
   badges: Badge[];
   student?: IStudentProfileDTO;
+  supervisor?: ISupervisorProfileDTO;
 }

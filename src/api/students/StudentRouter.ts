@@ -38,7 +38,7 @@ export class StudentRouter {
 
     // * set active unit
     this.router.put(
-      this.path + "/units/set-unit",
+      this.path + "/units",
       AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
       UnitCheckIn.restrictUnitActiveChanges(),
       this.studentHandler.putActiveUnit

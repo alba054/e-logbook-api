@@ -13,6 +13,7 @@ export class CheckInCheckOut {
       },
       include: {
         student: true,
+        unit: true,
       },
     });
   }
@@ -23,8 +24,6 @@ export class CheckInCheckOut {
     unitId?: string
   ) {
     try {
-      console.log(studentId);
-
       return db.checkInCheckOut.create({
         data: {
           id,

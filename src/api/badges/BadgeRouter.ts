@@ -1,16 +1,16 @@
 import { Router } from "express";
-import { UnitHandler } from "./UnitHandler";
 import { BasicAuthMiddleware } from "../../middleware/auth/BasicAuth";
+import { BadgeHandler } from "./BadgeHandler";
 
-export class UnitRouter {
-  unitHandler: UnitHandler;
-  path: string;
-  router: Router;
+export class BadgeRouter {
+  private path: string;
+  private router: Router;
+  private badgeHandler: BadgeHandler;
 
   constructor() {
-    this.path = "/units";
+    this.path = "/badges";
     this.router = Router();
-    this.unitHandler = new UnitHandler();
+    this.badgeHandler = new BadgeHandler();
   }
 
   register() {
@@ -20,9 +20,8 @@ export class UnitRouter {
       .route(this.path)
       .get(
         BasicAuthMiddleware.authenticateAdmin(),
-        this.unitHandler.getAllUnits
-      )
-      .post(BasicAuthMiddleware.authenticateAdmin(), this.unitHandler.postUnit);
+        this.badgeHandler.getBadges
+      );
 
     return this.router;
   }

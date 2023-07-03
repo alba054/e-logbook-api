@@ -18,6 +18,7 @@ import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentCheckInCheckOutService } from "../../services/facade/StudentCheckInCheckOutService";
 import { IActiveUnitDTO } from "../../utils/dto/ActiveUnitDTO";
 import { CheckInCheckOutService } from "../../services/database/CheckInCheckOutService";
+import { IListInProcessCheckInDTO } from "../../utils/dto/StudentCheckInDTO";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -53,11 +54,21 @@ export class StudentHandler {
     const studentCheckIns =
       await this.checkInCheckOutService.getAllCheckInStudents();
 
-    return res
-      .status(200)
-      .json(
-        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, studentCheckIns)
-      );
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        studentCheckIns.map((s) => {
+          return {
+            checkInStatus: s.checkInStatus,
+            checkInTime: Number(s.checkInTime),
+            fullname: s.student.fullName,
+            studentId: s.student.studentId,
+            unitId: s.unit.id,
+            unitName: s.unit.name,
+          } as IListInProcessCheckInDTO;
+        })
+      )
+    );
   }
 
   async postCheckInActiveUnit(req: Request, res: Response, next: NextFunction) {
