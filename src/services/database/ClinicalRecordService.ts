@@ -8,12 +8,10 @@ import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentService } from "./StudentService";
 
 export class ClinicalRecordService {
-  private clinicalRecordModel: ClinicalRecord;
   private studentService: StudentService;
 
   constructor() {
     this.studentService = new StudentService();
-    this.clinicalRecordModel = new ClinicalRecord();
   }
 
   async insertNewClinicalRecord(

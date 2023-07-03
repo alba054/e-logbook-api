@@ -6,6 +6,18 @@ import { createErrorObject } from "../utils";
 export class Student {
   constructor() {}
 
+  async getActiveUnitByStudentId(studentId: string) {
+    return db.student.findUnique({
+      where: {
+        studentId,
+      },
+      select: {
+        activeUnit: true,
+        id: true,
+      },
+    });
+  }
+
   async getActiveUnit(studentId: string) {
     return db.student.findUnique({
       where: {

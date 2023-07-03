@@ -33,7 +33,7 @@ export const generateRandomString = (length: number) => {
 export const constants = {
   SUCCESS_RESPONSE_MESSAGE: "success",
   FAILED_RESPONSE_MESSAGE: "failed",
-  ACCESS_TOKEN_EXP: 3 * 60, // * 3 minutes
+  ACCESS_TOKEN_EXP: 10 * 60, // * 10 minutes
   REFRESH_TOKEN_EXP: 24 * 60 * 60 * 30, // * 1 month
   PASSWORD_RESET_TOKEN_EXP: 5 * 60 * 1000,
   INVALID_TOKEN: "token is invalid",

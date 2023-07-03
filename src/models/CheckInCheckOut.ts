@@ -5,6 +5,33 @@ import { createErrorObject } from "../utils";
 export class CheckInCheckOut {
   constructor() {}
 
+  async verifyInProcessCheckIn(
+    verified: boolean,
+    userId: string,
+    studentId?: string,
+    unitId?: string
+  ) {
+    try {
+      return db.checkInCheckOut.updateMany({
+        where: {
+          unitId,
+          studentId,
+          checkInStatus: "INPROCESS",
+        },
+        data: {
+          checkInStatus: verified ? "VERIFIED" : "UNVERIFIED",
+          userId,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to update in process checkin");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async getStudentCheckIn() {
     return db.checkInCheckOut.findMany({
       where: {

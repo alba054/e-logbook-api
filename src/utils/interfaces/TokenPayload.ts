@@ -4,4 +4,6 @@ export interface ITokenPayload {
   readonly role: "SUPERVISOR" | "STUDENT";
   readonly badges?: string[];
   readonly studentId?: string;
+  readonly supervisorId?: string;
+  readonly userId: string;
 }

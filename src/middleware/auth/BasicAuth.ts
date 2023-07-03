@@ -102,6 +102,8 @@ export class BasicAuthMiddleware {
           role: user.role,
           badges: user.badges.map((badge) => badge.name),
           studentId: user.studentId,
+          userId: user.id,
+          supervisorId: user.supervisorId,
         } as ITokenPayload;
 
         next();

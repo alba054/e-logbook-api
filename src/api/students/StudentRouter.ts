@@ -73,6 +73,13 @@ export class StudentRouter {
       this.studentHandler.getAllCheckInsStudent
     );
 
+    // * verify student inprocess checkin
+    this.router.put(
+      this.path + "/checkins/:studentId",
+      AuthorizationBearer.authorize([constants.HEAD_DIV_BADGE]),
+      this.studentHandler.putVerificationCheckIn
+    );
+
     return this.router;
   }
 }
