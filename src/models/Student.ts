@@ -9,7 +9,7 @@ export class Student {
   async getActiveUnit(studentId: string) {
     return db.student.findUnique({
       where: {
-        studentId,
+        id: studentId,
       },
       select: {
         activeUnit: true,
@@ -24,7 +24,7 @@ export class Student {
     try {
       return db.student.update({
         where: {
-          studentId,
+          id: studentId,
         },
         data: {
           unitId: payload.unitId,

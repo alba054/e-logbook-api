@@ -5,14 +5,25 @@ import { createErrorObject } from "../utils";
 export class CheckInCheckOut {
   constructor() {}
 
+  async getStudentCheckIn() {
+    return db.checkInCheckOut.findMany({
+      where: {
+        checkIn: true,
+        checkInStatus: "INPROCESS",
+      },
+      include: {
+        student: true,
+        unit: true,
+      },
+    });
+  }
+
   async insertNewCheckInCheckOutUnit(
     id: string,
     studentId: string,
     unitId?: string
   ) {
     try {
-      console.log(studentId);
-
       return db.checkInCheckOut.create({
         data: {
           id,

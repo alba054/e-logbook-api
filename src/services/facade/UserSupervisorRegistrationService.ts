@@ -1,14 +1,14 @@
-import db from "../../database";
-import { IPostStudentPayload } from "../../utils/interfaces/Student";
-import { v4 as uuidv4 } from "uuid";
+import { IPostSupervisorPayload } from "../../utils/interfaces/Supervisor";
 import bcryptjs from "bcryptjs";
-import { createErrorObject } from "../../utils";
+import { v4 as uuidv4 } from "uuid";
+import db from "../../database";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { createErrorObject } from "../../utils";
 
-export class UserStudentRegistrationService {
+export class UserSupervisorRegistrationService {
   constructor() {}
 
-  async registerNewUserStudent(payload: IPostStudentPayload) {
+  async registerNewSupervisor(payload: IPostSupervisorPayload) {
     const hashedPassword = await bcryptjs.hash(payload.password, 10);
 
     try {
@@ -18,13 +18,14 @@ export class UserStudentRegistrationService {
             id: uuidv4(),
             username: payload.username,
             password: hashedPassword,
-            role: "STUDENT",
+            role: "SUPERVISOR",
             email: payload.email,
-            student: {
+            studentId: undefined,
+            supervisor: {
               create: {
                 id: uuidv4(),
-                studentId: payload.studentId,
-                fullName: payload.firstName + " " + payload.lastName,
+                supervisorId: payload.supervisorId,
+                fullname: payload.firstName + " " + payload.lastName,
               },
             },
           },
@@ -36,7 +37,7 @@ export class UserStudentRegistrationService {
 
         return createErrorObject(
           400,
-          "failed transaction of creating user and student"
+          "failed transaction of creating user and supervisor"
         );
       } else {
         return createErrorObject(500);

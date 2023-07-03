@@ -6,6 +6,8 @@ import { UserRouter } from "./api/users/UserRouter";
 import { StudentRouter } from "./api/students/StudentRouter";
 import { UnitRouter } from "./api/units/UnitRouter";
 import { ClinicalRecordRouter } from "./api/clinicalRecords/ClinicalRecordRouter";
+import { SupervisorRouter } from "./api/supervisors/SupervisorRouter";
+import { BadgeRouter } from "./api/badges/BadgeRouter";
 
 dotenv.config();
 
@@ -36,6 +38,8 @@ class Server {
     this.app.use("/api", new StudentRouter().register());
     this.app.use("/api", new UnitRouter().register());
     this.app.use("/api", new ClinicalRecordRouter().register());
+    this.app.use("/api", new SupervisorRouter().register());
+    this.app.use("/api", new BadgeRouter().register());
     // * error handling
     this.app.use(ErrorHandler);
   }

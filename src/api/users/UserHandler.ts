@@ -6,15 +6,81 @@ import { UnauthenticatedError } from "../../exceptions/httpError/Unauthenticated
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { config } from "../../config/Config";
+import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
+import { UserService } from "../../services/database/UserService";
+import { IUserProfileDTO } from "../../utils/dto/UserProfileDTO";
+import { IPostUserPayload } from "../../utils/interfaces/User";
+import { UserPayloadValidator } from "../../validator/users/UserValidator";
 
 export class UserHandler {
   private authenticationService: AuthenticationService;
+  private userService: UserService;
+  private userValidator: UserPayloadValidator;
 
   constructor() {
     this.authenticationService = new AuthenticationService();
+    this.userService = new UserService();
+    this.userValidator = new UserPayloadValidator();
 
     this.postRefreshToken = this.postRefreshToken.bind(this);
     this.postUserLogin = this.postUserLogin.bind(this);
+    this.getUserProfile = this.getUserProfile.bind(this);
+    this.postUser = this.postUser.bind(this);
+  }
+
+  async postUser(req: Request, res: Response, next: NextFunction) {
+    const payload: IPostUserPayload = req.body;
+
+    try {
+      const validationResult = this.userValidator.validatePostPayload(payload);
+
+      if (validationResult && "error" in validationResult) {
+        throw new BadRequestError(validationResult.message);
+      }
+
+      const testError = await this.userService.addNewAdmin(payload);
+
+      if (testError && "error" in testError) {
+        switch (testError.error) {
+          case 400:
+            throw new BadRequestError(testError.message);
+          case 404:
+            throw new NotFoundError(testError.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(201)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully register a new admin"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getUserProfile(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const user = await this.userService.getUserByUsername(
+      tokenPayload.username
+    );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        badges: user?.badges,
+        id: user?.id,
+        role: user?.role,
+        username: user?.username,
+        email: user?.email,
+        student: user?.student,
+        supervisor: user?.supervisor,
+      } as IUserProfileDTO)
+    );
   }
 
   async postRefreshToken(req: Request, res: Response, next: NextFunction) {

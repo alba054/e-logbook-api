@@ -46,4 +46,5 @@ export const constants = {
   ER_BADGE: "ER",
   CEU_BADGE: "CEU",
   HEAD_DIV_BADGE: "HEAD_DIV",
+  ADMIN_ROLE: "ADMIN",
 };

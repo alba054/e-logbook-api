@@ -23,11 +23,9 @@ export class StudentService {
         );
 
       return {
-        checkInStatus: checkInCheckOutUnit?.checkInStatus,
-        checkOutStatus: checkInCheckOutUnit?.checkOutStatus,
-        unitId: activeUnit.activeUnit.id,
-        unitName: activeUnit.activeUnit.name,
-      } as IActiveUnitDTO;
+        activeUnit,
+        checkInCheckOutUnit,
+      };
     }
 
     return null;

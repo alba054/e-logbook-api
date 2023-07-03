@@ -38,7 +38,7 @@ export class StudentRouter {
 
     // * set active unit
     this.router.put(
-      this.path + "/units/set-unit",
+      this.path + "/units",
       AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
       UnitCheckIn.restrictUnitActiveChanges(),
       this.studentHandler.putActiveUnit
@@ -64,6 +64,13 @@ export class StudentRouter {
       this.path + "/test-authorization-student",
       AuthorizationBearer.authorize([constants.CEU_BADGE]),
       this.studentHandler.getTestAuthorizationStudent
+    );
+
+    // * get all inprocess check ins student
+    this.router.get(
+      this.path + "/checkins",
+      AuthorizationBearer.authorize([constants.HEAD_DIV_BADGE]),
+      this.studentHandler.getAllCheckInsStudent
     );
 
     return this.router;
