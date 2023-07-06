@@ -5,10 +5,10 @@ export interface IPostSupervisorPayload {
   readonly email: string;
   readonly firstName: string;
   readonly lastName: string;
-  readonly badges: number[];
+  readonly badges?: number[];
 }
 
 export interface IPostSupervisorBadgePayload {
   readonly supervisorId: string;
-  readonly badges: number[];
+  readonly badges?: number[];
 }

@@ -37,10 +37,21 @@ export class ClinicalRecordHandler {
         }
       }
 
-      await this.clinicalRecordService.insertNewClinicalRecord(
+      const testError = await this.clinicalRecordService.insertNewClinicalRecord(
         tokenPayload,
         payload
       );
+
+      if (testError && "error" in testError) {
+        switch (testError.error) {
+          case 400:
+            throw new BadRequestError(testError.message);
+          case 404:
+            throw new NotFoundError(testError.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
 
       return res
         .status(201)

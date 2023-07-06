@@ -115,7 +115,7 @@ model CheckInCheckOut {
 
 model ClinicalRecord {
   id                        String                      @id @db.VarChar(100)
-  recordId                  Int                         @default(1) @db.UnsignedInt
+  recordId                  String                      @db.VarChar(5)
   patientName               String                      @db.VarChar(255)
   patientAge                Int                         @db.UnsignedInt
   gender                    Gender
@@ -124,7 +124,7 @@ model ClinicalRecord {
   verificationStatus        VerificationStatus          @default(INPROCESS)
   createdAt                 DateTime                    @default(now())
   updatedAt                 DateTime                    @updatedAt
-  Student                   Student?                    @relation(fields: [studentId], references: [studentId], onDelete: Cascade, onUpdate: Cascade)
+  Student                   Student?                    @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   studentId                 String?                     @db.VarChar(100)
   Unit                      Unit?                       @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   unitId                    String?                     @db.VarChar(100)

@@ -1,0 +1,1071 @@
+{
+	"info": {
+		"_postman_id": "2a8a9b42-2ca9-42b0-911c-88043991504b",
+		"name": "e-logbook",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13611365"
+	},
+	"item": [
+		{
+			"name": "/students",
+			"item": [
+				{
+					"name": "student.registerStudent",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"student1\",\n    \"password\": \"randompassword\",\n    \"studentId\": \"H071191000\",\n    \"email\": \"random@mail.com\",\n    \"firstName\": \"john\",\n    \"lastName\": \"doe\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/students",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "student.resetPassword",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{ADMIN}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{ADMIN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"random@mail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/students/reset-password",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "student.createNewPassword",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{ADMIN}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{ADMIN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"otp\": \"97461\",\n    \"newPassword\": \"randompassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/students/reset-password/9d1864c7-018f-4fff-a565-e0b51d4ebd06",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"reset-password",
+								"9d1864c7-018f-4fff-a565-e0b51d4ebd06"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "student.setActiveUnit",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0dWRlbnQxIiwiZW1haWwiOiJyYW5kb21AbWFpbC5jb20iLCJyb2xlIjoiU1RVREVOVCIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6Ijc4ZjhjNWRiLTJjZWMtNDc1My05MzNhLWUwMjcwZTM3NzMwNCIsInVzZXJJZCI6ImNhYWVjM2I3LTEwYWMtNGVlMS05MDE4LTZiNmQ5NTVmOGQzOCIsInN1cGVydmlzb3JJZCI6bnVsbCwiaWF0IjoxNjg4NjI1MTg5LCJleHAiOjE2ODg2MjU3ODksImlzcyI6ImFwaS5sb2NhbGhvc3QuY29tIiwic3ViIjoic3R1ZGVudDEifQ.FdYV9C-bidi6JeuhweATPZk5l7jjcO-ro1eJzbncBI0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"unitId\": \"18a79e3c-d7ca-439f-b36c-067f8d0250f7\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/students/units",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"units"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "student.getActiveUnit",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0dWRlbnQxIiwiZW1haWwiOiJyYW5kb21AbWFpbC5jb20iLCJyb2xlIjoiU1RVREVOVCIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6Ijc4ZjhjNWRiLTJjZWMtNDc1My05MzNhLWUwMjcwZTM3NzMwNCIsInVzZXJJZCI6ImNhYWVjM2I3LTEwYWMtNGVlMS05MDE4LTZiNmQ5NTVmOGQzOCIsInN1cGVydmlzb3JJZCI6bnVsbCwiaWF0IjoxNjg4NjI1MTg5LCJleHAiOjE2ODg2MjU3ODksImlzcyI6ImFwaS5sb2NhbGhvc3QuY29tIiwic3ViIjoic3R1ZGVudDEifQ.FdYV9C-bidi6JeuhweATPZk5l7jjcO-ro1eJzbncBI0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/students/units/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"units",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "student.studentCheckInActiveUnit",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0dWRlbnQxIiwiZW1haWwiOiJyYW5kb21AbWFpbC5jb20iLCJyb2xlIjoiU1RVREVOVCIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6Ijc4ZjhjNWRiLTJjZWMtNDc1My05MzNhLWUwMjcwZTM3NzMwNCIsInVzZXJJZCI6ImNhYWVjM2I3LTEwYWMtNGVlMS05MDE4LTZiNmQ5NTVmOGQzOCIsInN1cGVydmlzb3JJZCI6bnVsbCwiaWF0IjoxNjg4NjIzOTI4LCJleHAiOjE2ODg2MjQ1MjgsImlzcyI6ImFwaS5sb2NhbGhvc3QuY29tIiwic3ViIjoic3R1ZGVudDEifQ.SsHuRc_Jk-rjVPzz215w5R4GXD-7MEh6lazIOzx5L8A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/students/units/check-in",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"units",
+								"check-in"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "student.getInProcessCheckInStudents",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN1cGVydmlzb3IxIiwiZW1haWwiOm51bGwsInJvbGUiOiJTVVBFUlZJU09SIiwiYmFkZ2VzIjpbIkNFVSIsIkVSIiwiSEVBRF9ESVYiXSwic3R1ZGVudElkIjpudWxsLCJ1c2VySWQiOiIyYjIyNjE3Zi03MWYzLTRkYmItYjQyMC1mNWFlOTdkMDg2MGMiLCJzdXBlcnZpc29ySWQiOiI4MDBiOGY2Yy1jNGY2LTQzYzYtYWExZC0xMTYwOWJmZjM2M2YiLCJpYXQiOjE2ODg2MjQ5ODksImV4cCI6MTY4ODYyNTU4OSwiaXNzIjoiYXBpLmxvY2FsaG9zdC5jb20iLCJzdWIiOiJzdXBlcnZpc29yMSJ9.uDzZ58MfPsH_rbdWDz-fv4W1lOtFzSHKsDm_sUqBfuM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/students/checkins",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"checkins"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "student.verifyCheckInStudent",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN1cGVydmlzb3IxIiwiZW1haWwiOm51bGwsInJvbGUiOiJTVVBFUlZJU09SIiwiYmFkZ2VzIjpbIkNFVSIsIkVSIiwiSEVBRF9ESVYiXSwic3R1ZGVudElkIjpudWxsLCJ1c2VySWQiOiIyYjIyNjE3Zi03MWYzLTRkYmItYjQyMC1mNWFlOTdkMDg2MGMiLCJzdXBlcnZpc29ySWQiOiI4MDBiOGY2Yy1jNGY2LTQzYzYtYWExZC0xMTYwOWJmZjM2M2YiLCJpYXQiOjE2ODg2MjQ5ODksImV4cCI6MTY4ODYyNTU4OSwiaXNzIjoiYXBpLmxvY2FsaG9zdC5jb20iLCJzdWIiOiJzdXBlcnZpc29yMSJ9.uDzZ58MfPsH_rbdWDz-fv4W1lOtFzSHKsDm_sUqBfuM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"verified\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/students/checkins/H071191000",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"checkins",
+								"H071191000"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/users",
+			"item": [
+				{
+					"name": "user.login",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "student1",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "randompassword",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/users/login",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "supervisor.registerSupervisor",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiZW1haWwiOm51bGwsInJvbGUiOiJBRE1JTiIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6bnVsbCwidXNlcklkIjoiOTNiYjUxZjktZDE5Mi00ZTY2LWE3MjctZmQyNzZlM2FlODc3Iiwic3VwZXJ2aXNvcklkIjpudWxsLCJpYXQiOjE2ODg2MjQzNjIsImV4cCI6MTY4ODYyNDk2MiwiaXNzIjoiYXBpLmxvY2FsaG9zdC5jb20iLCJzdWIiOiJhZG1pbiJ9.aKBO_h55xjFGjqwiI0DYvRreAmJHjE6fEQN3F6BWkj0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"supervisor1\",\n    \"password\": \"randompassword\",\n    \"firstName\": \"john\",\n    \"lastName\": \"doe\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/supervisors",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"supervisors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user.registerAdmin",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"randompassword\",\n    \"role\": \"ADMIN\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/users",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user.getCredential",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0dWRlbnQxIiwiZW1haWwiOiJyYW5kb21AbWFpbC5jb20iLCJyb2xlIjoiU1RVREVOVCIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6Ijc4ZjhjNWRiLTJjZWMtNDc1My05MzNhLWUwMjcwZTM3NzMwNCIsInVzZXJJZCI6ImNhYWVjM2I3LTEwYWMtNGVlMS05MDE4LTZiNmQ5NTVmOGQzOCIsInN1cGVydmlzb3JJZCI6bnVsbCwiaWF0IjoxNjg4NjIzOTI4LCJleHAiOjE2ODg2MjQ1MjgsImlzcyI6ImFwaS5sb2NhbGhvc3QuY29tIiwic3ViIjoic3R1ZGVudDEifQ.SsHuRc_Jk-rjVPzz215w5R4GXD-7MEh6lazIOzx5L8A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/users",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user.refreshToken",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/users/refresh-token",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"refresh-token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/units",
+			"item": [
+				{
+					"name": "unit.getUnits",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/units",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"units"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unit.createUnit",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"ANESTESI\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/units",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"units"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/badges",
+			"item": [
+				{
+					"name": "badge.getAllBadges",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/badges",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"badges"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/supervisors",
+			"item": [
+				{
+					"name": "supervisor.assignBadge",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiZW1haWwiOm51bGwsInJvbGUiOiJBRE1JTiIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6bnVsbCwidXNlcklkIjoiOTNiYjUxZjktZDE5Mi00ZTY2LWE3MjctZmQyNzZlM2FlODc3Iiwic3VwZXJ2aXNvcklkIjpudWxsLCJpYXQiOjE2ODg2MjQ3MTMsImV4cCI6MTY4ODYyNTMxMywiaXNzIjoiYXBpLmxvY2FsaG9zdC5jb20iLCJzdWIiOiJhZG1pbiJ9.GsEmg6LJ2Uv2AQMb2YFxAn4Lk5MOrLl4KIJWek3LP0A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"supervisorId\": \"2b22617f-71f3-4dbb-b420-f5ae97d0860c\",\n    \"badges\": [1,2, 3]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/supervisors/badges",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"supervisors",
+								"badges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "supervisor.getAllSupervisors",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiZW1haWwiOm51bGwsInJvbGUiOiJBRE1JTiIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6bnVsbCwidXNlcklkIjoiOTNiYjUxZjktZDE5Mi00ZTY2LWE3MjctZmQyNzZlM2FlODc3Iiwic3VwZXJ2aXNvcklkIjpudWxsLCJpYXQiOjE2ODg2MjQ3MTMsImV4cCI6MTY4ODYyNTMxMywiaXNzIjoiYXBpLmxvY2FsaG9zdC5jb20iLCJzdWIiOiJhZG1pbiJ9.GsEmg6LJ2Uv2AQMb2YFxAn4Lk5MOrLl4KIJWek3LP0A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/supervisors",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"supervisors"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/management-types",
+			"item": [
+				{
+					"name": "managementTypes.getManagementTypesByUnitId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0dWRlbnQxIiwiZW1haWwiOiJyYW5kb21AbWFpbC5jb20iLCJyb2xlIjoiU1RVREVOVCIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6Ijc4ZjhjNWRiLTJjZWMtNDc1My05MzNhLWUwMjcwZTM3NzMwNCIsInVzZXJJZCI6ImNhYWVjM2I3LTEwYWMtNGVlMS05MDE4LTZiNmQ5NTVmOGQzOCIsInN1cGVydmlzb3JJZCI6bnVsbCwiaWF0IjoxNjg4NjI1MTg5LCJleHAiOjE2ODg2MjU3ODksImlzcyI6ImFwaS5sb2NhbGhvc3QuY29tIiwic3ViIjoic3R1ZGVudDEifQ.FdYV9C-bidi6JeuhweATPZk5l7jjcO-ro1eJzbncBI0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/management-types/units/18a79e3c-d7ca-439f-b36c-067f8d0250f7",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"management-types",
+								"units",
+								"18a79e3c-d7ca-439f-b36c-067f8d0250f7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "managementTypes.postManagementTypesUnit",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiZW1haWwiOm51bGwsInJvbGUiOiJBRE1JTiIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6bnVsbCwidXNlcklkIjoiOTNiYjUxZjktZDE5Mi00ZTY2LWE3MjctZmQyNzZlM2FlODc3Iiwic3VwZXJ2aXNvcklkIjpudWxsLCJpYXQiOjE2ODg2MjIxODgsImV4cCI6MTY4ODYyMjc4OCwiaXNzIjoiYXBpLmxvY2FsaG9zdC5jb20iLCJzdWIiOiJhZG1pbiJ9.Hnk507AvcFLthYcsWEcZWc36c98Uq2O9PYZsKPsdJ24",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"unitId\": \"18a79e3c-d7ca-439f-b36c-067f8d0250f7\",\n    \"typeName\": \"management type 3\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/management-types/units",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"management-types",
+								"units"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/management-roles",
+			"item": [
+				{
+					"name": "managementRoles.getManagementRolesByUnitId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0dWRlbnQxIiwiZW1haWwiOiJyYW5kb21AbWFpbC5jb20iLCJyb2xlIjoiU1RVREVOVCIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6Ijc4ZjhjNWRiLTJjZWMtNDc1My05MzNhLWUwMjcwZTM3NzMwNCIsInVzZXJJZCI6ImNhYWVjM2I3LTEwYWMtNGVlMS05MDE4LTZiNmQ5NTVmOGQzOCIsInN1cGVydmlzb3JJZCI6bnVsbCwiaWF0IjoxNjg4NjI1ODc4LCJleHAiOjE2ODg2MjY0NzgsImlzcyI6ImFwaS5sb2NhbGhvc3QuY29tIiwic3ViIjoic3R1ZGVudDEifQ.3Az6T1l9xTiqa6L0qllSwxxzUVWD8ngmdrEaqM3ZIEM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/management-roles/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"management-roles",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "managementRoles.postManagementRolesUnit",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiZW1haWwiOm51bGwsInJvbGUiOiJBRE1JTiIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6bnVsbCwidXNlcklkIjoiOTNiYjUxZjktZDE5Mi00ZTY2LWE3MjctZmQyNzZlM2FlODc3Iiwic3VwZXJ2aXNvcklkIjpudWxsLCJpYXQiOjE2ODg2MjMzOTEsImV4cCI6MTY4ODYyMzk5MSwiaXNzIjoiYXBpLmxvY2FsaG9zdC5jb20iLCJzdWIiOiJhZG1pbiJ9.ROADH_AcrkgVuqb71jece1mVAvQIsdZ_qkt_FcrPnag",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"roleName\": \"management role 1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/management-roles/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"management-roles",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/affected-parts",
+			"item": [
+				{
+					"name": "affectedParts.getAffectedPartsByUnitId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0dWRlbnQxIiwiZW1haWwiOiJyYW5kb21AbWFpbC5jb20iLCJyb2xlIjoiU1RVREVOVCIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6Ijc4ZjhjNWRiLTJjZWMtNDc1My05MzNhLWUwMjcwZTM3NzMwNCIsInVzZXJJZCI6ImNhYWVjM2I3LTEwYWMtNGVlMS05MDE4LTZiNmQ5NTVmOGQzOCIsInN1cGVydmlzb3JJZCI6bnVsbCwiaWF0IjoxNjg4NjI1MTg5LCJleHAiOjE2ODg2MjU3ODksImlzcyI6ImFwaS5sb2NhbGhvc3QuY29tIiwic3ViIjoic3R1ZGVudDEifQ.FdYV9C-bidi6JeuhweATPZk5l7jjcO-ro1eJzbncBI0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/affected-parts/units/18a79e3c-d7ca-439f-b36c-067f8d0250f7",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"affected-parts",
+								"units",
+								"18a79e3c-d7ca-439f-b36c-067f8d0250f7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "affectedParts.postAffectedPartsUnit",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiZW1haWwiOm51bGwsInJvbGUiOiJBRE1JTiIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6bnVsbCwidXNlcklkIjoiOTNiYjUxZjktZDE5Mi00ZTY2LWE3MjctZmQyNzZlM2FlODc3Iiwic3VwZXJ2aXNvcklkIjpudWxsLCJpYXQiOjE2ODg2MTI5OTgsImV4cCI6MTY4ODYxMzU5OCwiaXNzIjoiYXBpLmxvY2FsaG9zdC5jb20iLCJzdWIiOiJhZG1pbiJ9.n1X9qe_sS3BoxK41loRSAgE3EAFOHw1WEbwCW51aUJ0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"unitId\": \"18a79e3c-d7ca-439f-b36c-067f8d0250f7\",\n    \"partName\": \"both\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/affected-parts/units/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"affected-parts",
+								"units",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/examination-types",
+			"item": [
+				{
+					"name": "examinationTypes.postExaminationTypesUnit",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiZW1haWwiOm51bGwsInJvbGUiOiJBRE1JTiIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6bnVsbCwidXNlcklkIjoiOTNiYjUxZjktZDE5Mi00ZTY2LWE3MjctZmQyNzZlM2FlODc3Iiwic3VwZXJ2aXNvcklkIjpudWxsLCJpYXQiOjE2ODg2MTQ2MjYsImV4cCI6MTY4ODYxNTIyNiwiaXNzIjoiYXBpLmxvY2FsaG9zdC5jb20iLCJzdWIiOiJhZG1pbiJ9.Lf4I2rpeafXLmQ0Wm_STZNX05r5X6sL-kkwm9aIgS-o",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"unitId\": \"18a79e3c-d7ca-439f-b36c-067f8d0250f7\",\n    \"typeName\": \"examination type 4\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/examination-types/units",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"examination-types",
+								"units"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "examinationTypes.getExaminationTypesByUnitId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0dWRlbnQxIiwiZW1haWwiOiJyYW5kb21AbWFpbC5jb20iLCJyb2xlIjoiU1RVREVOVCIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6Ijc4ZjhjNWRiLTJjZWMtNDc1My05MzNhLWUwMjcwZTM3NzMwNCIsInVzZXJJZCI6ImNhYWVjM2I3LTEwYWMtNGVlMS05MDE4LTZiNmQ5NTVmOGQzOCIsInN1cGVydmlzb3JJZCI6bnVsbCwiaWF0IjoxNjg4NjI1MTg5LCJleHAiOjE2ODg2MjU3ODksImlzcyI6ImFwaS5sb2NhbGhvc3QuY29tIiwic3ViIjoic3R1ZGVudDEifQ.FdYV9C-bidi6JeuhweATPZk5l7jjcO-ro1eJzbncBI0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/examination-types/units/18a79e3c-d7ca-439f-b36c-067f8d0250f7",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"examination-types",
+								"units",
+								"18a79e3c-d7ca-439f-b36c-067f8d0250f7"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/clinical-records",
+			"item": [
+				{
+					"name": "clinicalRecords.addClinicalRecordsByStudent",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0dWRlbnQxIiwiZW1haWwiOiJyYW5kb21AbWFpbC5jb20iLCJyb2xlIjoiU1RVREVOVCIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6Ijc4ZjhjNWRiLTJjZWMtNDc1My05MzNhLWUwMjcwZTM3NzMwNCIsInVzZXJJZCI6ImNhYWVjM2I3LTEwYWMtNGVlMS05MDE4LTZiNmQ5NTVmOGQzOCIsInN1cGVydmlzb3JJZCI6bnVsbCwiaWF0IjoxNjg4NjI3Njk2LCJleHAiOjE2ODg2MjgyOTYsImlzcyI6ImFwaS5sb2NhbGhvc3QuY29tIiwic3ViIjoic3R1ZGVudDEifQ.6EDhWmPJo2Mk4rHa0YoJRFcCeAGDn65oOXlqsn6Ojk8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientName\": \"nurdin\",\n  \"patientAge\": 25,\n  \"gender\": \"MALE\",\n  \"recordId\": \"0001\",\n  \"notes\": \"ini pasien pertama hari ini\",\n  \"studentFeedback\": \"pasien sangat kooperatif\",\n  \"examinations\": [\n    {\n      \"affectedPartId\": \"5e89f1b8-59f8-4f77-84ca-f0b0f40aee39\",\n      \"examinationTypeId\": [\n        \"580a8eca-6971-4ead-932c-d03b4deafef8\",\n        \"a6306f99-0296-437b-ab5f-e32f4961967d\",\n        \"f6ecc4c3-8b57-4851-89b5-175f5f46ff49\"\n      ]\n    },\n    {\n      \"affectedPartId\": \"e6297455-1983-4f51-81cb-dff8d9fab438\",\n      \"examinationTypeId\": [\n        \"580a8eca-6971-4ead-932c-d03b4deafef8\",\n        \"a6306f99-0296-437b-ab5f-e32f4961967d\"\n      ]\n    }\n  ],\n  \"diagnosiss\": [\n    {\n      \"affectedPartId\": \"5e89f1b8-59f8-4f77-84ca-f0b0f40aee39\",\n      \"diagnosisTypeId\": [\n        \"1a0378c1-0149-4429-97d6-f638108de17f\",\n        \"2f0c2438-1faa-404b-8fa2-195265fc1649\",\n        \"99441b8d-85a6-49fd-a8df-269b2321df66\"\n      ]\n    },\n    {\n      \"affectedPartId\": \"e6297455-1983-4f51-81cb-dff8d9fab438\",\n      \"diagnosisTypeId\": [\n        \"1a0378c1-0149-4429-97d6-f638108de17f\",\n        \"2f0c2438-1faa-404b-8fa2-195265fc1649\"\n      ]\n    }\n  ],\n  \"managements\": [\n    {\n      \"affectedPartId\": \"5e89f1b8-59f8-4f77-84ca-f0b0f40aee39\",\n      \"management\": [\n        {\n          \"managementTypeId\": \"881fe16b-2b7a-4a51-bb0a-4da12c3bb173\",\n          \"managementRoleId\": \"4cd6eaee-eb93-4f49-8a79-d1b3380a5b01\"\n        },\n        {\n          \"managementTypeId\": \"5db49d42-0e05-4378-a490-8e37266a0d35\",\n          \"managementRoleId\": \"4cd6eaee-eb93-4f49-8a79-d1b3380a5b01\"\n        },\n        {\n          \"managementTypeId\": \"39552434-01d6-4904-bd48-68d7d16be774\",\n          \"managementRoleId\": \"4cd6eaee-eb93-4f49-8a79-d1b3380a5b01\"\n        }\n      ]\n    },\n    {\n      \"affectedPartId\": \"e6297455-1983-4f51-81cb-dff8d9fab438\",\n      \"management\": [\n        {\n          \"managementTypeId\": \"881fe16b-2b7a-4a51-bb0a-4da12c3bb173\",\n          \"managementRoleId\": \"4cd6eaee-eb93-4f49-8a79-d1b3380a5b01\"\n        },\n        {\n          \"managementTypeId\": \"5db49d42-0e05-4378-a490-8e37266a0d35\",\n          \"managementRoleId\": \"4cd6eaee-eb93-4f49-8a79-d1b3380a5b01\"\n        }\n      ]\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/clinical-records",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"clinical-records"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/diagnosis-types",
+			"item": [
+				{
+					"name": "diagnosisTypes.getDiagnosisTypesByUnitId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0dWRlbnQxIiwiZW1haWwiOiJyYW5kb21AbWFpbC5jb20iLCJyb2xlIjoiU1RVREVOVCIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6Ijc4ZjhjNWRiLTJjZWMtNDc1My05MzNhLWUwMjcwZTM3NzMwNCIsInVzZXJJZCI6ImNhYWVjM2I3LTEwYWMtNGVlMS05MDE4LTZiNmQ5NTVmOGQzOCIsInN1cGVydmlzb3JJZCI6bnVsbCwiaWF0IjoxNjg4NjI1MTg5LCJleHAiOjE2ODg2MjU3ODksImlzcyI6ImFwaS5sb2NhbGhvc3QuY29tIiwic3ViIjoic3R1ZGVudDEifQ.FdYV9C-bidi6JeuhweATPZk5l7jjcO-ro1eJzbncBI0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/diagnosis-types/units/18a79e3c-d7ca-439f-b36c-067f8d0250f7",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"diagnosis-types",
+								"units",
+								"18a79e3c-d7ca-439f-b36c-067f8d0250f7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "diagnosisTypes.postDiagnosisTypesUnit",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiZW1haWwiOm51bGwsInJvbGUiOiJBRE1JTiIsImJhZGdlcyI6W10sInN0dWRlbnRJZCI6bnVsbCwidXNlcklkIjoiOTNiYjUxZjktZDE5Mi00ZTY2LWE3MjctZmQyNzZlM2FlODc3Iiwic3VwZXJ2aXNvcklkIjpudWxsLCJpYXQiOjE2ODg2MTU3NjgsImV4cCI6MTY4ODYxNjM2OCwiaXNzIjoiYXBpLmxvY2FsaG9zdC5jb20iLCJzdWIiOiJhZG1pbiJ9.5p9PCRlbagnr8qHRjNDEJOQ4qQtPoERYsC5CsDnUUdA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"unitId\": \"18a79e3c-d7ca-439f-b36c-067f8d0250f7\",\n    \"typeName\": \"diagnosis type 3\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/diagnosis-types/units",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"diagnosis-types",
+								"units"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

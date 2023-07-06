@@ -8,6 +8,11 @@ import { UnitRouter } from "./api/units/UnitRouter";
 import { ClinicalRecordRouter } from "./api/clinicalRecords/ClinicalRecordRouter";
 import { SupervisorRouter } from "./api/supervisors/SupervisorRouter";
 import { BadgeRouter } from "./api/badges/BadgeRouter";
+import { AffectedPartRouter } from "./api/affectedParts/AffectedPartRouter";
+import { ExaminationTypeRouter } from "./api/examinationTypes/ExaminationTypeRouter";
+import { DiagnosisTypeRouter } from "./api/diagnosisTypes/DiagnosisTypeRouter";
+import { ManagementTypeRouter } from "./api/managementTypes/ManagementTypeRouter";
+import { ManagementRoleRouter } from "./api/managementRoles/ManagementRoleRouter";
 
 dotenv.config();
 
@@ -40,6 +45,11 @@ class Server {
     this.app.use("/api", new ClinicalRecordRouter().register());
     this.app.use("/api", new SupervisorRouter().register());
     this.app.use("/api", new BadgeRouter().register());
+    this.app.use("/api", new AffectedPartRouter().register());
+    this.app.use("/api", new ExaminationTypeRouter().register());
+    this.app.use("/api", new DiagnosisTypeRouter().register());
+    this.app.use("/api", new ManagementTypeRouter().register());
+    this.app.use("/api", new ManagementRoleRouter().register());
     // * error handling
     this.app.use(ErrorHandler);
   }
