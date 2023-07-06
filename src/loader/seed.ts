@@ -3,6 +3,11 @@ import { v4 as uuidv4 } from "uuid";
 
 const main = async () => {
   await db.badge.deleteMany({});
+  await db.affectedPart.deleteMany({});
+  await db.managementRole.deleteMany({});
+  await db.managementType.deleteMany({});
+  await db.examinationType.deleteMany({});
+  await db.diagnosisType.deleteMany({});
   await db.unit.deleteMany({});
 
   await db.badge.createMany({
@@ -19,9 +24,11 @@ const main = async () => {
     ],
   });
 
+  const anestesiId = uuidv4();
+
   await db.unit.createMany({
     data: [
-      { id: uuidv4(), name: "ANESTESI" },
+      { id: anestesiId, name: "ANESTESI" },
       { id: uuidv4(), name: "BEDAH" },
       { id: uuidv4(), name: "FORENSIK" },
       { id: uuidv4(), name: "IKM-IKK" },
@@ -37,6 +44,103 @@ const main = async () => {
       { id: uuidv4(), name: "OBSTETRI DAN GINEKOLOGI" },
       { id: uuidv4(), name: "ORTHOPEDI" },
       { id: uuidv4(), name: "THT-KL" },
+    ],
+  });
+
+  await db.examinationType.createMany({
+    data: [
+      {
+        id: uuidv4(),
+        typeName: "examination type 1",
+        unitId: anestesiId,
+      },
+      {
+        id: uuidv4(),
+        typeName: "examination type 2",
+        unitId: anestesiId,
+      },
+      {
+        id: uuidv4(),
+        typeName: "examination type 3",
+        unitId: anestesiId,
+      },
+    ],
+  });
+
+  await db.diagnosisType.createMany({
+    data: [
+      {
+        id: uuidv4(),
+        typeName: "diagnosis type 1",
+        unitId: anestesiId,
+      },
+      {
+        id: uuidv4(),
+        typeName: "diagnosis type 2",
+        unitId: anestesiId,
+      },
+      {
+        id: uuidv4(),
+        typeName: "diagnosis type 3",
+        unitId: anestesiId,
+      },
+    ],
+  });
+
+  await db.managementType.createMany({
+    data: [
+      {
+        id: uuidv4(),
+        typeName: "management type 1",
+        unitId: anestesiId,
+      },
+      {
+        id: uuidv4(),
+        typeName: "management type 2",
+        unitId: anestesiId,
+      },
+      {
+        id: uuidv4(),
+        typeName: "management type 3",
+        unitId: anestesiId,
+      },
+    ],
+  });
+
+  await db.managementRole.createMany({
+    data: [
+      {
+        id: uuidv4(),
+        roleName: "management role 1",
+      },
+      {
+        id: uuidv4(),
+        roleName: "management role 2",
+      },
+      {
+        id: uuidv4(),
+        roleName: "management role 3",
+      },
+    ],
+  });
+
+  await db.affectedPart.createMany({
+    data: [
+      {
+        id: uuidv4(),
+        partName: "left eye",
+        unitId: anestesiId,
+      },
+      {
+        id: uuidv4(),
+        partName: "right eye",
+        unitId: anestesiId,
+      },
+      {
+        id: uuidv4(),
+        partName: "both",
+        unitId: anestesiId,
+      },
     ],
   });
 };

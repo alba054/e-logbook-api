@@ -3,7 +3,7 @@ export interface IPostClinicalRecord {
   patientAge: number;
   gender: "FEMALE" | "MALE";
   notes?: string;
-  recordId: number;
+  recordId: string;
   attachment?: string;
   studentFeedback?: string;
   examinations: ClinicalRecordExamination[];

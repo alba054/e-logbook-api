@@ -1,4 +1,3 @@
-import { ClinicalRecord } from "../../models/ClinicalRecord";
 import db from "../../database";
 import { IPostClinicalRecord } from "../../utils/interfaces/ClinicalRecord";
 import { v4 as uuidv4 } from "uuid";
@@ -101,6 +100,8 @@ export class ClinicalRecordService {
         ...managements,
       ]);
     } catch (error) {
+      console.log(error);
+
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to insert new clinical record");
       } else {

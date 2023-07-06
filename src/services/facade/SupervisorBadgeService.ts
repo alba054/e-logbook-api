@@ -30,7 +30,7 @@ export class SupervisorBadgeService {
           },
           data: {
             badges: {
-              connect: payload.badges.map((b) => {
+              connect: payload.badges?.map((b) => {
                 return {
                   id: b,
                 };
@@ -41,7 +41,7 @@ export class SupervisorBadgeService {
       ]);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        console.log(error.message);
+        console.log(error);
 
         return createErrorObject(
           400,

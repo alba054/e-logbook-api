@@ -7,6 +7,7 @@ import { config } from "../../config/Config";
 import { UnauthorizedError } from "../../exceptions/httpError/UnauthorizedError";
 import { constants } from "../../utils";
 import { UnauthenticatedError } from "../../exceptions/httpError/UnauthenticatedError";
+import { UserService } from "../../services/database/UserService";
 
 export class AuthorizationBearer {
   static authorize(roles: string[]) {
@@ -54,10 +55,13 @@ export class AuthorizationBearer {
           return next(new UnauthorizedError("provide token"));
         }
 
+        const userService = new UserService();
+        const user = await userService.getUserByUsername(tokenPayload.username);
+
         if (
-          tokenPayload.badges &&
-          !roles.includes(tokenPayload.role) &&
-          !tokenPayload.badges.some((e) => roles.includes(e))
+          user?.badges &&
+          !roles.includes(user.role) &&
+          !user.badges.some((e) => roles.includes(e.name))
         ) {
           return next(new UnauthorizedError("you cannot access this resource"));
         }

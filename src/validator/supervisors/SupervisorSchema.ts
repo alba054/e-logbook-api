@@ -8,7 +8,7 @@ export const SupervisorPayloadSchema = UserPayloadSchema.append({
     .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/),
   firstName: Joi.string().optional(),
   lastName: Joi.string().optional(),
-  badges: Joi.array().items(Joi.number()),
+  badges: Joi.array().items(Joi.number()).optional(),
 });
 
 export const SupervisorBadgePayloadSchema = Joi.object({

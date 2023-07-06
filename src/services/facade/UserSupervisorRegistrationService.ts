@@ -22,7 +22,7 @@ export class UserSupervisorRegistrationService {
             email: payload.email,
             studentId: undefined,
             badges: {
-              connect: payload.badges.map((b) => {
+              connect: payload.badges?.map((b) => {
                 return {
                   id: b,
                 };
