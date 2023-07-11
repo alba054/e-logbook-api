@@ -77,7 +77,17 @@ export class UserHandler {
         role: user?.role,
         username: user?.username,
         email: user?.email,
-        student: user?.student,
+        student: {
+          studentId: user?.student?.studentId,
+          address: user?.student?.address,
+          fullName: user?.student?.fullName,
+          clinicId: user?.student?.clinicId,
+          graduationDate: user?.student?.graduationDate,
+          phoneNumber: user?.student?.phoneNumber,
+          preClinicId: user?.student?.preClinicId,
+          checkInStatus: user?.student?.CheckInCheckOut.at(-1)?.checkInStatus,
+          checkOutStatus: user?.student?.CheckInCheckOut.at(-1)?.checkOutStatus,
+        },
         supervisor: user?.supervisor,
       } as IUserProfileDTO)
     );

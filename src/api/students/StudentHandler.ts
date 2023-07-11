@@ -177,6 +177,8 @@ export class StudentHandler {
           checkOutStatus: result?.checkInCheckOutUnit?.checkOutStatus,
           unitId: result?.activeUnit.activeUnit?.id,
           unitName: result?.activeUnit.activeUnit?.name,
+          checkInTime: Number(result?.checkInCheckOutUnit?.checkInTime),
+          checkOutTime: Number(result?.checkInCheckOutUnit?.checkOutTime),
         } as IActiveUnitDTO)
       );
     } catch (error) {

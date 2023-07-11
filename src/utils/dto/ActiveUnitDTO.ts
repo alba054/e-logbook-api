@@ -3,4 +3,6 @@ export interface IActiveUnitDTO {
   unitName: string;
   checkInStatus: "VERIFIED" | "INPROCESS" | "UNVERIFIED";
   checkOutStatus: "VERIFIED" | "INPROCESS" | "UNVERIFIED";
+  checkInTime: number;
+  checkOutTime: number;
 }
