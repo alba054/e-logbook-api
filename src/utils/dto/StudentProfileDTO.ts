@@ -6,4 +6,6 @@ export interface IStudentProfileDTO {
   phoneNumber?: string;
   address?: string;
   fullName?: string;
+  checkInStatus: "VERIFIED" | "INPROCESS" | "UNVERIFIED";
+  checkOutStatus: "VERIFIED" | "INPROCESS" | "UNVERIFIED";
 }
