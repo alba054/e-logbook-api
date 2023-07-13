@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import { ClinicalRecordPayloadValidator } from "../../validator/clinicalRecords/ClinicalRecordValidator";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
@@ -7,6 +7,9 @@ import { ClinicalRecordService } from "../../services/database/ClinicalRecordSer
 import { IPostClinicalRecord } from "../../utils/interfaces/ClinicalRecord";
 import { constants, createResponse } from "../../utils";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
+import { ParamsDictionary } from "express-serve-static-core";
+import { ParsedQs } from "qs";
+import { UploadFileHelper } from "../../utils/helper/UploadFileHelper";
 
 export class ClinicalRecordHandler {
   private clinicalRecordValidator: ClinicalRecordPayloadValidator;
@@ -19,6 +22,32 @@ export class ClinicalRecordHandler {
     this.postClinicalRecord = this.postClinicalRecord.bind(this);
     this.getSubmittedClinicalRecords =
       this.getSubmittedClinicalRecords.bind(this);
+    this.postUploadedAttachment = this.postUploadedAttachment.bind(this);
+  }
+
+  async postUploadedAttachment(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      console.log(req.file);
+
+      if (!req.file?.buffer) {
+        throw new BadRequestError("upload file with fieldname attachment");
+      }
+
+      const savedFile = UploadFileHelper.uploadFileBuffer(
+        constants.CLINICAL_RECORD_ATTACHMENT_PATH,
+        req.file.buffer
+      );
+
+      return res
+        .status(201)
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, savedFile));
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getSubmittedClinicalRecords(

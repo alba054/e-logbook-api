@@ -3,6 +3,7 @@ import { ClinicalRecordHandler } from "./ClinicalRecordHandler";
 import { AuthorizationBearer } from "../../middleware/auth/AuthorizationBearer";
 import { constants } from "../../utils";
 import { UnitCheckIn } from "../../middleware/unitActivity/UnitCheckIn";
+import { multerHelper } from "../../utils/helper/MulterHelper";
 
 export class ClinicalRecordRouter {
   private clinicalRecordHandler: ClinicalRecordHandler;
@@ -31,6 +32,14 @@ export class ClinicalRecordRouter {
         constants.DPK_ROLE,
       ]),
       this.clinicalRecordHandler.getSubmittedClinicalRecords
+    );
+    // * upload attachment
+    this.router.post(
+      this.path + "/attachments",
+      AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+      UnitCheckIn.restrictUncheckInActiveUnit(),
+      multerHelper.upload.single("attachments"),
+      this.clinicalRecordHandler.postUploadedAttachment
     );
 
     return this.router;
