@@ -23,6 +23,15 @@ export class ClinicalRecordRouter {
       UnitCheckIn.restrictUncheckInActiveUnit(),
       this.clinicalRecordHandler.postClinicalRecord
     );
+    // * get submitted student clinical record
+    this.router.get(
+      this.path,
+      AuthorizationBearer.authorize([
+        constants.SUPERVISOR_ROLE,
+        constants.DPK_ROLE,
+      ]),
+      this.clinicalRecordHandler.getSubmittedClinicalRecords
+    );
 
     return this.router;
   }

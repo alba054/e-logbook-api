@@ -6,6 +6,7 @@ export interface IPostSupervisorPayload {
   readonly firstName: string;
   readonly lastName: string;
   readonly badges?: number[];
+  readonly roles: "DPK" | "SUPERVISOR";
 }
 
 export interface IPostSupervisorBadgePayload {

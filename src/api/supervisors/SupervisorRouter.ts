@@ -18,7 +18,10 @@ export class SupervisorRouter {
     // * get all supervisors
     this.router.get(
       this.path,
-      AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+      AuthorizationBearer.authorize([
+        constants.ADMIN_ROLE,
+        constants.STUDENT_ROLE,
+      ]),
       this.supervisorHandler.getSupervisors
     );
     // * post new supervisor
