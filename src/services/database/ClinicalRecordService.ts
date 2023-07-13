@@ -5,12 +5,28 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { createErrorObject } from "../../utils";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentService } from "./StudentService";
+import { ClinicalRecord } from "../../models/ClinicalRecord";
 
 export class ClinicalRecordService {
   private studentService: StudentService;
+  private clinicalRecordModel: ClinicalRecord;
 
   constructor() {
     this.studentService = new StudentService();
+    this.clinicalRecordModel = new ClinicalRecord();
+  }
+
+  async getSubmittedClinicalRecords(status: any, supervisorId?: string) {
+    if (status) {
+      return this.clinicalRecordModel.getClinicalRecordsByStatusAndSupervisorId(
+        status,
+        supervisorId
+      );
+    }
+
+    return this.clinicalRecordModel.getClinicalRecordsBySupervisorId(
+      supervisorId
+    );
   }
 
   async insertNewClinicalRecord(
@@ -38,11 +54,12 @@ export class ClinicalRecordService {
           unitId: studentActiveUnit?.activeUnit.activeUnit?.id,
           studentId: tokenPayload.studentId,
           id: clinicalRecordId,
+          supervisorId: payload.supervisorId,
         },
       });
 
       // * diagnosis
-      for (let i = 0; i < payload.diagnosiss.length; i++) {
+      for (let i = 0; i < payload.diagnosiss?.length; i++) {
         for (let j = 0; j < payload.diagnosiss[i].diagnosisTypeId.length; j++) {
           diagnosiss.push(
             db.clinicalRecordDiagnosis.create({
@@ -57,7 +74,7 @@ export class ClinicalRecordService {
       }
 
       // * examinations
-      for (let i = 0; i < payload.examinations.length; i++) {
+      for (let i = 0; i < payload.examinations?.length; i++) {
         for (
           let j = 0;
           j < payload.examinations[i].examinationTypeId.length;
@@ -76,7 +93,7 @@ export class ClinicalRecordService {
       }
 
       // * managements
-      for (let i = 0; i < payload.managements.length; i++) {
+      for (let i = 0; i < payload.managements?.length; i++) {
         for (let j = 0; j < payload.managements[i].management.length; j++) {
           managements.push(
             db.clinicalRecordManagement.create({

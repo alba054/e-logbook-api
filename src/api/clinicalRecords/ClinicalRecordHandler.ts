@@ -17,6 +17,29 @@ export class ClinicalRecordHandler {
     this.clinicalRecordValidator = new ClinicalRecordPayloadValidator();
 
     this.postClinicalRecord = this.postClinicalRecord.bind(this);
+    this.getSubmittedClinicalRecords =
+      this.getSubmittedClinicalRecords.bind(this);
+  }
+
+  async getSubmittedClinicalRecords(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { status } = req.query;
+
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const clinicalRecords =
+      await this.clinicalRecordService.getSubmittedClinicalRecords(
+        status,
+        tokenPayload.supervisorId
+      );
+
+    return res
+      .status(200)
+      .json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, clinicalRecords)
+      );
   }
 
   async postClinicalRecord(req: Request, res: Response, next: NextFunction) {
@@ -37,10 +60,11 @@ export class ClinicalRecordHandler {
         }
       }
 
-      const testError = await this.clinicalRecordService.insertNewClinicalRecord(
-        tokenPayload,
-        payload
-      );
+      const testError =
+        await this.clinicalRecordService.insertNewClinicalRecord(
+          tokenPayload,
+          payload
+        );
 
       if (testError && "error" in testError) {
         switch (testError.error) {

@@ -18,7 +18,7 @@ export class UserSupervisorRegistrationService {
             id: uuidv4(),
             username: payload.username,
             password: hashedPassword,
-            role: "SUPERVISOR",
+            role: payload.roles,
             email: payload.email,
             studentId: undefined,
             badges: {

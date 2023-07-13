@@ -35,13 +35,16 @@ export class SupervisorHandler {
     const supervisors = await this.userService.getUserByRole(
       constants.SUPERVISOR_ROLE
     );
+    const dpks = await this.userService.getUserByRole(constants.DPK_ROLE);
+
+    const results = [...supervisors, ...dpks];
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        supervisors.map((s) => {
+        results.map((s) => {
           return {
-            id: s.id,
+            id: s.supervisor?.id,
             fullName: s.supervisor?.fullname,
             supervisorId: s.supervisor?.supervisorId,
           } as ISupervisorProfileDTO;

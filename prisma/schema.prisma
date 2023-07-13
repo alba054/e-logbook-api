@@ -30,30 +30,40 @@ model User {
 }
 
 model Student {
-  id              String            @id @db.VarChar(100)
-  studentId       String            @unique @db.VarChar(25)
-  clinicId        String?           @db.VarChar(25)
-  preClinicId     String?           @db.VarChar(25)
-  graduationDate  Int?              @db.UnsignedInt
-  phoneNumber     String?           @db.VarChar(50)
-  address         String?           @db.VarChar(255)
-  fullName        String?           @db.VarChar(255)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  activeUnit      Unit?             @relation(fields: [unitId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  clinicalRecords ClinicalRecord[]
-  CheckInCheckOut CheckInCheckOut[]
-  unitId          String?           @db.VarChar(100)
-  User            User[]
+  id                      String            @id @db.VarChar(100)
+  studentId               String            @unique @db.VarChar(25)
+  clinicId                String?           @db.VarChar(25)
+  preClinicId             String?           @db.VarChar(25)
+  graduationDate          Int?              @db.UnsignedInt
+  phoneNumber             String?           @db.VarChar(50)
+  address                 String?           @db.VarChar(255)
+  fullName                String?           @db.VarChar(255)
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+  activeUnit              Unit?             @relation(fields: [unitId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  academicAdvisor         Supervisor?       @relation(fields: [academicSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "academicSupervisor")
+  supervisingDPK          Supervisor?       @relation(fields: [supervisingSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "supervisingDPK")
+  examinerDPK             Supervisor?       @relation(fields: [examinerSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "examinerDPK")
+  academicSupervisorId    String?
+  supervisingSupervisorId String?
+  examinerSupervisorId    String?
+  clinicalRecords         ClinicalRecord[]
+  CheckInCheckOut         CheckInCheckOut[]
+  unitId                  String?           @db.VarChar(100)
+  User                    User[]
 
   @@map("students")
 }
 
 model Supervisor {
-  id           String  @id @db.VarChar(100)
-  fullname     String? @db.VarChar(255)
-  supervisorId String? @unique @db.VarChar(50)
-  User         User[]
+  id                 String           @id @db.VarChar(100)
+  fullname           String?          @db.VarChar(255)
+  supervisorId       String?          @unique @db.VarChar(50)
+  User               User[]
+  academinSupervisor Student[]        @relation("academicSupervisor")
+  supervisingDPK     Student[]        @relation("supervisingDPK")
+  examinerDPK        Student[]        @relation("examinerDPK")
+  ClinicalRecord     ClinicalRecord[]
 
   @@map("supervisors")
 }
@@ -130,9 +140,11 @@ model ClinicalRecord {
   unitId                    String?                     @db.VarChar(100)
   studentFeedback           String?                     @db.Text
   supervisorFeedback        String?                     @db.Text
+  supervisor                Supervisor                  @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ClinicalRecordExamination ClinicalRecordExamination[]
   ClinicalRecordDiagnosis   ClinicalRecordDiagnosis[]
   ClinicalRecordManagement  ClinicalRecordManagement[]
+  supervisorId              String                      @db.VarChar(100)
 
   @@map("clinical_records")
 }

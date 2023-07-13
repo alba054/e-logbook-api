@@ -9,6 +9,7 @@ export interface IPostClinicalRecord {
   examinations: ClinicalRecordExamination[];
   diagnosiss: ClinicalRecordDiagnosis[];
   managements: ClinicalRecordManagement[];
+  supervisorId: string;
 }
 
 interface ClinicalRecordExamination {

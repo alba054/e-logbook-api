@@ -2,14 +2,6 @@ import db from "../database";
 import { v4 as uuidv4 } from "uuid";
 
 const main = async () => {
-  await db.badge.deleteMany({});
-  await db.affectedPart.deleteMany({});
-  await db.managementRole.deleteMany({});
-  await db.managementType.deleteMany({});
-  await db.examinationType.deleteMany({});
-  await db.diagnosisType.deleteMany({});
-  await db.unit.deleteMany({});
-
   await db.badge.createMany({
     data: [
       {

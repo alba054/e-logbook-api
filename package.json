@@ -7,7 +7,7 @@
     "migrate::dev": "prisma migrate dev --name",
     "build": "rimraf ./dist && tsc",
     "start": "npm run build && node ./dist/index.js",
-    "seed": "ts-node ./src/loader/seed.ts",
+    "seed": "prisma migrate reset && ts-node ./src/loader/seed.ts",
     "test": "jest"
   },
   "keywords": [],
@@ -39,6 +39,7 @@
     "jest": "^29.5.0",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.0",
+    "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.3",
     "rimraf": "^5.0.1",
     "uuid": "^9.0.0"

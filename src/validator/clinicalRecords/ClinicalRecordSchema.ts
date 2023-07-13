@@ -32,4 +32,5 @@ export const ClinicalRecordPayloadSchema = Joi.object({
         .min(1),
     })
   ),
+  supervisorId: Joi.string().required(),
 });

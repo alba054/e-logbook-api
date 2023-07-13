@@ -18,11 +18,17 @@ export class StudentRouter {
 
   register() {
     // * register
-    this.router.post(
-      this.path,
-      BasicAuthMiddleware.authenticateAdmin(),
-      this.studentHandler.postStudent
-    );
+    // * edit profile
+    this.router
+      .route(this.path)
+      .post(
+        BasicAuthMiddleware.authenticateAdmin(),
+        this.studentHandler.postStudent
+      )
+      .put(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.putStudentProfile
+      );
     // * send otp and token for reset password
     this.router.post(
       this.path + "/reset-password",
@@ -37,12 +43,18 @@ export class StudentRouter {
     );
 
     // * set active unit
-    this.router.put(
-      this.path + "/units",
-      AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
-      UnitCheckIn.restrictUnitActiveChanges(),
-      this.studentHandler.putActiveUnit
-    );
+    // * get active unit
+    this.router
+      .route(this.path + "/units")
+      .put(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        UnitCheckIn.restrictUnitActiveChanges(),
+        this.studentHandler.putActiveUnit
+      )
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getActiveUnit
+      );
 
     // * check in current active unit
     this.router.post(
@@ -50,13 +62,6 @@ export class StudentRouter {
       AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
       UnitCheckIn.restrictUnitActiveChanges(),
       this.studentHandler.postCheckInActiveUnit
-    );
-
-    // * get active unit
-    this.router.get(
-      this.path + "/units",
-      AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
-      this.studentHandler.getActiveUnit
     );
 
     // * test authorization for student
@@ -79,6 +84,14 @@ export class StudentRouter {
       AuthorizationBearer.authorize([constants.HEAD_DIV_BADGE]),
       this.studentHandler.putVerificationCheckIn
     );
+
+    // * assign supervisors to student
+    this.router
+      .route(this.path + "/supervisors")
+      .put(
+        AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+        this.studentHandler.putStudentSupervisors
+      );
 
     return this.router;
   }
