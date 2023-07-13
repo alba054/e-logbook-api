@@ -19,3 +19,7 @@ export interface IPutStudentActiveUnit {
 export interface IPostStudentTokenResetPassword {
   readonly email: string;
 }
+
+export interface IPutStudentSupervisor {
+  readonly supervisorIds: string[];
+}

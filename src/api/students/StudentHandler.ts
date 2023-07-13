@@ -52,7 +52,19 @@ export class StudentHandler {
     this.postCheckInActiveUnit = this.postCheckInActiveUnit.bind(this);
     this.getAllCheckInsStudent = this.getAllCheckInsStudent.bind(this);
     this.putVerificationCheckIn = this.putVerificationCheckIn.bind(this);
+    this.putStudentProfile = this.putStudentProfile.bind(this);
+    this.putStudentSupervisors = this.putStudentSupervisors.bind(this);
   }
+
+  // todo: assign student supervisors
+  async putStudentSupervisors(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {}
+
+  // todo: edit profile handler
+  async putStudentProfile(req: Request, res: Response, next: NextFunction) {}
 
   async putVerificationCheckIn(
     req: Request,
