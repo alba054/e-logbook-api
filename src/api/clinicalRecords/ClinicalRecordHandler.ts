@@ -7,6 +7,8 @@ import { ClinicalRecordService } from "../../services/database/ClinicalRecordSer
 import { IPostClinicalRecord } from "../../utils/interfaces/ClinicalRecord";
 import { constants, createResponse } from "../../utils";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
+import { UploadFileHelper } from "../../utils/helper/UploadFileHelper";
+import { IListClinicalRecordDTO } from "../../utils/dto/ClinicalRecordDTO";
 
 export class ClinicalRecordHandler {
   private clinicalRecordValidator: ClinicalRecordPayloadValidator;
@@ -19,6 +21,58 @@ export class ClinicalRecordHandler {
     this.postClinicalRecord = this.postClinicalRecord.bind(this);
     this.getSubmittedClinicalRecords =
       this.getSubmittedClinicalRecords.bind(this);
+    this.postUploadedAttachment = this.postUploadedAttachment.bind(this);
+    this.getAttachmentFile = this.getAttachmentFile.bind(this);
+  }
+
+  async getAttachmentFile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      const tokenPayload: ITokenPayload = res.locals.user;
+      const fileToSend =
+        await this.clinicalRecordService.getAttachmentByClinicalRecordId(
+          id,
+          tokenPayload
+        );
+
+      if (typeof fileToSend === "string") {
+        return res.sendFile(`${constants.ABS_PATH}/${fileToSend}`);
+      }
+      switch (fileToSend?.error) {
+        case 400:
+          throw new BadRequestError(fileToSend.message);
+        case 404:
+          throw new NotFoundError(fileToSend.message);
+        default:
+          throw new InternalServerError();
+      }
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async postUploadedAttachment(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      if (!req.file?.buffer) {
+        throw new BadRequestError("upload file with fieldname attachment");
+      }
+
+      const savedFile = UploadFileHelper.uploadFileBuffer(
+        constants.CLINICAL_RECORD_ATTACHMENT_PATH,
+        req.file.buffer
+      );
+
+      return res
+        .status(201)
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, savedFile));
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getSubmittedClinicalRecords(
@@ -35,11 +89,21 @@ export class ClinicalRecordHandler {
         tokenPayload.supervisorId
       );
 
-    return res
-      .status(200)
-      .json(
-        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, clinicalRecords)
-      );
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        clinicalRecords.map((c) => {
+          return {
+            patientName: c.patientName,
+            studentId: c.Student?.studentId,
+            studentName: c.Student?.fullName,
+            time: c.createdAt,
+            attachment: c.attachment,
+            id: c.id,
+          } as IListClinicalRecordDTO;
+        })
+      )
+    );
   }
 
   async postClinicalRecord(req: Request, res: Response, next: NextFunction) {
