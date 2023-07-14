@@ -1,4 +1,7 @@
 import crypto from "crypto";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const createResponse = (status: string, data: any = null) => {
   if (data) {
@@ -49,4 +52,5 @@ export const constants = {
   ADMIN_ROLE: "ADMIN",
   DPK_ROLE: "DPK",
   CLINICAL_RECORD_ATTACHMENT_PATH: "storage/clinical-record/",
+  ABS_PATH: process.env.ABS_PATH,
 };

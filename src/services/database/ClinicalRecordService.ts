@@ -16,6 +16,27 @@ export class ClinicalRecordService {
     this.clinicalRecordModel = new ClinicalRecord();
   }
 
+  async getAttachmentByClinicalRecordId(
+    id: string,
+    tokenPayload: ITokenPayload
+  ) {
+    const clinicalRecord =
+      await this.clinicalRecordModel.getClinicalRecordsById(id);
+
+    if (
+      clinicalRecord?.supervisorId !== tokenPayload.supervisorId &&
+      clinicalRecord?.studentId !== tokenPayload.studentId
+    ) {
+      return createErrorObject(400, "this attachment is not for you");
+    }
+
+    if (!clinicalRecord?.attachment) {
+      return createErrorObject(404, "attachment's not found");
+    }
+
+    return clinicalRecord.attachment;
+  }
+
   async getSubmittedClinicalRecords(status: any, supervisorId?: string) {
     if (status) {
       return this.clinicalRecordModel.getClinicalRecordsByStatusAndSupervisorId(
@@ -73,7 +94,7 @@ export class ClinicalRecordService {
         }
       }
 
-      // * examinations
+      // * examifileToSend && "error" in fileToSendnations
       for (let i = 0; i < payload.examinations?.length; i++) {
         for (
           let j = 0;

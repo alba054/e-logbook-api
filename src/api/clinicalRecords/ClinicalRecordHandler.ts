@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, RequestHandler } from "express";
+import { Request, Response, NextFunction } from "express";
 import { ClinicalRecordPayloadValidator } from "../../validator/clinicalRecords/ClinicalRecordValidator";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
@@ -7,9 +7,8 @@ import { ClinicalRecordService } from "../../services/database/ClinicalRecordSer
 import { IPostClinicalRecord } from "../../utils/interfaces/ClinicalRecord";
 import { constants, createResponse } from "../../utils";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
-import { ParamsDictionary } from "express-serve-static-core";
-import { ParsedQs } from "qs";
 import { UploadFileHelper } from "../../utils/helper/UploadFileHelper";
+import { IListClinicalRecordDTO } from "../../utils/dto/ClinicalRecordDTO";
 
 export class ClinicalRecordHandler {
   private clinicalRecordValidator: ClinicalRecordPayloadValidator;
@@ -23,6 +22,34 @@ export class ClinicalRecordHandler {
     this.getSubmittedClinicalRecords =
       this.getSubmittedClinicalRecords.bind(this);
     this.postUploadedAttachment = this.postUploadedAttachment.bind(this);
+    this.getAttachmentFile = this.getAttachmentFile.bind(this);
+  }
+
+  async getAttachmentFile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      const tokenPayload: ITokenPayload = res.locals.user;
+      const fileToSend =
+        await this.clinicalRecordService.getAttachmentByClinicalRecordId(
+          id,
+          tokenPayload
+        );
+
+      if (typeof fileToSend === "string") {
+        return res.sendFile(`${constants.ABS_PATH}/${fileToSend}`);
+      }
+      switch (fileToSend?.error) {
+        case 400:
+          throw new BadRequestError(fileToSend.message);
+        case 404:
+          throw new NotFoundError(fileToSend.message);
+        default:
+          throw new InternalServerError();
+      }
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async postUploadedAttachment(
@@ -31,8 +58,6 @@ export class ClinicalRecordHandler {
     next: NextFunction
   ) {
     try {
-      console.log(req.file);
-
       if (!req.file?.buffer) {
         throw new BadRequestError("upload file with fieldname attachment");
       }
@@ -64,11 +89,21 @@ export class ClinicalRecordHandler {
         tokenPayload.supervisorId
       );
 
-    return res
-      .status(200)
-      .json(
-        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, clinicalRecords)
-      );
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        clinicalRecords.map((c) => {
+          return {
+            patientName: c.patientName,
+            studentId: c.Student?.studentId,
+            studentName: c.Student?.fullName,
+            time: c.createdAt,
+            attachment: c.attachment,
+            id: c.id,
+          } as IListClinicalRecordDTO;
+        })
+      )
+    );
   }
 
   async postClinicalRecord(req: Request, res: Response, next: NextFunction) {

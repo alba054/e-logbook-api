@@ -34,13 +34,25 @@ export class ClinicalRecordRouter {
       this.clinicalRecordHandler.getSubmittedClinicalRecords
     );
     // * upload attachment
-    this.router.post(
-      this.path + "/attachments",
-      AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
-      UnitCheckIn.restrictUncheckInActiveUnit(),
-      multerHelper.upload.single("attachments"),
-      this.clinicalRecordHandler.postUploadedAttachment
-    );
+    // * get attachment file
+    this.router
+      .route(this.path + "/attachments")
+      .post(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        UnitCheckIn.restrictUncheckInActiveUnit(),
+        multerHelper.upload.single("attachments"),
+        this.clinicalRecordHandler.postUploadedAttachment
+      );
+
+    this.router
+      .route(this.path + "/:id/attachments")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.STUDENT_ROLE,
+          constants.SUPERVISOR_ROLE,
+        ]),
+        this.clinicalRecordHandler.getAttachmentFile
+      );
 
     return this.router;
   }
