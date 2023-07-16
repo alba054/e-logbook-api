@@ -30,40 +30,42 @@ model User {
 }
 
 model Student {
-  id                      String            @id @db.VarChar(100)
-  studentId               String            @unique @db.VarChar(25)
-  clinicId                String?           @db.VarChar(25)
-  preClinicId             String?           @db.VarChar(25)
-  graduationDate          Int?              @db.UnsignedInt
-  phoneNumber             String?           @db.VarChar(50)
-  address                 String?           @db.VarChar(255)
-  fullName                String?           @db.VarChar(255)
-  createdAt               DateTime          @default(now())
-  updatedAt               DateTime          @updatedAt
-  activeUnit              Unit?             @relation(fields: [unitId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  academicAdvisor         Supervisor?       @relation(fields: [academicSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "academicSupervisor")
-  supervisingDPK          Supervisor?       @relation(fields: [supervisingSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "supervisingDPK")
-  examinerDPK             Supervisor?       @relation(fields: [examinerSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "examinerDPK")
+  id                      String              @id @db.VarChar(100)
+  studentId               String              @unique @db.VarChar(25)
+  clinicId                String?             @db.VarChar(25)
+  preClinicId             String?             @db.VarChar(25)
+  graduationDate          Int?                @db.UnsignedInt
+  phoneNumber             String?             @db.VarChar(50)
+  address                 String?             @db.VarChar(255)
+  fullName                String?             @db.VarChar(255)
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+  activeUnit              Unit?               @relation(fields: [unitId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  academicAdvisor         Supervisor?         @relation(fields: [academicSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "academicSupervisor")
+  supervisingDPK          Supervisor?         @relation(fields: [supervisingSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "supervisingDPK")
+  examinerDPK             Supervisor?         @relation(fields: [examinerSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "examinerDPK")
   academicSupervisorId    String?
   supervisingSupervisorId String?
   examinerSupervisorId    String?
   clinicalRecords         ClinicalRecord[]
   CheckInCheckOut         CheckInCheckOut[]
-  unitId                  String?           @db.VarChar(100)
+  unitId                  String?             @db.VarChar(100)
   User                    User[]
+  ScientificSession       ScientificSession[]
 
   @@map("students")
 }
 
 model Supervisor {
-  id                 String           @id @db.VarChar(100)
-  fullname           String?          @db.VarChar(255)
-  supervisorId       String?          @unique @db.VarChar(50)
+  id                 String              @id @db.VarChar(100)
+  fullname           String?             @db.VarChar(255)
+  supervisorId       String?             @unique @db.VarChar(50)
   User               User[]
-  academinSupervisor Student[]        @relation("academicSupervisor")
-  supervisingDPK     Student[]        @relation("supervisingDPK")
-  examinerDPK        Student[]        @relation("examinerDPK")
+  academinSupervisor Student[]           @relation("academicSupervisor")
+  supervisingDPK     Student[]           @relation("supervisingDPK")
+  examinerDPK        Student[]           @relation("examinerDPK")
   ClinicalRecord     ClinicalRecord[]
+  ScientificSession  ScientificSession[]
 
   @@map("supervisors")
 }
@@ -90,35 +92,38 @@ model PasswordResetToken {
 }
 
 model Unit {
-  id               String            @id @db.VarChar(100)
-  name             String            @db.VarChar(100)
-  clinicalRecords  ClinicalRecord[]
-  affectedParts    AffectedPart[]
-  examinationTypes ExaminationType[]
-  DiagnosisType    DiagnosisType[]
-  ManagementType   ManagementType[]
-  CheckInCheckOut  CheckInCheckOut[]
-  Student          Student[]
+  id                String              @id @db.VarChar(100)
+  name              String              @db.VarChar(100)
+  clinicalRecords   ClinicalRecord[]
+  affectedParts     AffectedPart[]
+  examinationTypes  ExaminationType[]
+  DiagnosisType     DiagnosisType[]
+  ManagementType    ManagementType[]
+  CheckInCheckOut   CheckInCheckOut[]
+  Student           Student[]
+  ScientificSession ScientificSession[]
 
   @@map("units")
 }
 
 model CheckInCheckOut {
-  id                 String              @id @db.VarChar(100)
-  checkIn            Boolean             @default(false)
-  checkOut           Boolean?
-  checkInTime        BigInt?             @db.UnsignedBigInt
-  checkOutTime       BigInt?             @db.UnsignedBigInt
-  checkInStatus      VerificationStatus  @default(INPROCESS)
-  checkOutStatus     VerificationStatus?
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  unit               Unit                @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  student            Student             @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  unitId             String              @db.VarChar(100)
-  studentId          String              @db.VarChar(100)
-  headDivVerificator User?               @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId             String?             @db.VarChar(100)
+  id                    String              @id @db.VarChar(100)
+  checkIn               Boolean             @default(false)
+  checkOut              Boolean?
+  checkInTime           BigInt?             @db.UnsignedBigInt
+  checkOutTime          BigInt?             @db.UnsignedBigInt
+  checkInStatus         VerificationStatus  @default(INPROCESS)
+  checkOutStatus        VerificationStatus?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  unit                  Unit                @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  student               Student             @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId                String              @db.VarChar(100)
+  studentId             String              @db.VarChar(100)
+  headDivVerificator    User?               @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId                String?             @db.VarChar(100)
+  clinicalRecordDone    Boolean             @default(false)
+  scientificSessionDone Boolean             @default(false)
 
   @@unique([unitId, studentId])
 }
@@ -238,6 +243,28 @@ model ClinicalRecordManagement {
   @@map("clinical_record_managements")
 }
 
+model ScientificSession {
+  id                 String             @id @db.VarChar(100)
+  Unit               Unit?              @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId             String?            @db.VarChar(100)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  sessionType        SessionType
+  topic              String             @db.VarChar(255)
+  title              String             @db.VarChar(255)
+  reference          String             @db.VarChar(255)
+  role               ScientificRole
+  note               String?            @db.Text
+  attachment         String?            @db.VarChar(255)
+  verificationStatus VerificationStatus @default(INPROCESS)
+  supervisor         Supervisor         @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  supervisorId       String             @db.VarChar(100)
+  Student            Student?           @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId          String?            @db.VarChar(100)
+
+  @@map("scientific_session")
+}
+
 enum Badges {
   CEU
   HEAD_DIV // kepala bagian
@@ -260,4 +287,18 @@ enum VerificationStatus {
   VERIFIED
   INPROCESS
   UNVERIFIED
+}
+
+enum SessionType {
+  Journal_Reading
+  Session_Type0
+  Session_Type1
+  Session_Type2
+}
+
+enum ScientificRole {
+  Participant
+  Scientific_Role0
+  Scientific_Role1
+  Scientific_Role2
 }

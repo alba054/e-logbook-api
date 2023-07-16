@@ -8,9 +8,6 @@ const main = async () => {
         name: "CEU",
       },
       {
-        name: "ER",
-      },
-      {
         name: "HEAD_DIV",
       },
     ],
