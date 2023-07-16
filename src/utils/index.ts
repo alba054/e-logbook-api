@@ -36,7 +36,7 @@ export const generateRandomString = (length: number) => {
 export const constants = {
   SUCCESS_RESPONSE_MESSAGE: "success",
   FAILED_RESPONSE_MESSAGE: "failed",
-  ACCESS_TOKEN_EXP: 24 * 60 * 60, // *  1 day
+  ACCESS_TOKEN_EXP: 24 * 60 * 60 * 30, // *  1 month
   REFRESH_TOKEN_EXP: 24 * 60 * 60 * 30, // * 1 month
   PASSWORD_RESET_TOKEN_EXP: 5 * 60 * 1000,
   INVALID_TOKEN: "token is invalid",
@@ -46,7 +46,7 @@ export const constants = {
   INVALID_SIGNATURE: "secret key is not valid",
   STUDENT_ROLE: "STUDENT",
   SUPERVISOR_ROLE: "SUPERVISOR",
-  ER_BADGE: "ER",
+  ER_ROLE: "ER",
   CEU_BADGE: "CEU",
   HEAD_DIV_BADGE: "HEAD_DIV",
   ADMIN_ROLE: "ADMIN",

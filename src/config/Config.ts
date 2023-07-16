@@ -21,6 +21,7 @@ interface IConfig {
   FRONTEND_HOST?: string;
   ELOGBOOK_MAIL_USERNAME?: string;
   ELOGBOOK_MAIL_PASSWORD?: string;
+  FRONTEND_RESET_PASSWORD_URI?: string;
 }
 
 class Config {
@@ -53,6 +54,7 @@ class Config {
       this.config.REFRESH_SECRET_KEY = process.env.REFRESH_SECRET_KEY;
       this.config.ELOGBOOK_MAIL_USERNAME = process.env.ELOGBOOK_MAIL_USERNAME;
       this.config.ELOGBOOK_MAIL_PASSWORD = process.env.ELOGBOOK_MAIL_PASSWORD;
+      this.config.FRONTEND_RESET_PASSWORD_URI = `${process.env.FRONTEND_HOST}/reset-password?`;
     }
   }
 }

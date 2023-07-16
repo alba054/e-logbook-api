@@ -12,6 +12,12 @@ export interface IPostClinicalRecord {
   supervisorId: string;
 }
 
+export interface IPutVerificationStatusClinicalRecord {
+  verified: boolean;
+  supervisorFeedback?: string;
+  rating?: number;
+}
+
 interface ClinicalRecordExamination {
   affectedPartId: string;
   examinationTypeId: string[];

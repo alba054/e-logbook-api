@@ -1,5 +1,8 @@
 import db from "../../database";
-import { IPostClinicalRecord } from "../../utils/interfaces/ClinicalRecord";
+import {
+  IPostClinicalRecord,
+  IPutVerificationStatusClinicalRecord,
+} from "../../utils/interfaces/ClinicalRecord";
 import { v4 as uuidv4 } from "uuid";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { createErrorObject } from "../../utils";
@@ -14,6 +17,73 @@ export class ClinicalRecordService {
   constructor() {
     this.studentService = new StudentService();
     this.clinicalRecordModel = new ClinicalRecord();
+  }
+
+  async getClinicalRecordsByStudentAndUnitId(tokenPayload: ITokenPayload) {
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+
+    const clinicalRecords =
+      await this.clinicalRecordModel.getClinicalRecordsByStudentIdAndUnitId(
+        tokenPayload,
+        activeUnit?.activeUnit.activeUnit?.id
+      );
+
+    return {
+      clinicalRecords,
+      verifiedCounts: clinicalRecords.filter(
+        (c) => c.verificationStatus === "VERIFIED"
+      ).length,
+      unverifiedCounts: clinicalRecords.filter(
+        (c) =>
+          c.verificationStatus === "UNVERIFIED" ||
+          c.verificationStatus === "INPROCESS"
+      ).length,
+    };
+  }
+
+  async verifyClinicalRecord(
+    id: string,
+    tokenPayload: ITokenPayload,
+    payload: IPutVerificationStatusClinicalRecord
+  ) {
+    const clinicalRecord =
+      await this.clinicalRecordModel.getClinicalRecordsById(id);
+
+    if (!clinicalRecord) {
+      return createErrorObject(404, "clinical record's not found");
+    }
+
+    if (
+      clinicalRecord.supervisorId !== tokenPayload.supervisorId &&
+      clinicalRecord.studentId !== tokenPayload.studentId
+    ) {
+      return createErrorObject(400, "clinical record's not for you");
+    }
+
+    return this.clinicalRecordModel.changeVerificationStatusClinicalRecordById(
+      id,
+      payload
+    );
+  }
+
+  async getClinicalRecordDetail(id: string, tokenPayload: ITokenPayload) {
+    const clinicalRecord =
+      await this.clinicalRecordModel.getClinicalRecordsById(id);
+
+    if (!clinicalRecord) {
+      return createErrorObject(404, "clinical record's not found");
+    }
+
+    if (
+      clinicalRecord.supervisorId !== tokenPayload.supervisorId &&
+      clinicalRecord.studentId !== tokenPayload.studentId
+    ) {
+      return createErrorObject(400, "clinical record's not for you");
+    }
+
+    return clinicalRecord;
   }
 
   async getAttachmentByClinicalRecordId(
@@ -94,7 +164,7 @@ export class ClinicalRecordService {
         }
       }
 
-      // * examifileToSend && "error" in fileToSendnations
+      // * examinations
       for (let i = 0; i < payload.examinations?.length; i++) {
         for (
           let j = 0;

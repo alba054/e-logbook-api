@@ -4,6 +4,7 @@ import { EmailHelper } from "../../utils/helper/EmailHelper";
 import { IPasswordResetTokenData } from "../../utils/interfaces/PasswordResetToken";
 import { UserService } from "./UserService";
 import { v4 as uuidv4 } from "uuid";
+import { config } from "../../config/Config";
 
 export class PasswordResetTokenService {
   private userService: UserService;
@@ -35,7 +36,7 @@ export class PasswordResetTokenService {
     if (!("error" in testError)) {
       const emailHelper = new EmailHelper();
       emailHelper.sendEmail({
-        html: `<h3>OTP: ${testError.otp}</h3><br>OTP hanya berlaku selama 5 menit`,
+        html: `<h3>OTP: ${testError.otp}</h3><br>OTP hanya berlaku selama 5 menit<br><h3>${config.config.FRONTEND_RESET_PASSWORD_URI}token=${testError.token}</h3>`,
         subject: "RESIDENT RESET PASSWORD",
         text: "",
         to: user.email,

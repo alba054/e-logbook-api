@@ -5,6 +5,18 @@ import { createErrorObject } from "../utils";
 export class User {
   constructor() {}
 
+  async getUserByResetPasswordToken(token: string) {
+    return db.user.findFirst({
+      where: {
+        PasswordResetToken: {
+          some: {
+            token,
+          },
+        },
+      },
+    });
+  }
+
   async getUserByRole(role: any) {
     return db.user.findMany({
       where: {
