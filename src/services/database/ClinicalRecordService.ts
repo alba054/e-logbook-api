@@ -62,10 +62,32 @@ export class ClinicalRecordService {
       return createErrorObject(400, "clinical record's not for you");
     }
 
-    return this.clinicalRecordModel.changeVerificationStatusClinicalRecordById(
-      id,
-      payload
-    );
+    return db.$transaction([
+      db.clinicalRecord.update({
+        where: {
+          id,
+        },
+        data: {
+          verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
+          supervisorFeedback: payload.supervisorFeedback,
+          rating: payload.rating,
+        },
+      }),
+      db.checkInCheckOut.updateMany({
+        where: {
+          unitId: clinicalRecord.unitId ?? "",
+          studentId: clinicalRecord.studentId ?? "",
+        },
+        data: {
+          clinicalRecordDone: payload.verified,
+        },
+      }),
+    ]);
+
+    // return this.clinicalRecordModel.changeVerificationStatusClinicalRecordById(
+    //   id,
+    //   payload
+    // );
   }
 
   async getClinicalRecordDetail(id: string, tokenPayload: ITokenPayload) {
