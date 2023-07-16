@@ -36,11 +36,17 @@ export class StudentRouter {
       this.studentHandler.postStudentForgetPassword
     );
     // * reset password based on token and otp
-    this.router.post(
-      this.path + "/reset-password/:token",
-      BasicAuthMiddleware.authenticateAdmin(),
-      this.studentHandler.postStudentResetPassword
-    );
+    // * get student profile by token reset password
+    this.router
+      .route(this.path + "/reset-password/:token")
+      .post(
+        BasicAuthMiddleware.authenticateAdmin(),
+        this.studentHandler.postStudentResetPassword
+      )
+      .get(
+        BasicAuthMiddleware.authenticateAdmin(),
+        this.studentHandler.getStudentProfileByResetPasswordToken
+      );
 
     // * set active unit
     // * get active unit
@@ -91,6 +97,14 @@ export class StudentRouter {
       .put(
         AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
         this.studentHandler.putStudentSupervisors
+      );
+
+    // * get list of clinical records submitted
+    this.router
+      .route(this.path + "/clinical-records")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getStudentClinicalRecords
       );
 
     return this.router;

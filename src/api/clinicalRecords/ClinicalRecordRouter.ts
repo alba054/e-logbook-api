@@ -17,22 +17,23 @@ export class ClinicalRecordRouter {
   }
 
   register() {
-    // * student post new clinical record
-    this.router.post(
-      this.path,
-      AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
-      UnitCheckIn.restrictUncheckInActiveUnit(),
-      this.clinicalRecordHandler.postClinicalRecord
-    );
-    // * get submitted student clinical record
-    this.router.get(
-      this.path,
-      AuthorizationBearer.authorize([
-        constants.SUPERVISOR_ROLE,
-        constants.DPK_ROLE,
-      ]),
-      this.clinicalRecordHandler.getSubmittedClinicalRecords
-    );
+    this.router
+      // * student post new clinical record
+      // * get submitted student clinical record
+      .route(this.path)
+      .post(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        UnitCheckIn.restrictUncheckInActiveUnit(),
+        this.clinicalRecordHandler.postClinicalRecord
+      )
+      .get(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.clinicalRecordHandler.getSubmittedClinicalRecords
+      );
+    this.router;
     // * upload attachment
     // * get attachment file
     this.router
@@ -44,6 +45,20 @@ export class ClinicalRecordRouter {
         this.clinicalRecordHandler.postUploadedAttachment
       );
 
+    // * clinical record detail
+    this.router
+      .route(this.path + "/:id")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.STUDENT_ROLE,
+          constants.SUPERVISOR_ROLE,
+        ]),
+        this.clinicalRecordHandler.getClinicalRecordDetail
+      )
+      .put(
+        AuthorizationBearer.authorize([constants.SUPERVISOR_ROLE]),
+        this.clinicalRecordHandler.putVerificationStatusClinicalRecord
+      );
     this.router
       .route(this.path + "/:id/attachments")
       .get(

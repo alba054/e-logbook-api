@@ -20,6 +20,9 @@ import { IActiveUnitDTO } from "../../utils/dto/ActiveUnitDTO";
 import { IListInProcessCheckInDTO } from "../../utils/dto/StudentCheckInDTO";
 import { CheckInCheckOutValidator } from "../../validator/checkInCheckOut/CheckInCheckOutValidator";
 import { CheckInCheckOutService } from "../../services/database/CheckInCheckOutService";
+import { ClinicalRecordService } from "../../services/database/ClinicalRecordService";
+import { IStudentClinicalRecods } from "../../utils/dto/ClinicalRecordDTO";
+import { UserService } from "../../services/database/UserService";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -30,6 +33,8 @@ export class StudentHandler {
   private studentCheckInCheckOutService: StudentCheckInCheckOutService;
   private checkInCheckOutValidator: CheckInCheckOutValidator;
   private checkInCheckOutService: CheckInCheckOutService;
+  private clinicalRecordService: ClinicalRecordService;
+  private userService: UserService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -41,6 +46,8 @@ export class StudentHandler {
     this.studentService = new StudentService();
     this.studentCheckInCheckOutService = new StudentCheckInCheckOutService();
     this.checkInCheckOutService = new CheckInCheckOutService();
+    this.clinicalRecordService = new ClinicalRecordService();
+    this.userService = new UserService();
 
     this.postStudent = this.postStudent.bind(this);
     this.postStudentForgetPassword = this.postStudentForgetPassword.bind(this);
@@ -54,6 +61,67 @@ export class StudentHandler {
     this.putVerificationCheckIn = this.putVerificationCheckIn.bind(this);
     this.putStudentProfile = this.putStudentProfile.bind(this);
     this.putStudentSupervisors = this.putStudentSupervisors.bind(this);
+    this.getStudentClinicalRecords = this.getStudentClinicalRecords.bind(this);
+    this.getStudentProfileByResetPasswordToken =
+      this.getStudentProfileByResetPasswordToken.bind(this);
+  }
+
+  async getStudentProfileByResetPasswordToken(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { token } = req.params;
+
+    try {
+      const result = await this.userService.getUserProfileByResetTokenPassword(
+        token
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, result.email));
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getStudentClinicalRecords(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const clinicalRecords =
+      await this.clinicalRecordService.getClinicalRecordsByStudentAndUnitId(
+        tokenPayload
+      );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        unverifiedCounts: clinicalRecords.unverifiedCounts,
+        verifiedCounts: clinicalRecords.verifiedCounts,
+        listClinicalRecords: clinicalRecords.clinicalRecords.map((c) => {
+          return {
+            clinicalRecordId: c.id,
+            patientName: c.patientName,
+            supervisorName: c.supervisor.fullname,
+            verificationStatus: c.verificationStatus,
+          };
+        }),
+      } as IStudentClinicalRecods)
+    );
   }
 
   // todo: assign student supervisors

@@ -34,3 +34,9 @@ export const ClinicalRecordPayloadSchema = Joi.object({
   ),
   supervisorId: Joi.string().required(),
 });
+
+export const ClinicalRecordVerificationStatusSchema = Joi.object({
+  verified: Joi.boolean().required(),
+  supervisorFeedback: Joi.string().optional(),
+  rating: Joi.number().max(5),
+});

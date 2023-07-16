@@ -2,6 +2,7 @@ import { User } from "../../models/User";
 import { IPostUserPayload } from "../../utils/interfaces/User";
 import { v4 as uuidv4 } from "uuid";
 import bcryptjs from "bcryptjs";
+import { createErrorObject } from "../../utils";
 
 interface IUserData {
   id: string;
@@ -15,6 +16,16 @@ export class UserService {
 
   constructor() {
     this.userModel = new User();
+  }
+
+  async getUserProfileByResetTokenPassword(token: string) {
+    const user = await this.userModel.getUserByResetPasswordToken(token);
+
+    if (!user) {
+      return createErrorObject(404, "user's not found or token invalid");
+    }
+
+    return user;
   }
 
   async getUserByRole(role: any) {

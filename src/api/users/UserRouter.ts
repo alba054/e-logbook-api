@@ -21,7 +21,7 @@ export class UserRouter {
       this.path,
       AuthorizationBearer.authorize([
         constants.CEU_BADGE,
-        constants.ER_BADGE,
+        constants.ER_ROLE,
         constants.STUDENT_ROLE,
         constants.HEAD_DIV_BADGE,
         constants.SUPERVISOR_ROLE,
