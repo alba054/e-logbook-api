@@ -18,6 +18,10 @@ export interface IPutVerificationStatusClinicalRecord {
   rating?: number;
 }
 
+export interface IPutFeedbackClinicalRecord {
+  feedback: string;
+}
+
 interface ClinicalRecordExamination {
   affectedPartId: string;
   examinationTypeId: string[];

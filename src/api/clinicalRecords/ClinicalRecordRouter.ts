@@ -33,9 +33,7 @@ export class ClinicalRecordRouter {
         ]),
         this.clinicalRecordHandler.getSubmittedClinicalRecords
       );
-    this.router;
     // * upload attachment
-    // * get attachment file
     this.router
       .route(this.path + "/attachments")
       .post(
@@ -46,27 +44,46 @@ export class ClinicalRecordRouter {
       );
 
     // * clinical record detail
+    // * verify clinical record
     this.router
       .route(this.path + "/:id")
       .get(
         AuthorizationBearer.authorize([
           constants.STUDENT_ROLE,
           constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
         ]),
         this.clinicalRecordHandler.getClinicalRecordDetail
       )
       .put(
-        AuthorizationBearer.authorize([constants.SUPERVISOR_ROLE]),
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
         this.clinicalRecordHandler.putVerificationStatusClinicalRecord
       );
+    // * get clinical record attachment
     this.router
       .route(this.path + "/:id/attachments")
       .get(
         AuthorizationBearer.authorize([
           constants.STUDENT_ROLE,
           constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
         ]),
         this.clinicalRecordHandler.getAttachmentFile
+      );
+
+    // * give feedback to clinical record
+    this.router
+      .route(this.path + "/:id/feedback")
+      .put(
+        AuthorizationBearer.authorize([
+          constants.STUDENT_ROLE,
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.clinicalRecordHandler.putFeedbackOfClinicalRecord
       );
 
     return this.router;

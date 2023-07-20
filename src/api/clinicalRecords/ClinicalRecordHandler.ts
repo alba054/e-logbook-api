@@ -6,6 +6,7 @@ import { InternalServerError } from "../../exceptions/httpError/InternalServerEr
 import { ClinicalRecordService } from "../../services/database/ClinicalRecordService";
 import {
   IPostClinicalRecord,
+  IPutFeedbackClinicalRecord,
   IPutVerificationStatusClinicalRecord,
 } from "../../utils/interfaces/ClinicalRecord";
 import { constants, createResponse } from "../../utils";
@@ -32,6 +33,58 @@ export class ClinicalRecordHandler {
     this.getClinicalRecordDetail = this.getClinicalRecordDetail.bind(this);
     this.putVerificationStatusClinicalRecord =
       this.putVerificationStatusClinicalRecord.bind(this);
+    this.putFeedbackOfClinicalRecord =
+      this.putFeedbackOfClinicalRecord.bind(this);
+  }
+
+  async putFeedbackOfClinicalRecord(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const { id } = req.params;
+    const payload: IPutFeedbackClinicalRecord = req.body;
+
+    try {
+      const validationResult =
+        this.clinicalRecordValidator.validatePutFeedbackClinicalRecord(payload);
+
+      if (validationResult && "error" in validationResult) {
+        switch (validationResult.error) {
+          case 400:
+            throw new BadRequestError(validationResult.message);
+          case 404:
+            throw new NotFoundError(validationResult.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      const result =
+        await this.clinicalRecordService.giveFeedbackToClinicalRecord(
+          id,
+          tokenPayload,
+          payload
+        );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, result));
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async putVerificationStatusClinicalRecord(
@@ -109,11 +162,122 @@ export class ClinicalRecordHandler {
         }
       }
 
-      return res
-        .status(200)
-        .json(
-          createResponse(constants.SUCCESS_RESPONSE_MESSAGE, clinicalRecord)
-        );
+      const affectedPartIds = {
+        diagnosess: [] as string[],
+        examinations: [] as string[],
+        managements: [] as string[],
+      };
+
+      const diagnosess = [];
+      const examinations = [];
+      const managements = [];
+
+      for (let i = 0; i < clinicalRecord.ClinicalRecordDiagnosis.length; i++) {
+        const diagnosis = clinicalRecord.ClinicalRecordDiagnosis[i];
+        const affectedPart = diagnosis.affectedPartId;
+        if (affectedPartIds.diagnosess.includes(affectedPart)) {
+          continue;
+        }
+        const types: string[] = [];
+
+        affectedPartIds.diagnosess.push(affectedPart);
+
+        for (
+          let j = 0;
+          j < clinicalRecord.ClinicalRecordDiagnosis.length;
+          j++
+        ) {
+          const diagToSeekFor = clinicalRecord.ClinicalRecordDiagnosis[j];
+
+          if (diagToSeekFor.affectedPartId === affectedPart) {
+            types.push(diagToSeekFor.DiagnosisType.typeName);
+          }
+        }
+
+        diagnosess.push({
+          affectedPart: diagnosis.affectedPart.partName,
+          diagnosesType: types,
+        });
+      }
+
+      for (
+        let i = 0;
+        i < clinicalRecord.ClinicalRecordExamination.length;
+        i++
+      ) {
+        const examination = clinicalRecord.ClinicalRecordExamination[i];
+        const affectedPart = examination.affectedPartId;
+        if (affectedPartIds.examinations.includes(affectedPart)) {
+          continue;
+        }
+        const types: string[] = [];
+
+        affectedPartIds.examinations.push(affectedPart);
+
+        for (
+          let j = 0;
+          j < clinicalRecord.ClinicalRecordExamination.length;
+          j++
+        ) {
+          const diagToSeekFor = clinicalRecord.ClinicalRecordExamination[j];
+
+          if (diagToSeekFor.affectedPartId === affectedPart) {
+            types.push(diagToSeekFor.examinationType.typeName);
+          }
+        }
+
+        examinations.push({
+          affectedPart: examination.affectedPart.partName,
+          examinationType: types,
+        });
+      }
+
+      for (let i = 0; i < clinicalRecord.ClinicalRecordManagement.length; i++) {
+        const management = clinicalRecord.ClinicalRecordManagement[i];
+        const affectedPart = management.affectedPartId;
+        if (affectedPartIds.managements.includes(affectedPart)) {
+          continue;
+        }
+        const types = [];
+
+        affectedPartIds.managements.push(affectedPart);
+
+        for (
+          let j = 0;
+          j < clinicalRecord.ClinicalRecordManagement.length;
+          j++
+        ) {
+          const diagToSeekFor = clinicalRecord.ClinicalRecordManagement[j];
+
+          if (diagToSeekFor.affectedPartId === affectedPart) {
+            types.push({
+              managementType: diagToSeekFor.managementType.typeName,
+              managementRole: diagToSeekFor.managementRole.roleName,
+            });
+          }
+        }
+
+        managements.push({
+          affectedPart: management.affectedPart.partName,
+          management: types,
+        });
+      }
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          attachments: clinicalRecord.attachment,
+          diagnosess,
+          examinations,
+          managements,
+          patientName: clinicalRecord.patientName,
+          patientSex: clinicalRecord.gender,
+          studentFeedback: clinicalRecord.studentFeedback,
+          studentName: clinicalRecord.Student?.fullName,
+          supervisorFeedback: clinicalRecord.supervisorFeedback,
+          supervisorName: clinicalRecord.supervisor.fullname,
+          filename: clinicalRecord.attachment?.split("/").at(-1),
+        } as IClinicalRecordDetailDTO)
+      );
     } catch (error) {
       return next(error);
     }
@@ -194,6 +358,7 @@ export class ClinicalRecordHandler {
             time: c.createdAt,
             attachment: c.attachment,
             id: c.id,
+            status: c.verificationStatus,
           } as IListClinicalRecordDTO;
         })
       )

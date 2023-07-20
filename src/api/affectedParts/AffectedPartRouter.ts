@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { BasicAuthMiddleware } from "../../middleware/auth/BasicAuth";
 import { AffectedPartHandler } from "./AffectedPartHandler";
 import { AuthorizationBearer } from "../../middleware/auth/AuthorizationBearer";
 import { constants } from "../../utils";
@@ -23,6 +22,7 @@ export class AffectedPartRouter {
         constants.ADMIN_ROLE,
         constants.STUDENT_ROLE,
         constants.SUPERVISOR_ROLE,
+        constants.DPK_ROLE,
       ]),
       this.affectedPartHandler.getAffectedPartsUnit
     );

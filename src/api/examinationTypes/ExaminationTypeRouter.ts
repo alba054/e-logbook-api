@@ -22,6 +22,7 @@ export class ExaminationTypeRouter {
         constants.ADMIN_ROLE,
         constants.STUDENT_ROLE,
         constants.SUPERVISOR_ROLE,
+        constants.DPK_ROLE,
       ]),
       this.examinationType.getExaminationTypesUnit
     );

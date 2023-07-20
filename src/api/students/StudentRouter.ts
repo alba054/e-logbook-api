@@ -107,6 +107,14 @@ export class StudentRouter {
         this.studentHandler.getStudentClinicalRecords
       );
 
+    // * get list of scientific sessions submitted
+    this.router
+      .route(this.path + "/scientific-sessions")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getStudentScientificSessions
+      );
+
     return this.router;
   }
 }

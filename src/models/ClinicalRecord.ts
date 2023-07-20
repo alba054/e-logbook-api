@@ -5,6 +5,44 @@ import { IPutVerificationStatusClinicalRecord } from "../utils/interfaces/Clinic
 import { ITokenPayload } from "../utils/interfaces/TokenPayload";
 
 export class ClinicalRecord {
+  async insertSupervisorFeedback(id: string, feedback: string) {
+    try {
+      return db.clinicalRecord.update({
+        where: {
+          id,
+        },
+        data: {
+          supervisorFeedback: feedback,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to insert supervisor feedback");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
+  async insertStudentFeedback(id: string, feedback: string) {
+    try {
+      return db.clinicalRecord.update({
+        where: {
+          id,
+        },
+        data: {
+          studentFeedback: feedback,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to insert student feedback");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async getClinicalRecordsByStudentIdAndUnitId(
     tokenPayload: ITokenPayload,
     unitId?: string
@@ -72,6 +110,8 @@ export class ClinicalRecord {
             managementType: true,
           },
         },
+        Student: true,
+        supervisor: true,
       },
     });
   }

@@ -8,3 +8,8 @@ export interface IPostScientificSessionPayload {
   reference: string;
   role: string;
 }
+
+export interface IPutVerificationStatusScientificSession {
+  verified: boolean;
+  rating?: number;
+}
