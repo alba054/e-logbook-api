@@ -276,6 +276,7 @@ export class ClinicalRecordHandler {
           supervisorFeedback: clinicalRecord.supervisorFeedback,
           supervisorName: clinicalRecord.supervisor.fullname,
           filename: clinicalRecord.attachment?.split("/").at(-1),
+          verificationStatus: clinicalRecord.verificationStatus,
         } as IClinicalRecordDetailDTO)
       );
     } catch (error) {
@@ -321,6 +322,7 @@ export class ClinicalRecordHandler {
       }
 
       const savedFile = UploadFileHelper.uploadFileBuffer(
+        req.file.originalname,
         constants.CLINICAL_RECORD_ATTACHMENT_PATH,
         req.file.buffer
       );
