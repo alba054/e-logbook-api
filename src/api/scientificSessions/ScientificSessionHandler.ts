@@ -199,6 +199,7 @@ export class ScientificSessionHandler {
       }
 
       const savedFile = UploadFileHelper.uploadFileBuffer(
+        req.file.originalname,
         constants.SCIENTIFIC_SESSION_ATTACHMENT_PATH,
         req.file.buffer
       );

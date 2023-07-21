@@ -115,6 +115,14 @@ export class StudentRouter {
         this.studentHandler.getStudentScientificSessions
       );
 
+    // * get list of self reflections submitted
+    this.router
+      .route(this.path + "/self-reflections")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getStudentSelfReflections
+      );
+
     return this.router;
   }
 }

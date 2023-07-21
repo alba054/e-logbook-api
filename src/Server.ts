@@ -14,6 +14,7 @@ import { DiagnosisTypeRouter } from "./api/diagnosisTypes/DiagnosisTypeRouter";
 import { ManagementTypeRouter } from "./api/managementTypes/ManagementTypeRouter";
 import { ManagementRoleRouter } from "./api/managementRoles/ManagementRoleRouter";
 import { ScientificSessionRouter } from "./api/scientificSessions/ScientificSessionRouter";
+import { SelfReflectionRouter } from "./api/selfReflections/SelfReflectionRouter";
 
 dotenv.config();
 
@@ -52,6 +53,7 @@ class Server {
     this.app.use("/api", new ManagementTypeRouter().register());
     this.app.use("/api", new ManagementRoleRouter().register());
     this.app.use("/api", new ScientificSessionRouter().register());
+    this.app.use("/api", new SelfReflectionRouter().register());
     // * error handling
     this.app.use(ErrorHandler);
   }
