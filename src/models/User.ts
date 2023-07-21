@@ -5,6 +5,37 @@ import { createErrorObject } from "../utils";
 export class User {
   constructor() {}
 
+  async getUserByUsernameOrStudentIdOrSupervisorId(username: string) {
+    return db.user.findFirst({
+      where: {
+        OR: [
+          {
+            username,
+          },
+          {
+            student: {
+              studentId: username,
+            },
+          },
+          {
+            supervisor: {
+              supervisorId: username,
+            },
+          },
+        ],
+      },
+      include: {
+        badges: true,
+        student: {
+          include: {
+            CheckInCheckOut: true,
+          },
+        },
+        supervisor: true,
+      },
+    });
+  }
+
   async getUserByResetPasswordToken(token: string) {
     return db.user.findFirst({
       where: {
