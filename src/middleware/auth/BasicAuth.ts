@@ -79,9 +79,10 @@ export class BasicAuthMiddleware {
         }
 
         const userService = new UserService();
-        const user = await userService.getUserByUsername(
-          res.locals.credential.username
-        );
+        const user =
+          await userService.getUserByUsernameOrStudentIdOrSupervisorId(
+            res.locals.credential.username
+          );
 
         if (!user) {
           return next(new NotFoundError("user's not found"));

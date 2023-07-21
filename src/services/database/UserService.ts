@@ -18,6 +18,10 @@ export class UserService {
     this.userModel = new User();
   }
 
+  async getUserByUsernameOrStudentIdOrSupervisorId(username: string) {
+    return this.userModel.getUserByUsernameOrStudentIdOrSupervisorId(username);
+  }
+
   async getUserProfileByResetTokenPassword(token: string) {
     const user = await this.userModel.getUserByResetPasswordToken(token);
 
