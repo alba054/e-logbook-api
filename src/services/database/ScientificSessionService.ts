@@ -1,10 +1,14 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ScientificSession } from "../../models/ScientificSession";
 import { createErrorObject } from "../../utils";
-import { IPostScientificSessionPayload } from "../../utils/interfaces/ScientificSession";
+import {
+  IPostScientificSessionPayload,
+  IPutVerificationStatusScientificSession,
+} from "../../utils/interfaces/ScientificSession";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentService } from "./StudentService";
 import { v4 as uuidv4 } from "uuid";
+import db from "../../database";
 
 export class ScientificSessionService {
   private studentService: StudentService;
@@ -12,6 +16,123 @@ export class ScientificSessionService {
   constructor() {
     this.scientificSessionModel = new ScientificSession();
     this.studentService = new StudentService();
+  }
+
+  async getScientificSessionsByStudentAndUnitId(tokenPayload: ITokenPayload) {
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+
+    const scientificSessions =
+      await this.scientificSessionModel.getScientificSessionsByStudentIdAndUnitId(
+        tokenPayload.studentId ?? "",
+        activeUnit?.activeUnit.activeUnit?.id
+      );
+
+    return {
+      scientificSessions,
+      verifiedCounts: scientificSessions.filter(
+        (c) => c.verificationStatus === "VERIFIED"
+      ).length,
+      unverifiedCounts: scientificSessions.filter(
+        (c) =>
+          c.verificationStatus === "UNVERIFIED" ||
+          c.verificationStatus === "INPROCESS"
+      ).length,
+    };
+  }
+
+  async getAttachmentByScientificSessionId(
+    id: string,
+    tokenPayload: ITokenPayload
+  ) {
+    const scientificSession =
+      await this.scientificSessionModel.getScientificSessionById(id);
+
+    if (
+      scientificSession?.supervisorId !== tokenPayload.supervisorId &&
+      scientificSession?.studentId !== tokenPayload.studentId
+    ) {
+      return createErrorObject(400, "this attachment is not for you");
+    }
+
+    if (!scientificSession?.attachment) {
+      return createErrorObject(404, "attachment's not found");
+    }
+
+    return scientificSession.attachment;
+  }
+
+  async getSubmittedScientificSessions(status: any, supervisorId?: string) {
+    if (status) {
+      return this.scientificSessionModel.getScientificSessionsByStatusAndSupervisorId(
+        status,
+        supervisorId
+      );
+    }
+
+    return this.scientificSessionModel.getScientificSessionsBySupervisorId(
+      supervisorId
+    );
+  }
+
+  async verifyScientificSession(
+    id: string,
+    tokenPayload: ITokenPayload,
+    payload: IPutVerificationStatusScientificSession
+  ) {
+    const scientificSession =
+      await this.scientificSessionModel.getScientificSessionById(id);
+
+    if (!scientificSession) {
+      return createErrorObject(404, "scientific session's not found");
+    }
+
+    if (
+      scientificSession.supervisorId !== tokenPayload.supervisorId &&
+      scientificSession.studentId !== tokenPayload.studentId
+    ) {
+      return createErrorObject(400, "scientific session's not for you");
+    }
+
+    return db.$transaction([
+      db.scientificSession.update({
+        where: {
+          id,
+        },
+        data: {
+          verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
+          rating: payload.rating,
+        },
+      }),
+      db.checkInCheckOut.updateMany({
+        where: {
+          unitId: scientificSession.unitId ?? "",
+          studentId: scientificSession.studentId ?? "",
+        },
+        data: {
+          scientificSessionDone: payload.verified,
+        },
+      }),
+    ]);
+  }
+
+  async getScientificSessionDetail(id: string, tokenPayload: ITokenPayload) {
+    const scientificSession =
+      await this.scientificSessionModel.getScientificSessionById(id);
+
+    if (!scientificSession) {
+      return createErrorObject(404, "scientific session's not found");
+    }
+
+    if (
+      scientificSession.supervisorId !== tokenPayload.supervisorId &&
+      scientificSession.studentId !== tokenPayload.studentId
+    ) {
+      return createErrorObject(400, "scientific session's not for you");
+    }
+
+    return scientificSession;
   }
 
   async insertNewScientificSession(
@@ -35,10 +156,7 @@ export class ScientificSessionService {
       console.log(error);
 
       if (error instanceof PrismaClientKnownRequestError) {
-        return createErrorObject(
-          400,
-          "failed to insert new scientific session"
-        );
+        return createErrorObject(400, error.message);
       } else {
         return createErrorObject(500);
       }

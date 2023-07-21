@@ -52,5 +52,6 @@ export const constants = {
   ADMIN_ROLE: "ADMIN",
   DPK_ROLE: "DPK",
   CLINICAL_RECORD_ATTACHMENT_PATH: "storage/clinical-record/",
+  SCIENTIFIC_SESSION_ATTACHMENT_PATH: "storage/scientific-session/",
   ABS_PATH: process.env.ABS_PATH,
 };

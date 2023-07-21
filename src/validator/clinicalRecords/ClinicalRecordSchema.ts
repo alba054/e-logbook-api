@@ -1,4 +1,4 @@
-import Joi from "joi";
+import Joi, { string } from "joi";
 export const ClinicalRecordPayloadSchema = Joi.object({
   patientName: Joi.string().required(),
   patientAge: Joi.number().min(1),
@@ -39,4 +39,8 @@ export const ClinicalRecordVerificationStatusSchema = Joi.object({
   verified: Joi.boolean().required(),
   supervisorFeedback: Joi.string().optional(),
   rating: Joi.number().max(5),
+});
+
+export const ClinicalRecordFeedbackSchema = Joi.object({
+  feedback: Joi.string().required(),
 });

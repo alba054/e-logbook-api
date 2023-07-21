@@ -23,6 +23,8 @@ import { CheckInCheckOutService } from "../../services/database/CheckInCheckOutS
 import { ClinicalRecordService } from "../../services/database/ClinicalRecordService";
 import { IStudentClinicalRecods } from "../../utils/dto/ClinicalRecordDTO";
 import { UserService } from "../../services/database/UserService";
+import { ScientificSessionService } from "../../services/database/ScientificSessionService";
+import { IStudentScientificSessions } from "../../utils/dto/ScientificSessionDTO";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -35,6 +37,7 @@ export class StudentHandler {
   private checkInCheckOutService: CheckInCheckOutService;
   private clinicalRecordService: ClinicalRecordService;
   private userService: UserService;
+  private scientificSessionService: ScientificSessionService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -48,6 +51,7 @@ export class StudentHandler {
     this.checkInCheckOutService = new CheckInCheckOutService();
     this.clinicalRecordService = new ClinicalRecordService();
     this.userService = new UserService();
+    this.scientificSessionService = new ScientificSessionService();
 
     this.postStudent = this.postStudent.bind(this);
     this.postStudentForgetPassword = this.postStudentForgetPassword.bind(this);
@@ -64,6 +68,37 @@ export class StudentHandler {
     this.getStudentClinicalRecords = this.getStudentClinicalRecords.bind(this);
     this.getStudentProfileByResetPasswordToken =
       this.getStudentProfileByResetPasswordToken.bind(this);
+    this.getStudentScientificSessions =
+      this.getStudentScientificSessions.bind(this);
+  }
+
+  async getStudentScientificSessions(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const scientificSessions =
+      await this.scientificSessionService.getScientificSessionsByStudentAndUnitId(
+        tokenPayload
+      );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        unverifiedCounts: scientificSessions.unverifiedCounts,
+        verifiedCounts: scientificSessions.verifiedCounts,
+        listScientificSessions: scientificSessions.scientificSessions.map(
+          (c) => {
+            return {
+              scientificSessionId: c.id,
+              supervisorName: c.supervisor.fullname,
+              verificationStatus: c.verificationStatus,
+              updatedAt: c.updatedAt,
+            };
+          }
+        ),
+      } as IStudentScientificSessions)
+    );
   }
 
   async getStudentProfileByResetPasswordToken(

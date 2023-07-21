@@ -5,6 +5,7 @@ export interface IListClinicalRecordDTO {
   patientName?: string;
   studentId?: string;
   attachment?: string;
+  status: "VERIFIED" | "UNVERIFIED" | "INPROCESS";
 }
 
 export interface IClinicalRecordDetailDTO {
@@ -18,6 +19,7 @@ export interface IClinicalRecordDetailDTO {
   attachments?: string;
   studentFeedback?: string;
   supervisorFeedback?: string;
+  filename?: string;
 }
 
 export interface IStudentClinicalRecods {
@@ -48,5 +50,5 @@ interface IManagementClinicalRecordDetail {
   management: {
     managementType: string;
     managementRole: string;
-  };
+  }[];
 }

@@ -44,8 +44,9 @@ export class SupervisorHandler {
         constants.SUCCESS_RESPONSE_MESSAGE,
         results.map((s) => {
           return {
-            id: s.supervisor?.id,
+            userId: s.id,
             fullName: s.supervisor?.fullname,
+            id: s.supervisor?.id,
             supervisorId: s.supervisor?.supervisorId,
           } as ISupervisorProfileDTO;
         })

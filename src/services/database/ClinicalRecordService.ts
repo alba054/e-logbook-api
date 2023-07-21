@@ -1,6 +1,7 @@
 import db from "../../database";
 import {
   IPostClinicalRecord,
+  IPutFeedbackClinicalRecord,
   IPutVerificationStatusClinicalRecord,
 } from "../../utils/interfaces/ClinicalRecord";
 import { v4 as uuidv4 } from "uuid";
@@ -17,6 +18,40 @@ export class ClinicalRecordService {
   constructor() {
     this.studentService = new StudentService();
     this.clinicalRecordModel = new ClinicalRecord();
+  }
+
+  async giveFeedbackToClinicalRecord(
+    id: string,
+    tokenPayload: ITokenPayload,
+    payload: IPutFeedbackClinicalRecord
+  ) {
+    const clinicalRecord =
+      await this.clinicalRecordModel.getClinicalRecordsById(id);
+
+    if (!clinicalRecord) {
+      return createErrorObject(404, "clinical record's not found");
+    }
+
+    if (
+      clinicalRecord.supervisorId !== tokenPayload.supervisorId &&
+      clinicalRecord.studentId !== tokenPayload.studentId
+    ) {
+      return createErrorObject(400, "clinical record's not for you");
+    }
+
+    if (tokenPayload.studentId) {
+      return this.clinicalRecordModel.insertStudentFeedback(
+        id,
+        payload.feedback
+      );
+    } else if (tokenPayload.supervisorId) {
+      return this.clinicalRecordModel.insertSupervisorFeedback(
+        id,
+        payload.feedback
+      );
+    }
+
+    return null;
   }
 
   async getClinicalRecordsByStudentAndUnitId(tokenPayload: ITokenPayload) {
@@ -233,7 +268,7 @@ export class ClinicalRecordService {
       console.log(error);
 
       if (error instanceof PrismaClientKnownRequestError) {
-        return createErrorObject(400, "failed to insert new clinical record");
+        return createErrorObject(400, error.message);
       } else {
         return createErrorObject(500);
       }
