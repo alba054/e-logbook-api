@@ -20,6 +20,7 @@ export interface IClinicalRecordDetailDTO {
   studentFeedback?: string;
   supervisorFeedback?: string;
   filename?: string;
+  verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
 }
 
 export interface IStudentClinicalRecods {

@@ -1,13 +1,18 @@
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
+import path from "path";
 
 export class UploadFileHelper {
-  static uploadFileBuffer(path: string, buffer: Buffer) {
-    if (!fs.existsSync(path)) {
-      fs.mkdirSync(path, { recursive: true });
+  static uploadFileBuffer(
+    originalName: string,
+    filePath: string,
+    buffer: Buffer
+  ) {
+    if (!fs.existsSync(filePath)) {
+      fs.mkdirSync(filePath, { recursive: true });
     }
 
-    const pathToSave = `${path}/${uuidv4()}`;
+    const pathToSave = `${filePath}/${uuidv4()}${path.extname(originalName)}`;
     fs.createWriteStream(pathToSave).write(buffer);
 
     return pathToSave;

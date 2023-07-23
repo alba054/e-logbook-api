@@ -25,6 +25,8 @@ import { IStudentClinicalRecods } from "../../utils/dto/ClinicalRecordDTO";
 import { UserService } from "../../services/database/UserService";
 import { ScientificSessionService } from "../../services/database/ScientificSessionService";
 import { IStudentScientificSessions } from "../../utils/dto/ScientificSessionDTO";
+import { IStudentSelfReflections } from "../../utils/dto/SelfReflectionDTO";
+import { SelfReflectionService } from "../../services/database/SelfReflectionService";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -38,6 +40,7 @@ export class StudentHandler {
   private clinicalRecordService: ClinicalRecordService;
   private userService: UserService;
   private scientificSessionService: ScientificSessionService;
+  private selfReflectionService: SelfReflectionService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -52,6 +55,7 @@ export class StudentHandler {
     this.clinicalRecordService = new ClinicalRecordService();
     this.userService = new UserService();
     this.scientificSessionService = new ScientificSessionService();
+    this.selfReflectionService = new SelfReflectionService();
 
     this.postStudent = this.postStudent.bind(this);
     this.postStudentForgetPassword = this.postStudentForgetPassword.bind(this);
@@ -70,6 +74,33 @@ export class StudentHandler {
       this.getStudentProfileByResetPasswordToken.bind(this);
     this.getStudentScientificSessions =
       this.getStudentScientificSessions.bind(this);
+    this.getStudentSelfReflections = this.getStudentSelfReflections.bind(this);
+  }
+
+  async getStudentSelfReflections(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const selfReflections =
+      await this.selfReflectionService.getSelfReflectionsByStudentAndUnitId(
+        tokenPayload
+      );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentId: selfReflections[0]?.Student?.studentId,
+        studentName: selfReflections[0]?.Student?.fullName,
+        listSelfReflections: selfReflections.map((c) => {
+          return {
+            content: c.content,
+            selfReflectionId: c.id,
+            verificationStatus: c.verificationStatus,
+          };
+        }),
+      } as IStudentSelfReflections)
+    );
   }
 
   async getStudentScientificSessions(
