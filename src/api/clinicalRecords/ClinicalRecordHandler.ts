@@ -277,6 +277,8 @@ export class ClinicalRecordHandler {
           supervisorName: clinicalRecord.supervisor.fullname,
           filename: clinicalRecord.attachment?.split("/").at(-1),
           verificationStatus: clinicalRecord.verificationStatus,
+          recordId: clinicalRecord.recordId,
+          unit: clinicalRecord.Unit?.name,
         } as IClinicalRecordDetailDTO)
       );
     } catch (error) {

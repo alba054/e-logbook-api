@@ -112,6 +112,7 @@ export class ClinicalRecord {
         },
         Student: true,
         supervisor: true,
+        Unit: true,
       },
     });
   }
