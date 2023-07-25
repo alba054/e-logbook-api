@@ -1,5 +1,5 @@
 export interface IPasswordResetTokenData {
-  username: string;
-  token: string;
-  otp: string;
+  readonly username: string;
+  readonly token: string;
+  readonly otp: string;
 }

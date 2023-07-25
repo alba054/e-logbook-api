@@ -15,3 +15,7 @@ export const ScientificSessionVerificationStatusSchema = Joi.object({
   verified: Joi.boolean().required(),
   rating: Joi.number().max(5),
 });
+
+export const ScientificSessionFeedbackSchema = Joi.object({
+  feedback: Joi.string().required(),
+});

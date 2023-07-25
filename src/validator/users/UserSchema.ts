@@ -8,3 +8,10 @@ export const UserPayloadSchema = Joi.object({
 export const UserRawPayloadSchema = UserPayloadSchema.append({
   role: Joi.string().valid("SUPERVISOR", "STUDENT", "ADMIN").required(),
 });
+
+export const UserProfileSchema = Joi.object({
+  username: Joi.string().optional(),
+  nim: Joi.string().optional(),
+  email: Joi.string().email().optional(),
+  pic: Joi.string().optional(),
+});

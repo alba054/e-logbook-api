@@ -8,4 +8,7 @@ export interface IStudentProfileDTO {
   fullName?: string;
   checkInStatus: "VERIFIED" | "INPROCESS" | "UNVERIFIED";
   checkOutStatus: "VERIFIED" | "INPROCESS" | "UNVERIFIED";
+  academicSupervisorName?: string;
+  supervisingDPKName?: string;
+  examinerDPKName?: string;
 }

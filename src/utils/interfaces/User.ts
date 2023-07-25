@@ -3,3 +3,10 @@ export interface IPostUserPayload {
   readonly password: string;
   readonly role: "ADMIN";
 }
+
+export interface IPutUserProfile {
+  readonly username: string;
+  readonly nim: string;
+  readonly email: string;
+  readonly pic: string;
+}

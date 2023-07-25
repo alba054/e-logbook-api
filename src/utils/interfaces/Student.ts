@@ -7,6 +7,17 @@ export interface IPostStudentPayload {
   readonly lastName: string;
 }
 
+export interface IPutStudentData {
+  readonly clinicId?: string;
+  readonly preclinicId?: string;
+  readonly graduationDate?: number;
+  readonly phoneNumber?: string;
+  readonly address?: string;
+  readonly academicSupervisor?: string;
+  readonly supervisingDPK?: string;
+  readonly examinerDPK?: string;
+}
+
 export interface IPostStudentResetPasswordPayload {
   readonly otp: string;
   readonly newPassword: string;

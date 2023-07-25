@@ -1,4 +1,4 @@
 export interface IPostDiagnosisTypePayload {
-  unitId: string;
-  typeName: string;
+  readonly unitId: string;
+  readonly typeName: string;
 }

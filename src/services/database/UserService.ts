@@ -1,8 +1,9 @@
 import { User } from "../../models/User";
-import { IPostUserPayload } from "../../utils/interfaces/User";
+import { IPostUserPayload, IPutUserProfile } from "../../utils/interfaces/User";
 import { v4 as uuidv4 } from "uuid";
 import bcryptjs from "bcryptjs";
 import { createErrorObject } from "../../utils";
+import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 
 interface IUserData {
   id: string;
@@ -16,6 +17,23 @@ export class UserService {
 
   constructor() {
     this.userModel = new User();
+  }
+
+  async getUserProfilePicture(tokenPayload: ITokenPayload) {
+    const user = await this.userModel.getUserByUsername(tokenPayload.username);
+
+    if (!user?.profilePic) {
+      return createErrorObject(404, "no profile picture's uploaded");
+    }
+
+    return user?.profilePic;
+  }
+
+  async updateUserProfile(
+    tokenPayload: ITokenPayload,
+    payload: IPutUserProfile
+  ) {
+    return this.userModel.updateUserProfile(tokenPayload.userId, payload);
   }
 
   async getUserByUsernameOrStudentIdOrSupervisorId(username: string) {

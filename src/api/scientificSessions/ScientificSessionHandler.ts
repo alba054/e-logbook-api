@@ -11,9 +11,11 @@ import {
 import { UploadFileHelper } from "../../utils/helper/UploadFileHelper";
 import {
   IPostScientificSessionPayload,
+  IPutFeedbackScientificSession,
   IPutVerificationStatusScientificSession,
 } from "../../utils/interfaces/ScientificSession";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
+import { ScientificSessionFeedbackSchema } from "../../validator/scientificSessions/ScientificSessionSchema";
 import { ScientificSessionValidator } from "../../validator/scientificSessions/ScientificSessionValidator";
 
 export class ScientificSessionHandler {
@@ -33,6 +35,60 @@ export class ScientificSessionHandler {
     this.getSubmittedScientificSessions =
       this.getSubmittedScientificSessions.bind(this);
     this.getAttachmentFile = this.getAttachmentFile.bind(this);
+    this.putFeedbackOfScientificSession =
+      this.putFeedbackOfScientificSession.bind(this);
+  }
+
+  async putFeedbackOfScientificSession(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const { id } = req.params;
+    const payload: IPutFeedbackScientificSession = req.body;
+
+    try {
+      const validationResult = this.scientificSessionValidator.validate(
+        ScientificSessionFeedbackSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        switch (validationResult.error) {
+          case 400:
+            throw new BadRequestError(validationResult.message);
+          case 404:
+            throw new NotFoundError(validationResult.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      const result =
+        await this.scientificSessionService.giveFeedbackToScientificSession(
+          id,
+          tokenPayload,
+          payload
+        );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, result));
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getAttachmentFile(req: Request, res: Response, next: NextFunction) {
@@ -181,6 +237,11 @@ export class ScientificSessionHandler {
           updatedAt: scientificSession.updatedAt,
           attachment: scientificSession.attachment,
           filename: scientificSession.attachment?.split("/").at(-1),
+          sessionType: scientificSession.sessionType,
+          unit: scientificSession.Unit?.name,
+          verificationStatus: scientificSession.verificationStatus,
+          studentFeedback: scientificSession.studentFeedback,
+          supervisorFeedback: scientificSession.supervisorFeedback,
         } as IScientificSessionDetail)
       );
     } catch (error) {

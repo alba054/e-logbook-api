@@ -1,4 +1,4 @@
 export interface IPostAffectedPartPayload {
-  unitId: string;
-  partName: string;
+  readonly unitId: string;
+  readonly partName: string;
 }

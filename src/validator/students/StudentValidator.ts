@@ -1,3 +1,4 @@
+import Joi from "joi";
 import { createErrorObject } from "../../utils";
 import {
   IPostStudentPayload,
@@ -13,6 +14,16 @@ import {
 } from "./StudentSchema";
 
 export class StudentPayloadValidator {
+  validate(schema: Joi.ObjectSchema, payload: any) {
+    const validationResult = schema.validate(payload);
+
+    if (validationResult.error) {
+      return createErrorObject(400, validationResult.error.message);
+    }
+
+    return null;
+  }
+
   validatePostPayload(payload: IPostStudentPayload) {
     const validationResult = StudentPayloadSchema.validate(payload);
 
