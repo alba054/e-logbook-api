@@ -54,4 +54,5 @@ export const constants = {
   CLINICAL_RECORD_ATTACHMENT_PATH: "storage/clinical-record/",
   SCIENTIFIC_SESSION_ATTACHMENT_PATH: "storage/scientific-session/",
   ABS_PATH: process.env.ABS_PATH,
+  PROFILE_PIC_PATH: "storage/user-pic/",
 };

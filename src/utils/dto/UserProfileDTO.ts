@@ -8,6 +8,7 @@ export interface IUserProfileDTO {
   email?: string;
   role: "SUPERVISOR" | "STUDENT";
   badges: Badge[];
+  pic?: string;
   student?: IStudentProfileDTO;
   supervisor?: ISupervisorProfileDTO;
 }

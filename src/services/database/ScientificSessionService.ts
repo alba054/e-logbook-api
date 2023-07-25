@@ -3,6 +3,7 @@ import { ScientificSession } from "../../models/ScientificSession";
 import { createErrorObject } from "../../utils";
 import {
   IPostScientificSessionPayload,
+  IPutFeedbackScientificSession,
   IPutVerificationStatusScientificSession,
 } from "../../utils/interfaces/ScientificSession";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
@@ -16,6 +17,40 @@ export class ScientificSessionService {
   constructor() {
     this.scientificSessionModel = new ScientificSession();
     this.studentService = new StudentService();
+  }
+
+  async giveFeedbackToScientificSession(
+    id: string,
+    tokenPayload: ITokenPayload,
+    payload: IPutFeedbackScientificSession
+  ) {
+    const ScientificSession =
+      await this.scientificSessionModel.getScientificSessionById(id);
+
+    if (!ScientificSession) {
+      return createErrorObject(404, "scientific session's not found");
+    }
+
+    if (
+      ScientificSession.supervisorId !== tokenPayload.supervisorId &&
+      ScientificSession.studentId !== tokenPayload.studentId
+    ) {
+      return createErrorObject(400, "scientific session's not for you");
+    }
+
+    if (tokenPayload.studentId) {
+      return this.scientificSessionModel.insertStudentFeedback(
+        id,
+        payload.feedback
+      );
+    } else if (tokenPayload.supervisorId) {
+      return this.scientificSessionModel.insertSupervisorFeedback(
+        id,
+        payload.feedback
+      );
+    }
+
+    return null;
   }
 
   async getScientificSessionsByStudentAndUnitId(tokenPayload: ITokenPayload) {

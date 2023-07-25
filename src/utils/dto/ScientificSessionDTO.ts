@@ -18,6 +18,11 @@ export interface IScientificSessionDetail {
   updatedAt: Date | string;
   attachment?: string;
   filename?: string;
+  unit?: string;
+  sessionType?: string;
+  verificationStatus?: string;
+  studentFeedback?: string;
+  supervisorFeedback?: string;
 }
 
 export interface IStudentScientificSessions {

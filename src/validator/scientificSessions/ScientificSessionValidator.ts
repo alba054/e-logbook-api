@@ -1,6 +1,8 @@
+import Joi from "joi";
 import { createErrorObject } from "../../utils";
 import {
   IPostScientificSessionPayload,
+  IPutFeedbackScientificSession,
   IPutVerificationStatusScientificSession,
 } from "../../utils/interfaces/ScientificSession";
 import {
@@ -9,6 +11,16 @@ import {
 } from "./ScientificSessionSchema";
 
 export class ScientificSessionValidator {
+  validate(schema: Joi.ObjectSchema, payload: any) {
+    const validationResult = schema.validate(payload);
+
+    if (validationResult.error) {
+      return createErrorObject(400, validationResult.error.message);
+    }
+
+    return null;
+  }
+
   validatePutVerificationStatus(
     payload: IPutVerificationStatusScientificSession
   ) {

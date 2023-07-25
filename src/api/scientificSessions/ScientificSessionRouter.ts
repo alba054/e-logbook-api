@@ -76,6 +76,18 @@ export class ScientificSessionRouter {
         this.scientificSessionHandler.getAttachmentFile
       );
 
+    // * give feedback to scientific session
+    this.router
+      .route(this.path + "/:id/feedback")
+      .put(
+        AuthorizationBearer.authorize([
+          constants.STUDENT_ROLE,
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.scientificSessionHandler.putFeedbackOfScientificSession
+      );
+
     return this.router;
   }
 }

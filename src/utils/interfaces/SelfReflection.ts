@@ -1,3 +1,3 @@
 export interface IPostSelfReflection {
-  content: string;
+  readonly content: string;
 }

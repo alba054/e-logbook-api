@@ -1,3 +1,3 @@
 export interface IPostUnit {
-  name: string;
+  readonly name: string;
 }

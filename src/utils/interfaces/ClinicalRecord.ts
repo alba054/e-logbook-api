@@ -1,25 +1,25 @@
 export interface IPostClinicalRecord {
-  patientName: string;
-  patientAge: number;
-  gender: "FEMALE" | "MALE";
-  notes?: string;
-  recordId: string;
-  attachment?: string;
-  studentFeedback?: string;
-  examinations: ClinicalRecordExamination[];
-  diagnosiss: ClinicalRecordDiagnosis[];
-  managements: ClinicalRecordManagement[];
-  supervisorId: string;
+  readonly patientName: string;
+  readonly patientAge: number;
+  readonly gender: "FEMALE" | "MALE";
+  readonly notes?: string;
+  readonly recordId: string;
+  readonly attachment?: string;
+  readonly studentFeedback?: string;
+  readonly examinations: ClinicalRecordExamination[];
+  readonly diagnosiss: ClinicalRecordDiagnosis[];
+  readonly managements: ClinicalRecordManagement[];
+  readonly supervisorId: string;
 }
 
 export interface IPutVerificationStatusClinicalRecord {
-  verified: boolean;
-  supervisorFeedback?: string;
-  rating?: number;
+  readonly verified: boolean;
+  readonly supervisorFeedback?: string;
+  readonly rating?: number;
 }
 
 export interface IPutFeedbackClinicalRecord {
-  feedback: string;
+  readonly feedback: string;
 }
 
 interface ClinicalRecordExamination {

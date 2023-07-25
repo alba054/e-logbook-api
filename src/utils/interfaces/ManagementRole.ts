@@ -1,3 +1,3 @@
 export interface IPostManagementRolePayload {
-  roleName: string;
+  readonly roleName: string;
 }

@@ -22,3 +22,14 @@ export const StudentActiveUnitPayloadSchema = Joi.object({
 export const StudentTokenResetPasswordPayloadSchema = Joi.object({
   email: Joi.string().email().required(),
 });
+
+export const StudentDataPayloadSchema = Joi.object({
+  clinicId: Joi.string().optional(),
+  preclinicId: Joi.string().optional(),
+  graduationDate: Joi.number().optional(),
+  phoneNumber: Joi.string().min(8).max(15).optional(),
+  address: Joi.string().optional(),
+  academicSupervisor: Joi.string().optional(),
+  supervisingDPK: Joi.string().optional(),
+  examinerDPK: Joi.string().optional(),
+});

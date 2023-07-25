@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import { constants, createResponse } from "../../utils";
 import { AuthenticationService } from "../../services/facade/AuthenticationService";
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
@@ -9,8 +9,10 @@ import { config } from "../../config/Config";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { UserService } from "../../services/database/UserService";
 import { IUserProfileDTO } from "../../utils/dto/UserProfileDTO";
-import { IPostUserPayload } from "../../utils/interfaces/User";
+import { IPostUserPayload, IPutUserProfile } from "../../utils/interfaces/User";
 import { UserPayloadValidator } from "../../validator/users/UserValidator";
+import { UserProfileSchema } from "../../validator/users/UserSchema";
+import { UploadFileHelper } from "../../utils/helper/UploadFileHelper";
 
 export class UserHandler {
   private authenticationService: AuthenticationService;
@@ -26,6 +28,95 @@ export class UserHandler {
     this.postUserLogin = this.postUserLogin.bind(this);
     this.getUserProfile = this.getUserProfile.bind(this);
     this.postUser = this.postUser.bind(this);
+    this.putUserProfile = this.putUserProfile.bind(this);
+    this.postProfilePicture = this.postProfilePicture.bind(this);
+    this.getUserProfilePic = this.getUserProfilePic.bind(this);
+  }
+
+  async getUserProfilePic(req: Request, res: Response, next: NextFunction) {
+    try {
+      const tokenPayload: ITokenPayload = res.locals.user;
+      const fileToSend = await this.userService.getUserProfilePicture(
+        tokenPayload
+      );
+
+      if (typeof fileToSend === "string") {
+        return res.sendFile(`${constants.ABS_PATH}/${fileToSend}`);
+      }
+      switch (fileToSend?.error) {
+        case 400:
+          throw new BadRequestError(fileToSend.message);
+        case 404:
+          throw new NotFoundError(fileToSend.message);
+        default:
+          throw new InternalServerError();
+      }
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async postProfilePicture(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (!req.file?.buffer) {
+        throw new BadRequestError("upload file with fieldname pic");
+      }
+
+      const savedFile = UploadFileHelper.uploadFileBuffer(
+        req.file.originalname,
+        constants.PROFILE_PIC_PATH,
+        req.file.buffer
+      );
+
+      return res
+        .status(201)
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, savedFile));
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async putUserProfile(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const payload: IPutUserProfile = req.body;
+
+    try {
+      const validationResult = this.userValidator.validate(
+        UserProfileSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        throw new BadRequestError(validationResult.message);
+      }
+
+      const testError = await this.userService.updateUserProfile(
+        tokenPayload,
+        payload
+      );
+
+      if (testError && "error" in testError) {
+        switch (testError.error) {
+          case 400:
+            throw new BadRequestError(testError.message);
+          case 404:
+            throw new NotFoundError(testError.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully update user profile"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async postUser(req: Request, res: Response, next: NextFunction) {
@@ -87,6 +178,9 @@ export class UserHandler {
           preClinicId: user?.student?.preClinicId,
           checkInStatus: user?.student?.CheckInCheckOut.at(-1)?.checkInStatus,
           checkOutStatus: user?.student?.CheckInCheckOut.at(-1)?.checkOutStatus,
+          academicSupervisorName: user?.student?.academicAdvisor?.fullname,
+          supervisingDPKName: user?.student?.supervisingDPK?.fullname,
+          examinerDPKName: user?.student?.examinerDPK?.fullname,
         },
         supervisor: user?.supervisor,
       } as IUserProfileDTO)

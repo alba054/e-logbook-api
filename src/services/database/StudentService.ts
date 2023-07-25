@@ -1,7 +1,11 @@
 import { CheckInCheckOut } from "../../models/CheckInCheckOut";
 import { Student } from "../../models/Student";
 import { IActiveUnitDTO } from "../../utils/dto/ActiveUnitDTO";
-import { IPutStudentActiveUnit } from "../../utils/interfaces/Student";
+import {
+  IPutStudentActiveUnit,
+  IPutStudentData,
+} from "../../utils/interfaces/Student";
+import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 
 export class StudentService {
   private studentModel: Student;
@@ -10,6 +14,16 @@ export class StudentService {
   constructor() {
     this.studentModel = new Student();
     this.checkInCheckoutModel = new CheckInCheckOut();
+  }
+
+  async updateStudentData(
+    tokenPayload: ITokenPayload,
+    payload: IPutStudentData
+  ) {
+    return this.studentModel.updateStudentProfile(
+      tokenPayload.studentId,
+      payload
+    );
   }
 
   async getActiveUnit(studentId: string) {

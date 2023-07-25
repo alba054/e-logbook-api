@@ -4,6 +4,50 @@ import { createErrorObject } from "../utils";
 import { IPostScientificSessionPayload } from "../utils/interfaces/ScientificSession";
 
 export class ScientificSession {
+  async insertSupervisorFeedback(id: string, feedback: string) {
+    try {
+      return db.scientificSession.update({
+        where: {
+          id,
+        },
+        data: {
+          supervisorFeedback: feedback,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(
+          400,
+          "failed to insert feedback of scientific session"
+        );
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
+  async insertStudentFeedback(id: string, feedback: string) {
+    try {
+      return db.scientificSession.update({
+        where: {
+          id,
+        },
+        data: {
+          studentFeedback: feedback,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(
+          400,
+          "failed to insert feedback of scientific session"
+        );
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async getScientificSessionsByStudentIdAndUnitId(
     studentId: string,
     unitId?: string
@@ -53,6 +97,7 @@ export class ScientificSession {
       include: {
         Student: true,
         supervisor: true,
+        Unit: true,
       },
     });
   }

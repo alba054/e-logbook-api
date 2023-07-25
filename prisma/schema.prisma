@@ -17,6 +17,7 @@ model User {
   email              String?              @unique @db.VarChar(255)
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
+  profilePic         String?              @db.VarChar(255)
   student            Student?             @relation(fields: [studentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   role               Role
   badges             Badge[]
@@ -258,6 +259,8 @@ model ScientificSession {
   role               ScientificRole
   note               String?            @db.Text
   attachment         String?            @db.VarChar(255)
+  studentFeedback    String?            @db.Text
+  supervisorFeedback String?            @db.Text
   verificationStatus VerificationStatus @default(INPROCESS)
   supervisor         Supervisor         @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   supervisorId       String             @db.VarChar(100)

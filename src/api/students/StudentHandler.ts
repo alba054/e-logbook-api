@@ -5,6 +5,7 @@ import {
   IPostStudentResetPasswordPayload,
   IPostStudentTokenResetPassword,
   IPutStudentActiveUnit,
+  IPutStudentData,
 } from "../../utils/interfaces/Student";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { constants, createResponse } from "../../utils";
@@ -27,6 +28,7 @@ import { ScientificSessionService } from "../../services/database/ScientificSess
 import { IStudentScientificSessions } from "../../utils/dto/ScientificSessionDTO";
 import { IStudentSelfReflections } from "../../utils/dto/SelfReflectionDTO";
 import { SelfReflectionService } from "../../services/database/SelfReflectionService";
+import { StudentDataPayloadSchema } from "../../validator/students/StudentSchema";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -87,11 +89,14 @@ export class StudentHandler {
       await this.selfReflectionService.getSelfReflectionsByStudentAndUnitId(
         tokenPayload
       );
+    const student = await this.userService.getUserByUsername(
+      tokenPayload.username
+    );
 
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-        studentId: selfReflections[0]?.Student?.studentId,
-        studentName: selfReflections[0]?.Student?.fullName,
+        studentId: student?.student?.studentId,
+        studentName: student?.student?.fullName,
         listSelfReflections: selfReflections.map((c) => {
           return {
             content: c.content,
@@ -197,8 +202,48 @@ export class StudentHandler {
     next: NextFunction
   ) {}
 
-  // todo: edit profile handler
-  async putStudentProfile(req: Request, res: Response, next: NextFunction) {}
+  async putStudentProfile(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const payload: IPutStudentData = req.body;
+
+    try {
+      const validationResult = this.studentPayloadValidator.validate(
+        StudentDataPayloadSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        throw new BadRequestError(validationResult.message);
+      }
+
+      const result = await this.studentService.updateStudentData(
+        tokenPayload,
+        payload
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully update student data"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
+  }
 
   async putVerificationCheckIn(
     req: Request,

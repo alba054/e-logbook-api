@@ -1,9 +1,32 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
 import { createErrorObject } from "../utils";
+import { IPutUserProfile } from "../utils/interfaces/User";
 
 export class User {
   constructor() {}
+
+  async updateUserProfile(userId: string, payload: IPutUserProfile) {
+    try {
+      return db.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          email: payload.email,
+          profilePic: payload.pic,
+          username: payload.username,
+          studentId: payload.nim,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to update user profile");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
 
   async getUserByUsernameOrStudentIdOrSupervisorId(username: string) {
     return db.user.findFirst({
@@ -101,6 +124,9 @@ export class User {
         student: {
           include: {
             CheckInCheckOut: true,
+            academicAdvisor: true,
+            examinerDPK: true,
+            supervisingDPK: true,
           },
         },
         supervisor: true,
