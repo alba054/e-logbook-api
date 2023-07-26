@@ -57,6 +57,8 @@ export class UserHandler {
   }
 
   async postProfilePicture(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+
     try {
       if (!req.file?.buffer) {
         throw new BadRequestError("upload file with fieldname pic");
@@ -67,6 +69,10 @@ export class UserHandler {
         constants.PROFILE_PIC_PATH,
         req.file.buffer
       );
+
+      await this.userService.updateUserProfile(tokenPayload, {
+        pic: savedFile,
+      });
 
       return res
         .status(201)

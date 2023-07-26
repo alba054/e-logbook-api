@@ -5,8 +5,8 @@ export interface IPostUserPayload {
 }
 
 export interface IPutUserProfile {
-  readonly username: string;
-  readonly nim: string;
-  readonly email: string;
-  readonly pic: string;
+  readonly username?: string;
+  readonly nim?: string;
+  readonly email?: string;
+  readonly pic?: string;
 }
