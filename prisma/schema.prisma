@@ -127,6 +127,7 @@ model CheckInCheckOut {
   userId                String?             @db.VarChar(100)
   clinicalRecordDone    Boolean             @default(false)
   scientificSessionDone Boolean             @default(false)
+  selfReflectionDone    Boolean             @default(false)
 
   @@unique([unitId, studentId])
 }
@@ -246,17 +247,31 @@ model ClinicalRecordManagement {
   @@map("clinical_record_managements")
 }
 
+model SessionType {
+  id                Int                 @id @default(autoincrement())
+  name              String              @db.VarChar(100)
+  ScientificSession ScientificSession[]
+
+  @@map("session_types")
+}
+
+model ScientificRole {
+  id                Int                 @id @default(autoincrement())
+  name              String              @db.VarChar(100)
+  ScientificSession ScientificSession[]
+
+  @@map("scientific_roles")
+}
+
 model ScientificSession {
   id                 String             @id @db.VarChar(100)
   Unit               Unit?              @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   unitId             String?            @db.VarChar(100)
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
-  sessionType        SessionType
   topic              String             @db.VarChar(255)
   title              String             @db.VarChar(255)
   reference          String             @db.VarChar(255)
-  role               ScientificRole
   note               String?            @db.Text
   attachment         String?            @db.VarChar(255)
   studentFeedback    String?            @db.Text
@@ -267,6 +282,10 @@ model ScientificSession {
   Student            Student?           @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   studentId          String?            @db.VarChar(100)
   rating             Int?               @default(0) @db.UnsignedTinyInt()
+  sessionType        SessionType        @relation(fields: [sessionTypeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  scientificRole     ScientificRole     @relation(fields: [scientificRoleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  sessionTypeId      Int
+  scientificRoleId   Int
 
   @@map("scientific_session")
 }
@@ -305,18 +324,4 @@ enum VerificationStatus {
   VERIFIED
   INPROCESS
   UNVERIFIED
-}
-
-enum SessionType {
-  Journal_Reading
-  Session_Type0
-  Session_Type1
-  Session_Type2
-}
-
-enum ScientificRole {
-  Participant
-  Scientific_Role0
-  Scientific_Role1
-  Scientific_Role2
 }

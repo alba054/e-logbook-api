@@ -98,6 +98,8 @@ export class ScientificSession {
         Student: true,
         supervisor: true,
         Unit: true,
+        scientificRole: true,
+        sessionType: true,
       },
     });
   }
@@ -121,8 +123,8 @@ export class ScientificSession {
           attachment: payload.attachment,
           note: payload.notes,
           supervisorId: payload.supervisorId,
-          role: "Participant",
-          sessionType: "Journal_Reading",
+          sessionTypeId: payload.sessionType,
+          scientificRoleId: payload.role,
         },
       });
     } catch (error) {

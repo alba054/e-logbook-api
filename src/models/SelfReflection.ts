@@ -1,9 +1,74 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
 import { createErrorObject } from "../utils";
-import { IPostSelfReflection } from "../utils/interfaces/SelfReflection";
+import {
+  IPostSelfReflection,
+  IPutSelfReflectionVerificationStatus,
+} from "../utils/interfaces/SelfReflection";
 
 export class SelfReflection {
+  async getSelfReflectionsById(id: string) {
+    return db.selfReflection.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        Student: true,
+      },
+    });
+  }
+
+  async getSelfReflectionsBySupervisorAndStudentId(
+    supervisorId: string | undefined,
+    studentId: string
+  ) {
+    return db.selfReflection.findMany({
+      where: {
+        Student: {
+          OR: [
+            {
+              academicSupervisorId: supervisorId,
+            },
+            {
+              supervisingSupervisorId: supervisorId,
+            },
+            {
+              examinerSupervisorId: supervisorId,
+            },
+          ],
+          studentId,
+        },
+      },
+    });
+  }
+
+  async getSelfReflectionsBySupervisor(supervisorId?: string) {
+    return db.selfReflection.findMany({
+      where: {
+        Student: {
+          OR: [
+            {
+              academicSupervisorId: supervisorId,
+            },
+            {
+              supervisingSupervisorId: supervisorId,
+            },
+            {
+              examinerSupervisorId: supervisorId,
+            },
+          ],
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      distinct: ["studentId"],
+      include: {
+        Student: true,
+      },
+    });
+  }
+
   async getSelfReflectionsByStudentIdAndUnitId(
     studentId?: string,
     unitId?: string
