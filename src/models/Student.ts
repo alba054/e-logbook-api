@@ -8,6 +8,23 @@ import { createErrorObject } from "../utils";
 
 export class Student {
   constructor() {}
+
+  async getStudentByStudentId(studentId: string) {
+    return db.student.findUnique({
+      where: {
+        studentId,
+      },
+    });
+  }
+
+  async getStudentById(studentId: string | undefined) {
+    return db.student.findUnique({
+      where: {
+        id: studentId,
+      },
+    });
+  }
+
   async updateStudentProfile(studentId?: string, payload?: IPutStudentData) {
     try {
       return db.student.update({

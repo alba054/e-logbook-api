@@ -229,7 +229,7 @@ export class ScientificSessionHandler {
         createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
           rating: scientificSession.rating,
           reference: scientificSession.reference,
-          role: scientificSession.role,
+          role: scientificSession.scientificRole.name,
           studentName: scientificSession.Student?.fullName,
           supervisorName: scientificSession.supervisor.fullname,
           title: scientificSession.title,
@@ -237,7 +237,7 @@ export class ScientificSessionHandler {
           updatedAt: scientificSession.updatedAt,
           attachment: scientificSession.attachment,
           filename: scientificSession.attachment?.split("/").at(-1),
-          sessionType: scientificSession.sessionType,
+          sessionType: scientificSession.sessionType.name,
           unit: scientificSession.Unit?.name,
           verificationStatus: scientificSession.verificationStatus,
           studentFeedback: scientificSession.studentFeedback,

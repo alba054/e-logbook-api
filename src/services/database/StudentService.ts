@@ -16,6 +16,14 @@ export class StudentService {
     this.checkInCheckoutModel = new CheckInCheckOut();
   }
 
+  async getStudentByStudentId(studentId: string) {
+    return this.studentModel.getStudentByStudentId(studentId);
+  }
+
+  async getStudentById(studentId?: string) {
+    return this.studentModel.getStudentById(studentId);
+  }
+
   async updateStudentData(
     tokenPayload: ITokenPayload,
     payload: IPutStudentData
