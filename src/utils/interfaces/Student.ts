@@ -16,6 +16,9 @@ export interface IPutStudentData {
   readonly academicSupervisor?: string;
   readonly supervisingDPK?: string;
   readonly examinerDPK?: string;
+  readonly rsStation?: string;
+  readonly pkmStation?: string;
+  readonly periodLengthStation?: number;
 }
 
 export interface IPostStudentResetPasswordPayload {

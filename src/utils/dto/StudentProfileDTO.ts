@@ -11,4 +11,7 @@ export interface IStudentProfileDTO {
   academicSupervisorName?: string;
   supervisingDPKName?: string;
   examinerDPKName?: string;
+  rsStation?: string;
+  pkmStation?: string;
+  periodLengthStation?: number;
 }

@@ -79,6 +79,17 @@ export class UserRouter {
           constants.SUPERVISOR_ROLE,
         ]),
         this.userHandler.getUserProfilePic
+      )
+      .delete(
+        AuthorizationBearer.authorize([
+          constants.ER_ROLE,
+          constants.DPK_ROLE,
+          constants.ADMIN_ROLE,
+          constants.ADMIN_ROLE,
+          constants.STUDENT_ROLE,
+          constants.SUPERVISOR_ROLE,
+        ]),
+        this.userHandler.deleteUserProfilePic
       );
 
     return this.router;

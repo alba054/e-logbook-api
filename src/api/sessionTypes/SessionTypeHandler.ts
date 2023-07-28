@@ -18,6 +18,28 @@ export class SessionTypeHandler {
 
     this.getSessionTypes = this.getSessionTypes.bind(this);
     this.postSessionType = this.postSessionType.bind(this);
+    this.deleteSessionType = this.deleteSessionType.bind(this);
+  }
+
+  async deleteSessionType(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+
+    try {
+      const result = await this.sessionTypeService.deleteSessionTypeById(
+        Number(id)
+      );
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully delete session types"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async postSessionType(req: Request, res: Response, next: NextFunction) {
