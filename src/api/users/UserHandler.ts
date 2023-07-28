@@ -31,6 +31,28 @@ export class UserHandler {
     this.putUserProfile = this.putUserProfile.bind(this);
     this.postProfilePicture = this.postProfilePicture.bind(this);
     this.getUserProfilePic = this.getUserProfilePic.bind(this);
+    this.deleteUserProfilePic = this.deleteUserProfilePic.bind(this);
+  }
+
+  async deleteUserProfilePic(req: Request, res: Response, next: NextFunction) {
+    try {
+      const tokenPayload: ITokenPayload = res.locals.user;
+
+      await this.userService.updateUserProfile(tokenPayload, {
+        pic: "",
+      });
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "deleted user profile pic"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getUserProfilePic(req: Request, res: Response, next: NextFunction) {
@@ -174,6 +196,7 @@ export class UserHandler {
         role: user?.role,
         username: user?.username,
         email: user?.email,
+        fullname: user?.student?.fullName ?? user?.supervisor?.fullname,
         student: {
           studentId: user?.student?.studentId,
           address: user?.student?.address,
@@ -187,6 +210,9 @@ export class UserHandler {
           academicSupervisorName: user?.student?.academicAdvisor?.fullname,
           supervisingDPKName: user?.student?.supervisingDPK?.fullname,
           examinerDPKName: user?.student?.examinerDPK?.fullname,
+          rsStation: user?.student?.rsStation,
+          pkmStation: user?.student?.pkmStation,
+          periodLengthStation: Number(user?.student?.periodLengthStation),
         },
         supervisor: user?.supervisor,
       } as IUserProfileDTO)

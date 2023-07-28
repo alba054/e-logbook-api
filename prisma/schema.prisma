@@ -48,6 +48,9 @@ model Student {
   academicSupervisorId    String?
   supervisingSupervisorId String?
   examinerSupervisorId    String?
+  rsStation               String?             @db.VarChar(100)
+  pkmStation              String?             @db.VarChar(100)
+  periodLengthStation     BigInt              @default(0) @db.UnsignedBigInt
   clinicalRecords         ClinicalRecord[]
   CheckInCheckOut         CheckInCheckOut[]
   unitId                  String?             @db.VarChar(100)

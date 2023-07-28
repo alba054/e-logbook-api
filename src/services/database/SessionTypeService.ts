@@ -8,6 +8,10 @@ export class SessionTypeService {
     this.sessionTypeModel = new SessionType();
   }
 
+  async deleteSessionTypeById(id: number) {
+    return this.sessionTypeModel.deleteSessionType(id);
+  }
+
   async insertSessionType(payload: IPostSessionTypePayload) {
     return this.sessionTypeModel.insertSessionType(payload);
   }

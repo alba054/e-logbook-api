@@ -11,4 +11,5 @@ export interface IUserProfileDTO {
   pic?: string;
   student?: IStudentProfileDTO;
   supervisor?: ISupervisorProfileDTO;
+  fullname?: string;
 }

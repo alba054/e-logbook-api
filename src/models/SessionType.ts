@@ -4,6 +4,22 @@ import { createErrorObject } from "../utils";
 import { IPostSessionTypePayload } from "../utils/interfaces/SessionType";
 
 export class SessionType {
+  async deleteSessionType(id: number) {
+    try {
+      return db.sessionType.delete({
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to delete new session type");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async insertSessionType(payload: IPostSessionTypePayload) {
     try {
       return db.sessionType.create({

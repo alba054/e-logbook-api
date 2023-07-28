@@ -32,4 +32,7 @@ export const StudentDataPayloadSchema = Joi.object({
   academicSupervisor: Joi.string().optional(),
   supervisingDPK: Joi.string().optional(),
   examinerDPK: Joi.string().optional(),
+  rsStation: Joi.string().optional(),
+  pkmStation: Joi.string().optional(),
+  periodLengthStation: Joi.number().optional(),
 });

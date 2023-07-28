@@ -16,22 +16,30 @@ export class SessionTypeRouter {
 
   register() {
     // * get all session types
-    this.router.get(
-      this.path,
-      AuthorizationBearer.authorize([
-        constants.ADMIN_ROLE,
-        constants.STUDENT_ROLE,
-        constants.SUPERVISOR_ROLE,
-        constants.DPK_ROLE,
-      ]),
-      this.sessionTypeHandler.getSessionTypes
-    );
     // * post session type
-    this.router.post(
-      this.path,
-      AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
-      this.sessionTypeHandler.postSessionType
-    );
+    this.router
+      .route(this.path)
+      .get(
+        AuthorizationBearer.authorize([
+          constants.ADMIN_ROLE,
+          constants.STUDENT_ROLE,
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.sessionTypeHandler.getSessionTypes
+      )
+      .post(
+        AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+        this.sessionTypeHandler.postSessionType
+      );
+
+    // * delete session type
+    this.router
+      .route(this.path + "/:id")
+      .delete(
+        AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+        this.sessionTypeHandler.deleteSessionType
+      );
 
     return this.router;
   }

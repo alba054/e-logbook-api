@@ -40,6 +40,9 @@ export class Student {
           phoneNumber: payload?.phoneNumber,
           preClinicId: payload?.preclinicId,
           supervisingSupervisorId: payload?.supervisingDPK,
+          periodLengthStation: payload?.periodLengthStation,
+          pkmStation: payload?.pkmStation,
+          rsStation: payload?.rsStation,
         },
       });
     } catch (error) {
