@@ -29,6 +29,10 @@ import { IStudentScientificSessions } from "../../utils/dto/ScientificSessionDTO
 import { IStudentSelfReflections } from "../../utils/dto/SelfReflectionDTO";
 import { SelfReflectionService } from "../../services/database/SelfReflectionService";
 import { StudentDataPayloadSchema } from "../../validator/students/StudentSchema";
+import { CaseService } from "../../services/database/CaseService";
+import { IStudentCases } from "../../utils/dto/CaseDTO";
+import { SkillService } from "../../services/database/SkillService";
+import { IStudentSkills } from "../../utils/dto/SkillDTO";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -43,6 +47,8 @@ export class StudentHandler {
   private userService: UserService;
   private scientificSessionService: ScientificSessionService;
   private selfReflectionService: SelfReflectionService;
+  private caseService: CaseService;
+  private skillService: SkillService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -58,6 +64,8 @@ export class StudentHandler {
     this.userService = new UserService();
     this.scientificSessionService = new ScientificSessionService();
     this.selfReflectionService = new SelfReflectionService();
+    this.caseService = new CaseService();
+    this.skillService = new SkillService();
 
     this.postStudent = this.postStudent.bind(this);
     this.postStudentForgetPassword = this.postStudentForgetPassword.bind(this);
@@ -77,6 +85,58 @@ export class StudentHandler {
     this.getStudentScientificSessions =
       this.getStudentScientificSessions.bind(this);
     this.getStudentSelfReflections = this.getStudentSelfReflections.bind(this);
+    this.getStudentCases = this.getStudentCases.bind(this);
+    this.getStudentSkills = this.getStudentSkills.bind(this);
+  }
+
+  async getStudentSkills(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const skills = await this.skillService.getSkillsByStudentAndUnitId(
+      tokenPayload
+    );
+    const student = await this.userService.getUserByUsername(
+      tokenPayload.username
+    );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentId: student?.student?.studentId,
+        studentName: student?.student?.fullName,
+        listSkills: skills.map((c) => {
+          return {
+            skillId: c.id,
+            skillName: c.name,
+            skillType: c.type,
+            verificationStatus: c.verificationStatus,
+          };
+        }),
+      } as IStudentSkills)
+    );
+  }
+
+  async getStudentCases(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const selfReflections = await this.caseService.getCasesByStudentAndUnitId(
+      tokenPayload
+    );
+    const student = await this.userService.getUserByUsername(
+      tokenPayload.username
+    );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentId: student?.student?.studentId,
+        studentName: student?.student?.fullName,
+        listCases: selfReflections.map((c) => {
+          return {
+            caseId: c.id,
+            caseName: c.name,
+            caseType: c.type,
+            verificationStatus: c.verificationStatus,
+          };
+        }),
+      } as IStudentCases)
+    );
   }
 
   async getStudentSelfReflections(

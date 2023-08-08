@@ -17,6 +17,7 @@ import { ScientificSessionRouter } from "./api/scientificSessions/ScientificSess
 import { SelfReflectionRouter } from "./api/selfReflections/SelfReflectionRouter";
 import { SessionTypeRouter } from "./api/sessionTypes/SessionTypeRouter";
 import { ScientificRoleRouter } from "./api/scientificRole/ScientificRoleRouter";
+import { CompetencyRouter } from "./api/competencies/CompetencyRouter";
 
 dotenv.config();
 
@@ -58,6 +59,7 @@ class Server {
     this.app.use("/api", new SelfReflectionRouter().register());
     this.app.use("/api", new SessionTypeRouter().register());
     this.app.use("/api", new ScientificRoleRouter().register());
+    this.app.use("/api", new CompetencyRouter().register());
     // * error handling
     this.app.use(ErrorHandler);
   }

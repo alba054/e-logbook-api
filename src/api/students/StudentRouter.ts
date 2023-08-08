@@ -123,6 +123,22 @@ export class StudentRouter {
         this.studentHandler.getStudentSelfReflections
       );
 
+    // * get list of cases submitted
+    this.router
+      .route(this.path + "/cases")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getStudentCases
+      );
+
+    // * get list of skills submitted
+    this.router
+      .route(this.path + "/skills")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getStudentSkills
+      );
+
     return this.router;
   }
 }
