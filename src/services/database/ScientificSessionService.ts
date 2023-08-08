@@ -179,8 +179,6 @@ export class ScientificSessionService {
         tokenPayload.studentId ?? ""
       );
 
-      console.log(studentActiveUnit?.activeUnit.activeUnit?.id);
-
       return this.scientificSessionModel.insertScientificSession(
         payload,
         uuidv4(),

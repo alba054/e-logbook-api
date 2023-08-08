@@ -4,7 +4,7 @@ import { IPostUserPayload, IPutUserProfile } from "../../utils/interfaces/User";
 import { UserRawPayloadSchema } from "./UserSchema";
 
 export class UserPayloadValidator {
-  validate(schema: Joi.ObjectSchema, payload: IPutUserProfile) {
+  validate(schema: Joi.ObjectSchema, payload: any) {
     const validationResult = schema.validate(payload);
 
     if (validationResult.error) {
