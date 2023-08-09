@@ -18,6 +18,28 @@ export class ScientificRoleHandler {
 
     this.getScientificRoles = this.getScientificRoles.bind(this);
     this.postScientificRole = this.postScientificRole.bind(this);
+    this.deleteScientificRole = this.deleteScientificRole.bind(this);
+  }
+
+  async deleteScientificRole(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+
+    try {
+      const result = await this.scientificRoleService.deleteScientificRoleById(
+        Number(id)
+      );
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully delete scientific role"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async postScientificRole(req: Request, res: Response, next: NextFunction) {

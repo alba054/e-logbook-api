@@ -17,6 +17,28 @@ export class ManagementRoleHandler {
 
     this.getManagementRolesUnit = this.getManagementRolesUnit.bind(this);
     this.postManagementRolesUnit = this.postManagementRolesUnit.bind(this);
+    this.deleteManagementRole = this.deleteManagementRole.bind(this);
+  }
+
+  async deleteManagementRole(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+
+    try {
+      const result = await this.managementRoleService.deleteManagementRoleById(
+        id
+      );
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully delete management role"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async postManagementRolesUnit(
