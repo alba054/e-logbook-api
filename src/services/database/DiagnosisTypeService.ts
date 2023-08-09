@@ -9,6 +9,10 @@ export class DiagnosisTypeService {
     this.diagnosisTypeModel = new DiagnosisType();
   }
 
+  async deleteDiagnosisTypeById(id: string) {
+    return this.diagnosisTypeModel.deleteDiagnosisType(id);
+  }
+
   async insertDiagnosisTypesUnit(payload: IPostDiagnosisTypePayload) {
     return this.diagnosisTypeModel.insertDiagnosisTypeByUnitId(
       uuidv4(),

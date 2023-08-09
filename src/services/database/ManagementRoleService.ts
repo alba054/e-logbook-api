@@ -9,6 +9,10 @@ export class ManagementRoleService {
     this.managementRoleModel = new ManagementRole();
   }
 
+  async deleteManagementRoleById(id: string) {
+    return this.managementRoleModel.deleteManagementRole(id);
+  }
+
   async insertManagementRolesUnit(payload: IPostManagementRolePayload) {
     return this.managementRoleModel.insertManagementRoleByUnitId(
       uuidv4(),

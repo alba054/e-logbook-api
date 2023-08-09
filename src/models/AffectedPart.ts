@@ -6,6 +6,22 @@ import { createErrorObject } from "../utils";
 export class AffectedPart {
   constructor() {}
 
+  async deleteAffectedPart(id: string) {
+    try {
+      return db.affectedPart.delete({
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to delete new affected part");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async insertAffectedPartByUnitId(
     id: string,
     payload: IPostAffectedPartPayload

@@ -33,6 +33,14 @@ export class ManagementRoleRouter {
       this.managementRoleHandler.postManagementRolesUnit
     );
 
+    // * delete management role
+    this.router
+      .route(this.path + "/:id")
+      .delete(
+        AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+        this.managementRoleHandler.deleteManagementRole
+      );
+
     return this.router;
   }
 }

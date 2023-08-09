@@ -17,6 +17,28 @@ export class DiagnosisTypeHandler {
 
     this.getDiagnosisTypesUnit = this.getDiagnosisTypesUnit.bind(this);
     this.postDiagnosisTypesUnit = this.postDiagnosisTypesUnit.bind(this);
+    this.deleteDiagnosisType = this.deleteDiagnosisType.bind(this);
+  }
+
+  async deleteDiagnosisType(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+
+    try {
+      const result = await this.diagnosisTypeService.deleteDiagnosisTypeById(
+        id
+      );
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully delete diagnosis type"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async postDiagnosisTypesUnit(

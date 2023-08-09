@@ -17,6 +17,26 @@ export class AffectedPartHandler {
 
     this.getAffectedPartsUnit = this.getAffectedPartsUnit.bind(this);
     this.postAffectedPartsUnit = this.postAffectedPartsUnit.bind(this);
+    this.deleteAffectedPart = this.deleteAffectedPart.bind(this);
+  }
+
+  async deleteAffectedPart(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+
+    try {
+      const result = await this.affectedPartService.deleteAffectedPartById(id);
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully delete affected part"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async postAffectedPartsUnit(req: Request, res: Response, next: NextFunction) {
