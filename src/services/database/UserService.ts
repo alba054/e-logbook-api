@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import bcryptjs from "bcryptjs";
 import { createErrorObject } from "../../utils";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
+import db from "../../database";
 
 interface IUserData {
   id: string;
@@ -33,6 +34,18 @@ export class UserService {
     tokenPayload: ITokenPayload,
     payload: IPutUserProfile
   ) {
+    return db.$transaction([
+      db.user.update({
+        where: {
+          id: tokenPayload.userId,
+        },
+        data: {
+          email: payload.email,
+          profilePic: payload.pic,
+          username: payload.username,
+        },
+      }),
+    ]);
     return this.userModel.updateUserProfile(tokenPayload.userId, payload);
   }
 

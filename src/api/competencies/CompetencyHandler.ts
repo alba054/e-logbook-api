@@ -3,10 +3,12 @@ import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
 import { CaseService } from "../../services/database/CaseService";
+import { CompetencyService } from "../../services/database/CompetencyService";
 import { SkillService } from "../../services/database/SkillService";
 import { StudentService } from "../../services/database/StudentService";
 import { constants, createResponse } from "../../utils";
 import { IStudentCases, ISubmittedCase } from "../../utils/dto/CaseDTO";
+import { ICompetencySubmitted } from "../../utils/dto/CompetencyDTO";
 import { IStudentSkills, ISubmittedSkill } from "../../utils/dto/SkillDTO";
 import {
   IPostCase,
@@ -30,16 +32,14 @@ import { Validator } from "../../validator/Validator";
 
 export class CompetencyHandler {
   private skillValidator: SkillValidator;
-  private skillService: SkillService;
   private validator: Validator;
-  private caseService: CaseService;
   private studentService: StudentService;
+  private competencyService: CompetencyService;
 
   constructor() {
     this.skillValidator = new SkillValidator();
-    this.skillService = new SkillService();
+    this.competencyService = new CompetencyService();
     this.validator = new Validator();
-    this.caseService = new CaseService();
     this.studentService = new StudentService();
 
     this.postSkill = this.postSkill.bind(this);
@@ -55,6 +55,27 @@ export class CompetencyHandler {
     this.putVerificationStatusSkill =
       this.putVerificationStatusSkill.bind(this);
     this.putVerificationStatusCase = this.putVerificationStatusCase.bind(this);
+    this.getCompetencies = this.getCompetencies.bind(this);
+  }
+
+  async getCompetencies(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    const competencies =
+      await this.competencyService.getCompetenciesBySupervisor(tokenPayload);
+
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        competencies.map((c) => {
+          return {
+            competencyType: c.type,
+            latest: c.createdAt,
+            studentName: c.Student?.fullName,
+          } as ICompetencySubmitted;
+        })
+      )
+    );
   }
 
   async putVerificationStatusCase(
@@ -83,7 +104,7 @@ export class CompetencyHandler {
         }
       }
 
-      const result = await this.caseService.verifyCase(
+      const result = await this.competencyService.verifyCase(
         id,
         tokenPayload,
         payload
@@ -134,7 +155,7 @@ export class CompetencyHandler {
         }
       }
 
-      const result = await this.skillService.verifySkill(
+      const result = await this.competencyService.verifySkill(
         id,
         tokenPayload,
         payload
@@ -168,7 +189,7 @@ export class CompetencyHandler {
     const { studentId } = req.params;
 
     try {
-      const result = await this.skillService.verifyAllStudentSkills(
+      const result = await this.competencyService.verifyAllStudentSkills(
         tokenPayload,
         studentId
       );
@@ -206,7 +227,7 @@ export class CompetencyHandler {
     const { studentId } = req.params;
 
     try {
-      const result = await this.caseService.verifyAllStudentCases(
+      const result = await this.competencyService.verifyAllStudentCases(
         tokenPayload,
         studentId
       );
@@ -239,7 +260,7 @@ export class CompetencyHandler {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { studentId } = req.params;
 
-    const cases = await this.caseService.getCaseByStudentId(
+    const cases = await this.competencyService.getCaseByStudentId(
       tokenPayload,
       studentId
     );
@@ -253,7 +274,7 @@ export class CompetencyHandler {
         listCases: cases.map((s) => {
           return {
             caseId: s.id,
-            caseType: s.type,
+            caseType: s.competencyType,
             caseName: s.name,
             verificationStatus: s.verificationStatus,
           };
@@ -266,7 +287,7 @@ export class CompetencyHandler {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { studentId } = req.params;
 
-    const skills = await this.skillService.getSkillsByStudentId(
+    const skills = await this.competencyService.getSkillsByStudentId(
       tokenPayload,
       studentId
     );
@@ -280,7 +301,7 @@ export class CompetencyHandler {
         listSkills: skills.map((s) => {
           return {
             skillId: s.id,
-            skillType: s.type,
+            skillType: s.competencyType,
             skillName: s.name,
             verificationStatus: s.verificationStatus,
           };
@@ -292,7 +313,9 @@ export class CompetencyHandler {
   async getCases(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
 
-    const cases = await this.caseService.getCasesBySupervisor(tokenPayload);
+    const cases = await this.competencyService.getCasesBySupervisor(
+      tokenPayload
+    );
 
     return res.status(200).json(
       createResponse(
@@ -311,7 +334,9 @@ export class CompetencyHandler {
   async getSkills(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
 
-    const skills = await this.skillService.getSkillsBySupervisor(tokenPayload);
+    const skills = await this.competencyService.getSkillsBySupervisor(
+      tokenPayload
+    );
 
     return res.status(200).json(
       createResponse(
@@ -345,7 +370,7 @@ export class CompetencyHandler {
         }
       }
 
-      const testError = await this.caseService.insertNewCase(
+      const testError = await this.competencyService.insertNewCase(
         tokenPayload,
         payload
       );
@@ -392,7 +417,7 @@ export class CompetencyHandler {
         }
       }
 
-      const testError = await this.skillService.insertNewSkill(
+      const testError = await this.competencyService.insertNewSkill(
         tokenPayload,
         payload
       );

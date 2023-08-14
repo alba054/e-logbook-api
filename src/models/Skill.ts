@@ -70,6 +70,7 @@ export class Skill {
             },
           ],
         },
+        verificationStatus: "INPROCESS",
       },
       orderBy: {
         createdAt: "desc",
