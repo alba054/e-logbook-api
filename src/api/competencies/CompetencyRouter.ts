@@ -16,6 +16,17 @@ export class CompetencyRouter {
   }
 
   register() {
+    // * get submitted competencies (skills and cases merged)
+    this.router
+      .route(this.path)
+      .get(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.getCompetencies
+      );
+
     // * add new skill
     // * get student submitted skills by supervisor or dpk
     this.router

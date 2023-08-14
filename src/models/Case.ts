@@ -70,6 +70,7 @@ export class Case {
             },
           ],
         },
+        verificationStatus: "INPROCESS",
       },
       orderBy: {
         createdAt: "desc",

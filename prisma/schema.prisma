@@ -59,6 +59,7 @@ model Student {
   SelfReflection          SelfReflection[]
   Skill                   Skill[]
   Case                    Case[]
+  Competency              Competency[]
 
   @@map("students")
 }
@@ -112,6 +113,7 @@ model Unit {
   SelfReflection    SelfReflection[]
   Skill             Skill[]
   Case              Case[]
+  Competency        Competency[]
 
   @@map("units")
 }
@@ -314,6 +316,23 @@ model SelfReflection {
   @@map("self_reflections")
 }
 
+model Competency {
+  id                 String             @id @db.VarChar(100)
+  name               String             @db.VarChar(255)
+  competencyType     CompetencyType
+  rating             Int                @default(0) @db.UnsignedTinyInt
+  verificationStatus VerificationStatus @default(INPROCESS)
+  Student            Student?           @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId          String?            @db.VarChar(100)
+  Unit               Unit?              @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId             String?            @db.VarChar(100)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  type               Type
+
+  @@map("competencies")
+}
+
 model Skill {
   id                 String             @id @db.VarChar(100)
   name               String             @db.VarChar(255)
@@ -350,6 +369,11 @@ enum CompetencyType {
   OBTAINED
   DISCUSSED
   OBSERVED
+}
+
+enum Type {
+  SKILL
+  CASE
 }
 
 enum Badges {
