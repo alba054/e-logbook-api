@@ -7,4 +7,4 @@ COPY . .
 RUN npm install
 
 EXPOSE 7890
-CMD ["npm", "run", "migrate::dev", "migration", "&&", "npm", "run", "start"]
+CMD ["npm", "run", "start"]
