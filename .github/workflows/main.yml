@@ -1,43 +1,50 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-# This is a basic workflow to help you get started with Actions
 name: CI
-# Controls when the action will run. 
+
 on:
   push:
-    branches: [ "staging" ]
+    branches: [ "development", "main" ]
+  pull_request:
+    branches: [ "development", "main" ]
   workflow_dispatch:
+
 jobs:
   build:
-    name: Build and deploy
     runs-on: ubuntu-latest
-    
     steps:
-    - uses: actions/checkout@v3
-      with:
-        ref: 'staging'
-    - name: Use Node.js lts/Hydrogen
-      uses: actions/setup-node@v3
-      with:
-        node-version: 'lts/Hydrogen'
-        cache: 'npm'
-#     - name: Install Deps
-#       run: npm ci
-#     - name: Create production build
-#       run: npm run build
-    - name: Copy repo to remote host
-      uses: appleboy/scp-action@v0.1.4
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_KEY }}
-        source: .
-        target: ~/e-logbook-staging
-        strip_components: 1
-    - name: Restart pm2 instance
-      uses: appleboy/ssh-action@v0.1.10
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_KEY }}
-        script: cd ~/e-logbook-staging && npm ci && pm2 restart e-logbook-staging-api
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/app:e-logbook-backend-main
+
+  deploy:
+    needs: build
+    runs-on: sm-npe
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Deploy
+        run: |
+          docker compose pull
+          docker compose up -d --force-recreate
