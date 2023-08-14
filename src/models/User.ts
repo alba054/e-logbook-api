@@ -16,7 +16,11 @@ export class User {
           email: payload.email,
           profilePic: payload.pic,
           username: payload.username,
-          studentId: payload.nim,
+          student: {
+            update: {
+              studentId: payload.nim,
+            },
+          },
         },
       });
     } catch (error) {
