@@ -10,7 +10,7 @@ services:
     ports:
       - 7890:7890
     environment:
-      DATABASE_URL: "mysql://root:np3digihous3@localhost:3306/e_logbook"
+      DATABASE_URL: "mysql://root:np3digihous3@172.17.0.1:3306/e_logbook"
       # token variable
       ISSUER: api.localhost.com
       ACCESS_SECRET_KEY: A0GALSJDF0813LJASDF08ZA03129AESF840ASDFSDF
