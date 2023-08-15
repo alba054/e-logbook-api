@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from "uuid";
 import bcryptjs from "bcryptjs";
 import { createErrorObject } from "../../utils";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
-import db from "../../database";
 
 interface IUserData {
   id: string;
@@ -34,7 +33,16 @@ export class UserService {
     tokenPayload: ITokenPayload,
     payload: IPutUserProfile
   ) {
-    return this.userModel.updateUserProfile(tokenPayload.userId, payload);
+    if (tokenPayload.role === "STUDENT") {
+      return this.userModel.updateUserStudentProfile(
+        tokenPayload.userId,
+        payload
+      );
+    }
+    return this.userModel.updateUserSupervisorProfile(
+      tokenPayload.userId,
+      payload
+    );
   }
 
   async getUserByUsernameOrStudentIdOrSupervisorId(username: string) {

@@ -6,7 +6,7 @@ import { IPutUserProfile } from "../utils/interfaces/User";
 export class User {
   constructor() {}
 
-  async updateUserProfile(userId: string, payload: IPutUserProfile) {
+  async updateUserStudentProfile(userId: string, payload: IPutUserProfile) {
     try {
       return db.user.update({
         where: {
@@ -19,6 +19,32 @@ export class User {
           student: {
             update: {
               studentId: payload.nim,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to update user profile");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
+  async updateUserSupervisorProfile(userId: string, payload: IPutUserProfile) {
+    try {
+      return db.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          email: payload.email,
+          profilePic: payload.pic,
+          username: payload.username,
+          supervisor: {
+            update: {
+              supervisorId: payload.nim,
             },
           },
         },
