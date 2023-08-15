@@ -1,6 +1,6 @@
 export interface IPostSkill {
-  readonly name: string;
   readonly type: "OBTAINED" | "DISCUSSED" | "OBSERVED";
+  readonly skillTypeId: number;
 }
 
 export interface IPutSkillVerificationStatus {

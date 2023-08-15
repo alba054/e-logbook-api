@@ -2,9 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
-import { CaseService } from "../../services/database/CaseService";
 import { CompetencyService } from "../../services/database/CompetencyService";
-import { SkillService } from "../../services/database/SkillService";
 import { StudentService } from "../../services/database/StudentService";
 import { constants, createResponse } from "../../utils";
 import { IStudentCases, ISubmittedCase } from "../../utils/dto/CaseDTO";
@@ -275,7 +273,7 @@ export class CompetencyHandler {
           return {
             caseId: s.id,
             caseType: s.competencyType,
-            caseName: s.name,
+            caseName: s.case?.name,
             verificationStatus: s.verificationStatus,
           };
         }),
@@ -302,7 +300,7 @@ export class CompetencyHandler {
           return {
             skillId: s.id,
             skillType: s.competencyType,
-            skillName: s.name,
+            skillName: s.skill?.name,
             verificationStatus: s.verificationStatus,
           };
         }),
