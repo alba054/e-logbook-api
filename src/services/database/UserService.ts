@@ -34,18 +34,6 @@ export class UserService {
     tokenPayload: ITokenPayload,
     payload: IPutUserProfile
   ) {
-    return db.$transaction([
-      db.user.update({
-        where: {
-          id: tokenPayload.userId,
-        },
-        data: {
-          email: payload.email,
-          profilePic: payload.pic,
-          username: payload.username,
-        },
-      }),
-    ]);
     return this.userModel.updateUserProfile(tokenPayload.userId, payload);
   }
 

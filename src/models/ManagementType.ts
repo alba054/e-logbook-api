@@ -6,6 +6,22 @@ import { createErrorObject } from "../utils";
 export class ManagementType {
   constructor() {}
 
+  async deleteManagementType(id: string) {
+    try {
+      return db.managementType.delete({
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to delete new management type");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async insertManagementTypeByUnitId(
     id: string,
     payload: IPostManagementTypePayload

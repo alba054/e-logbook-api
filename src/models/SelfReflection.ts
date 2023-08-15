@@ -58,6 +58,7 @@ export class SelfReflection {
             },
           ],
         },
+        verificationStatus: "INPROCESS",
       },
       orderBy: {
         createdAt: "desc",

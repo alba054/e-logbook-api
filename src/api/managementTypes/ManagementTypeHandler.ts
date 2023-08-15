@@ -17,6 +17,28 @@ export class ManagementTypeHandler {
 
     this.getManagementTypesUnit = this.getManagementTypesUnit.bind(this);
     this.postManagementTypesUnit = this.postManagementTypesUnit.bind(this);
+    this.deleteManagementType = this.deleteManagementType.bind(this);
+  }
+
+  async deleteManagementType(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+
+    try {
+      const result = await this.managementTypeService.deleteManagementTypeById(
+        id
+      );
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully delete management type"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async postManagementTypesUnit(

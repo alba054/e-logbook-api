@@ -6,6 +6,22 @@ import { createErrorObject } from "../utils";
 export class ExaminationType {
   constructor() {}
 
+  async deleteExaminationType(id: string) {
+    try {
+      return db.examinationType.delete({
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to delete new examination type");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async insertExaminationTypeByUnitId(
     id: string,
     payload: IPostExaminationTypePayload

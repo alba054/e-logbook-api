@@ -33,6 +33,14 @@ export class ScientificRoleRouter {
       this.scientificRoleHandler.postScientificRole
     );
 
+    // * delete scientific role
+    this.router
+      .route(this.path + "/:id")
+      .delete(
+        AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+        this.scientificRoleHandler.deleteScientificRole
+      );
+
     return this.router;
   }
 }
