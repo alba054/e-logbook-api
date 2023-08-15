@@ -23,6 +23,32 @@ export class CompetencyService {
     this.studentService = new StudentService();
   }
 
+  async getSkillsByStudentAndUnitId(tokenPayload: ITokenPayload) {
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+
+    const skills = await this.competencyModel.getSkillsByStudentIdAndUnitId(
+      tokenPayload.studentId,
+      activeUnit?.activeUnit.activeUnit?.id
+    );
+
+    return skills;
+  }
+
+  async getCasesByStudentAndUnitId(tokenPayload: ITokenPayload) {
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+
+    const cases = await this.competencyModel.getCasesByStudentIdAndUnitId(
+      tokenPayload.studentId,
+      activeUnit?.activeUnit.activeUnit?.id
+    );
+
+    return cases;
+  }
+
   async getCompetenciesBySupervisor(tokenPayload: ITokenPayload) {
     return this.competencyModel.getCompetenciesBySupervisor(
       tokenPayload.supervisorId

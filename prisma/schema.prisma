@@ -114,6 +114,8 @@ model Unit {
   Skill             Skill[]
   Case              Case[]
   Competency        Competency[]
+  SkillType         SkillType[]
+  CaseType          CaseType[]
 
   @@map("units")
 }
@@ -318,7 +320,7 @@ model SelfReflection {
 
 model Competency {
   id                 String             @id @db.VarChar(100)
-  name               String             @db.VarChar(255)
+  name               String?            @db.VarChar(255)
   competencyType     CompetencyType
   rating             Int                @default(0) @db.UnsignedTinyInt
   verificationStatus VerificationStatus @default(INPROCESS)
@@ -328,11 +330,11 @@ model Competency {
   unitId             String?            @db.VarChar(100)
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
-  case               CaseType           @relation(fields: [caseTypeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  skill              SkillType          @relation(fields: [skillTypeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  case               CaseType?          @relation(fields: [caseTypeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  skill              SkillType?         @relation(fields: [skillTypeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   type               Type
-  caseTypeId         Int
-  skillTypeId        Int
+  caseTypeId         Int?
+  skillTypeId        Int?
 
   @@map("competencies")
 }
@@ -340,6 +342,8 @@ model Competency {
 model CaseType {
   id         Int          @id @default(autoincrement())
   name       String       @db.VarChar(255)
+  Unit       Unit?        @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId     String?      @db.VarChar(100)
   Competency Competency[]
 
   @@map("case_types")
@@ -348,6 +352,8 @@ model CaseType {
 model SkillType {
   id         Int          @id @default(autoincrement())
   name       String       @db.VarChar(255)
+  Unit       Unit?        @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId     String?      @db.VarChar(100)
   Competency Competency[]
 
   @@map("skill_types")
