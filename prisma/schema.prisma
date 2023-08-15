@@ -328,9 +328,29 @@ model Competency {
   unitId             String?            @db.VarChar(100)
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
+  case               CaseType           @relation(fields: [caseTypeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  skill              SkillType          @relation(fields: [skillTypeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   type               Type
+  caseTypeId         Int
+  skillTypeId        Int
 
   @@map("competencies")
+}
+
+model CaseType {
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(255)
+  Competency Competency[]
+
+  @@map("case_types")
+}
+
+model SkillType {
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(255)
+  Competency Competency[]
+
+  @@map("skill_types")
 }
 
 model Skill {
