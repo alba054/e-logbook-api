@@ -342,12 +342,15 @@ export class ClinicalRecordHandler {
     res: Response,
     next: NextFunction
   ) {
-    const { status } = req.query;
+    const { status, page, offset, query } = req.query;
 
     const tokenPayload: ITokenPayload = res.locals.user;
     const clinicalRecords =
       await this.clinicalRecordService.getSubmittedClinicalRecords(
         status,
+        Number(page),
+        Number(offset),
+        query,
         tokenPayload.supervisorId
       );
 

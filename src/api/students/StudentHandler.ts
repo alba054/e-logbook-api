@@ -33,6 +33,7 @@ import { CaseService } from "../../services/database/CaseService";
 import { IStudentCases } from "../../utils/dto/CaseDTO";
 import { SkillService } from "../../services/database/SkillService";
 import { IStudentSkills } from "../../utils/dto/SkillDTO";
+import { CompetencyService } from "../../services/database/CompetencyService";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -47,8 +48,7 @@ export class StudentHandler {
   private userService: UserService;
   private scientificSessionService: ScientificSessionService;
   private selfReflectionService: SelfReflectionService;
-  private caseService: CaseService;
-  private skillService: SkillService;
+  private competencyService: CompetencyService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -64,8 +64,7 @@ export class StudentHandler {
     this.userService = new UserService();
     this.scientificSessionService = new ScientificSessionService();
     this.selfReflectionService = new SelfReflectionService();
-    this.caseService = new CaseService();
-    this.skillService = new SkillService();
+    this.competencyService = new CompetencyService();
 
     this.postStudent = this.postStudent.bind(this);
     this.postStudentForgetPassword = this.postStudentForgetPassword.bind(this);
@@ -91,7 +90,7 @@ export class StudentHandler {
 
   async getStudentSkills(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
-    const skills = await this.skillService.getSkillsByStudentAndUnitId(
+    const skills = await this.competencyService.getSkillsByStudentAndUnitId(
       tokenPayload
     );
     const student = await this.userService.getUserByUsername(
@@ -105,8 +104,9 @@ export class StudentHandler {
         listSkills: skills.map((c) => {
           return {
             skillId: c.id,
-            skillName: c.name,
-            skillType: c.type,
+            skillName: c.skill?.name,
+            skillTypeId: c.skillTypeId,
+            skillType: c.competencyType,
             verificationStatus: c.verificationStatus,
           };
         }),
@@ -116,9 +116,8 @@ export class StudentHandler {
 
   async getStudentCases(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
-    const selfReflections = await this.caseService.getCasesByStudentAndUnitId(
-      tokenPayload
-    );
+    const selfReflections =
+      await this.competencyService.getCasesByStudentAndUnitId(tokenPayload);
     const student = await this.userService.getUserByUsername(
       tokenPayload.username
     );
@@ -130,8 +129,9 @@ export class StudentHandler {
         listCases: selfReflections.map((c) => {
           return {
             caseId: c.id,
-            caseName: c.name,
-            caseType: c.type,
+            caseName: c.case?.name,
+            caseType: c.competencyType,
+            caseTypeId: c.caseTypeId,
             verificationStatus: c.verificationStatus,
           };
         }),

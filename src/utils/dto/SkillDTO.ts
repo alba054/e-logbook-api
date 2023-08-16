@@ -13,6 +13,7 @@ export interface IStudentSkills {
 interface IListSkillDTO {
   skillId: string;
   skillName: string;
+  skillTypeId: number;
   skillType: "OBSERVED" | "DISCUSSED" | "OBTAINED";
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERFIED";
 }

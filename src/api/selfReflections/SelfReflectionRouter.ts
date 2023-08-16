@@ -45,6 +45,7 @@ export class SelfReflectionRouter {
       );
 
     // * verify self reflection
+    // * self reflection detail
     this.router
       .route(this.path + "/:id")
       .put(
@@ -53,6 +54,22 @@ export class SelfReflectionRouter {
           constants.DPK_ROLE,
         ]),
         this.handler.putSelfReflectionVerificationStatus
+      )
+      .get(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+          constants.STUDENT_ROLE,
+        ]),
+        this.handler.getSelfReflectionDetail
+      );
+
+    // * update self reflection
+    this.router
+      .route(this.path + "/:id/update")
+      .put(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.handler.putSelfReflectionDetail
       );
 
     return this.router;

@@ -12,6 +12,7 @@ export interface IStudentCases {
 
 interface IListCaseDTO {
   caseId: string;
+  caseTypeId: number;
   caseName: string;
   caseType: "OBSERVED" | "DISCUSSED" | "OBTAINED";
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";

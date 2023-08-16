@@ -117,29 +117,87 @@ export class ClinicalRecord {
     });
   }
 
-  async getClinicalRecordsBySupervisorId(supervisorId?: string) {
+  async getClinicalRecordsBySupervisorId(
+    page: number | undefined,
+    offset: number | undefined,
+    query: string | undefined,
+    supervisorId?: string
+  ) {
     return db.clinicalRecord.findMany({
       where: {
         supervisorId,
+        OR: [
+          {
+            Student: {
+              OR: [
+                {
+                  fullName: {
+                    contains: query,
+                  },
+                },
+                {
+                  studentId: {
+                    contains: query,
+                  },
+                },
+              ],
+            },
+          },
+          {
+            patientName: {
+              contains: query,
+            },
+          },
+        ],
       },
       include: {
         Student: true,
       },
+      skip: ((page || 1) - 1) * (offset || 0),
+      take: offset || 10,
     });
   }
 
   async getClinicalRecordsByStatusAndSupervisorId(
     status: any,
+    page: number | undefined,
+    offset: number | undefined,
+    query: string | undefined,
     supervisorId?: string
   ) {
     return db.clinicalRecord.findMany({
       where: {
         verificationStatus: status,
         supervisorId,
+        OR: [
+          {
+            Student: {
+              OR: [
+                {
+                  fullName: {
+                    contains: query,
+                  },
+                },
+                {
+                  studentId: {
+                    contains: query,
+                  },
+                },
+              ],
+            },
+          },
+          {
+            patientName: {
+              contains: query,
+            },
+          },
+        ],
       },
       include: {
         Student: true,
       },
+      skip: ((page || 1) - 1) * (offset || 0),
+      take: offset || 10,
     });
   }
 }

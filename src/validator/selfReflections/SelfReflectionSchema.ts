@@ -7,4 +7,5 @@ export const SelfReflectionPayloadSchema = Joi.object({
 export const SelfReflectionVerificationStatusSchema = Joi.object({
   verified: Joi.boolean().required(),
   rating: Joi.number().max(5),
+  feedback: Joi.string().optional(),
 });

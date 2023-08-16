@@ -2,9 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
-import { CaseService } from "../../services/database/CaseService";
 import { CompetencyService } from "../../services/database/CompetencyService";
-import { SkillService } from "../../services/database/SkillService";
 import { StudentService } from "../../services/database/StudentService";
 import { constants, createResponse } from "../../utils";
 import { IStudentCases, ISubmittedCase } from "../../utils/dto/CaseDTO";
@@ -72,6 +70,7 @@ export class CompetencyHandler {
             competencyType: c.type,
             latest: c.createdAt,
             studentName: c.Student?.fullName,
+            studentId: c.Student?.studentId,
           } as ICompetencySubmitted;
         })
       )
@@ -265,22 +264,38 @@ export class CompetencyHandler {
       studentId
     );
 
-    const student = await this.studentService.getStudentByStudentId(studentId);
+    try {
+      const student = await this.studentService.getStudentByStudentId(
+        studentId
+      );
+      if (student && "error" in student) {
+        switch (student.error) {
+          case 400:
+            throw new BadRequestError(student.message);
+          case 404:
+            throw new NotFoundError(student.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
 
-    return res.status(200).json(
-      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-        studentName: student?.fullName,
-        studentId: studentId,
-        listCases: cases.map((s) => {
-          return {
-            caseId: s.id,
-            caseType: s.competencyType,
-            caseName: s.name,
-            verificationStatus: s.verificationStatus,
-          };
-        }),
-      } as IStudentCases)
-    );
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          studentName: student?.fullName,
+          studentId: studentId,
+          listCases: cases.map((s) => {
+            return {
+              caseId: s.id,
+              caseType: s.competencyType,
+              caseName: s.name,
+              verificationStatus: s.verificationStatus,
+            };
+          }),
+        } as IStudentCases)
+      );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getStudentSkills(req: Request, res: Response, next: NextFunction) {
@@ -292,22 +307,39 @@ export class CompetencyHandler {
       studentId
     );
 
-    const student = await this.studentService.getStudentByStudentId(studentId);
+    try {
+      const student = await this.studentService.getStudentByStudentId(
+        studentId
+      );
 
-    return res.status(200).json(
-      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-        studentName: student?.fullName,
-        studentId: studentId,
-        listSkills: skills.map((s) => {
-          return {
-            skillId: s.id,
-            skillType: s.competencyType,
-            skillName: s.name,
-            verificationStatus: s.verificationStatus,
-          };
-        }),
-      } as IStudentSkills)
-    );
+      if (student && "error" in student) {
+        switch (student.error) {
+          case 400:
+            throw new BadRequestError(student.message);
+          case 404:
+            throw new NotFoundError(student.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          studentName: student?.fullName,
+          studentId: studentId,
+          listSkills: skills.map((s) => {
+            return {
+              skillId: s.id,
+              skillType: s.competencyType,
+              skillName: s.name,
+              verificationStatus: s.verificationStatus,
+            };
+          }),
+        } as IStudentSkills)
+      );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getCases(req: Request, res: Response, next: NextFunction) {

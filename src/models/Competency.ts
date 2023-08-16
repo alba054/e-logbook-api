@@ -5,6 +5,40 @@ import { IPostCase } from "../utils/interfaces/Case";
 import { IPostSkill } from "../utils/interfaces/Skill";
 
 export class Competency {
+  async getSkillsByStudentIdAndUnitId(
+    studentId: string | undefined,
+    unitId: string | undefined
+  ) {
+    return db.competency.findMany({
+      where: {
+        studentId,
+        unitId,
+        type: "SKILL",
+      },
+      include: {
+        Student: true,
+        skill: true,
+      },
+    });
+  }
+
+  async getCasesByStudentIdAndUnitId(
+    studentId: string | undefined,
+    unitId: string | undefined
+  ) {
+    return db.competency.findMany({
+      where: {
+        studentId,
+        unitId,
+        type: "CASE",
+      },
+      include: {
+        Student: true,
+        case: true,
+      },
+    });
+  }
+
   async getCompetenciesBySupervisor(supervisorId: string | undefined) {
     return db.competency.findMany({
       where: {

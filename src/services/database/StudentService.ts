@@ -1,5 +1,6 @@
 import { CheckInCheckOut } from "../../models/CheckInCheckOut";
 import { Student } from "../../models/Student";
+import { createErrorObject } from "../../utils";
 import { IActiveUnitDTO } from "../../utils/dto/ActiveUnitDTO";
 import {
   IPutStudentActiveUnit,
@@ -17,7 +18,13 @@ export class StudentService {
   }
 
   async getStudentByStudentId(studentId: string) {
-    return this.studentModel.getStudentByStudentId(studentId);
+    const student = await this.studentModel.getStudentByStudentId(studentId);
+
+    if (!student) {
+      return createErrorObject(404, "student's not found");
+    }
+
+    return student;
   }
 
   async getStudentById(studentId?: string) {

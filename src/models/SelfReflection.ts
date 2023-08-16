@@ -3,10 +3,22 @@ import db from "../database";
 import { createErrorObject } from "../utils";
 import {
   IPostSelfReflection,
+  IPutSelfReflection,
   IPutSelfReflectionVerificationStatus,
 } from "../utils/interfaces/SelfReflection";
 
 export class SelfReflection {
+  async updateSelfReflectionById(id: string, payload: IPutSelfReflection) {
+    return db.selfReflection.update({
+      where: {
+        id,
+      },
+      data: {
+        content: payload.content,
+      },
+    });
+  }
+
   async getSelfReflectionsById(id: string) {
     return db.selfReflection.findUnique({
       where: {

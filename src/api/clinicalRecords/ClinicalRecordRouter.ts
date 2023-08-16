@@ -50,6 +50,7 @@ export class ClinicalRecordRouter {
       .get(
         AuthorizationBearer.authorize([
           constants.STUDENT_ROLE,
+
           constants.SUPERVISOR_ROLE,
           constants.DPK_ROLE,
         ]),
