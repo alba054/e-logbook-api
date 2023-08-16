@@ -60,6 +60,8 @@ model Student {
   Skill                   Skill[]
   Case                    Case[]
   Competency              Competency[]
+  SGL                     SGL[]
+  CST                     CST[]
 
   @@map("students")
 }
@@ -74,6 +76,8 @@ model Supervisor {
   examinerDPK        Student[]           @relation("examinerDPK")
   ClinicalRecord     ClinicalRecord[]
   ScientificSession  ScientificSession[]
+  SglTopic           SglTopic[]
+  CstTopic           CstTopic[]
 
   @@map("supervisors")
 }
@@ -116,6 +120,8 @@ model Unit {
   Competency        Competency[]
   SkillType         SkillType[]
   CaseType          CaseType[]
+  SGL               SGL[]
+  CST               CST[]
 
   @@map("units")
 }
@@ -313,6 +319,8 @@ model SelfReflection {
   Student            Student?           @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   studentId          String?            @db.VarChar(100)
   rating             Int?               @default(0) @db.UnsignedTinyInt
+  studentFeedback    String?            @db.Text
+  supervisorFeedback String?            @db.Text
   verificationStatus VerificationStatus @default(INPROCESS)
 
   @@map("self_reflections")
@@ -389,6 +397,79 @@ model Case {
   updatedAt          DateTime           @default(now()) @updatedAt
 
   @@map("cases")
+}
+
+model Topic {
+  id       Int        @id @default(autoincrement())
+  name     String     @db.VarChar(255)
+  SglTopic SglTopic[]
+  CstTopic CstTopic[]
+
+  @@map("topics")
+}
+
+model SGL {
+  id                 String             @id @db.VarChar(100)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @default(now()) @updatedAt
+  verificationStatus VerificationStatus @default(INPROCESS)
+  Student            Student?           @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId          String?            @db.VarChar(100)
+  Unit               Unit?              @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId             String?            @db.VarChar(100)
+  topics             SglTopic[]
+
+  @@map("sgls")
+}
+
+model SglTopic {
+  id                 String             @id @db.VarChar(100)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @default(now()) @updatedAt
+  verificationStatus VerificationStatus @default(INPROCESS)
+  notes              String?            @db.Text
+  startTime          BigInt?            @db.UnsignedBigInt
+  endTime            BigInt?            @db.UnsignedBigInt
+  supervisor         Supervisor         @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  supervisorId       String             @db.VarChar(100)
+  topic              Topic?             @relation(fields: [topicId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  topicId            Int?
+  SGL                SGL?               @relation(fields: [sGLId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  sGLId              String?            @db.VarChar(100)
+
+  @@map("sgl_topics")
+}
+
+model CST {
+  id                 String             @id @db.VarChar(100)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @default(now()) @updatedAt
+  verificationStatus VerificationStatus @default(INPROCESS)
+  Student            Student?           @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId          String?            @db.VarChar(100)
+  Unit               Unit?              @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId             String?            @db.VarChar(100)
+  topics             CstTopic[]
+
+  @@map("csts")
+}
+
+model CstTopic {
+  id                 String             @id @db.VarChar(100)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @default(now()) @updatedAt
+  verificationStatus VerificationStatus @default(INPROCESS)
+  notes              String?            @db.Text
+  startTime          BigInt?            @db.UnsignedBigInt
+  endTime            BigInt?            @db.UnsignedBigInt
+  supervisor         Supervisor         @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  supervisorId       String             @db.VarChar(100)
+  topic              Topic?             @relation(fields: [topicId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  topicId            Int?
+  CST                CST?               @relation(fields: [cSTId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cSTId              String?            @db.VarChar(100)
+
+  @@map("cst_topics")
 }
 
 enum CompetencyType {

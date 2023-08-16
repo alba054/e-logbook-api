@@ -6,15 +6,20 @@ import { SelfReflectionService } from "../../services/database/SelfReflectionSer
 import { StudentService } from "../../services/database/StudentService";
 import { constants, createResponse } from "../../utils";
 import {
+  ISelfReflectionDetailDTO,
   IStudentSelfReflections,
   ISubmittedSelfReflections,
 } from "../../utils/dto/SelfReflectionDTO";
 import {
   IPostSelfReflection,
+  IPutSelfReflection,
   IPutSelfReflectionVerificationStatus,
 } from "../../utils/interfaces/SelfReflection";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
-import { SelfReflectionVerificationStatusSchema } from "../../validator/selfReflections/SelfReflectionSchema";
+import {
+  SelfReflectionPayloadSchema,
+  SelfReflectionVerificationStatusSchema,
+} from "../../validator/selfReflections/SelfReflectionSchema";
 import { SelfReflectionValidator } from "../../validator/selfReflections/SelfReflectionValidator";
 
 export class SelfReflectionHandler {
@@ -33,6 +38,104 @@ export class SelfReflectionHandler {
     this.getStudentSelfReflections = this.getStudentSelfReflections.bind(this);
     this.putSelfReflectionVerificationStatus =
       this.putSelfReflectionVerificationStatus.bind(this);
+    this.getSelfReflectionDetail = this.getSelfReflectionDetail.bind(this);
+    this.putSelfReflectionDetail = this.putSelfReflectionDetail.bind(this);
+  }
+
+  async putSelfReflectionDetail(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const payload: IPutSelfReflection = req.body;
+    const { id } = req.params;
+
+    try {
+      const validationResult = this.selfReflectionValidator.validate(
+        SelfReflectionPayloadSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        switch (validationResult.error) {
+          case 400:
+            throw new BadRequestError(validationResult.message);
+          case 404:
+            throw new NotFoundError(validationResult.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      const result = await this.selfReflectionService.updateSelfReflection(
+        tokenPayload,
+        id,
+        payload
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully update self reflection"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getSelfReflectionDetail(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const { id } = req.params;
+
+    try {
+      const selfReflection =
+        await this.selfReflectionService.getSelfReflectionById(
+          tokenPayload,
+          id
+        );
+
+      if (selfReflection && "error" in selfReflection) {
+        switch (selfReflection.error) {
+          case 400:
+            throw new BadRequestError(selfReflection.message);
+          case 404:
+            throw new NotFoundError(selfReflection.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          content: selfReflection.content,
+          selfReflectionId: selfReflection.id,
+          studentId: selfReflection.Student?.studentId,
+          studentName: selfReflection.Student?.fullName,
+          verificationStatus: selfReflection.verificationStatus,
+        } as ISelfReflectionDetailDTO)
+      );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async putSelfReflectionVerificationStatus(
@@ -94,27 +197,43 @@ export class SelfReflectionHandler {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { studentId } = req.params;
 
-    const selfReflections =
-      await this.selfReflectionService.getSelfReflectionsByStudentId(
-        tokenPayload,
+    try {
+      const selfReflections =
+        await this.selfReflectionService.getSelfReflectionsByStudentId(
+          tokenPayload,
+          studentId
+        );
+
+      const student = await this.studentService.getStudentByStudentId(
         studentId
       );
+      if (student && "error" in student) {
+        switch (student.error) {
+          case 400:
+            throw new BadRequestError(student.message);
+          case 404:
+            throw new NotFoundError(student.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
 
-    const student = await this.studentService.getStudentByStudentId(studentId);
-
-    return res.status(200).json(
-      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-        studentName: student?.fullName,
-        studentId: studentId,
-        listSelfReflections: selfReflections.map((s) => {
-          return {
-            content: s.content,
-            selfReflectionId: s.id,
-            verificationStatus: s.verificationStatus,
-          };
-        }),
-      } as IStudentSelfReflections)
-    );
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          studentName: student?.fullName,
+          studentId: studentId,
+          listSelfReflections: selfReflections.map((s) => {
+            return {
+              content: s.content,
+              selfReflectionId: s.id,
+              verificationStatus: s.verificationStatus,
+            };
+          }),
+        } as IStudentSelfReflections)
+      );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getSubmittedSelfReflections(

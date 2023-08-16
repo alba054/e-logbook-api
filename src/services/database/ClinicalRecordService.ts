@@ -164,15 +164,27 @@ export class ClinicalRecordService {
     return clinicalRecord.attachment;
   }
 
-  async getSubmittedClinicalRecords(status: any, supervisorId?: string) {
+  async getSubmittedClinicalRecords(
+    status: any,
+    page: number | undefined,
+    offset: number | undefined,
+    query: any,
+    supervisorId?: string
+  ) {
     if (status) {
       return this.clinicalRecordModel.getClinicalRecordsByStatusAndSupervisorId(
         status,
+        page,
+        offset,
+        query,
         supervisorId
       );
     }
 
     return this.clinicalRecordModel.getClinicalRecordsBySupervisorId(
+      page,
+      offset,
+      query,
       supervisorId
     );
   }

@@ -5,25 +5,6 @@ import { IPostCase } from "../utils/interfaces/Case";
 import { IPostSkill } from "../utils/interfaces/Skill";
 
 export class Competency {
-  async getCasesByStudentIdAndUnitId(
-    studentId: string | undefined,
-    unitId: string | undefined
-  ) {
-    return db.competency.findMany({
-      where: {
-        studentId,
-        unitId,
-        type: "CASE",
-      },
-      include: {
-        case: true,
-        skill: true,
-        Student: true,
-        Unit: true,
-      },
-    });
-  }
-
   async getSkillsByStudentIdAndUnitId(
     studentId: string | undefined,
     unitId: string | undefined
@@ -35,10 +16,25 @@ export class Competency {
         type: "SKILL",
       },
       include: {
-        case: true,
-        skill: true,
         Student: true,
-        Unit: true,
+        skill: true,
+      },
+    });
+  }
+
+  async getCasesByStudentIdAndUnitId(
+    studentId: string | undefined,
+    unitId: string | undefined
+  ) {
+    return db.competency.findMany({
+      where: {
+        studentId,
+        unitId,
+        type: "CASE",
+      },
+      include: {
+        Student: true,
+        case: true,
       },
     });
   }

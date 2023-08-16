@@ -1,6 +1,7 @@
 import { SelfReflection } from "../../models/SelfReflection";
 import {
   IPostSelfReflection,
+  IPutSelfReflection,
   IPutSelfReflectionVerificationStatus,
 } from "../../utils/interfaces/SelfReflection";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
@@ -16,6 +17,56 @@ export class SelfReflectionService {
   constructor() {
     this.selfReflectionModel = new SelfReflection();
     this.studentService = new StudentService();
+  }
+
+  async updateSelfReflection(
+    tokenPayload: ITokenPayload,
+    id: string,
+    payload: IPutSelfReflection
+  ) {
+    const selfReflection =
+      await this.selfReflectionModel.getSelfReflectionsById(id);
+
+    if (!selfReflection) {
+      return createErrorObject(404, "self reflection's not found");
+    }
+
+    if (
+      selfReflection.studentId !== tokenPayload.studentId &&
+      selfReflection?.Student?.examinerSupervisorId !==
+        tokenPayload.supervisorId &&
+      selfReflection?.Student?.supervisingSupervisorId !==
+        tokenPayload.supervisorId &&
+      selfReflection?.Student?.academicSupervisorId !==
+        tokenPayload.supervisorId
+    ) {
+      return createErrorObject(400, "not for you");
+    }
+
+    return await this.selfReflectionModel.updateSelfReflectionById(id, payload);
+  }
+
+  async getSelfReflectionById(tokenPayload: ITokenPayload, id: string) {
+    const selfReflection =
+      await this.selfReflectionModel.getSelfReflectionsById(id);
+
+    if (!selfReflection) {
+      return createErrorObject(404, "self reflection's not found");
+    }
+
+    if (
+      selfReflection.studentId !== tokenPayload.studentId &&
+      selfReflection?.Student?.examinerSupervisorId !==
+        tokenPayload.supervisorId &&
+      selfReflection?.Student?.supervisingSupervisorId !==
+        tokenPayload.supervisorId &&
+      selfReflection?.Student?.academicSupervisorId !==
+        tokenPayload.supervisorId
+    ) {
+      return createErrorObject(400, "not for you");
+    }
+
+    return selfReflection;
   }
 
   async verifySelfReflection(
@@ -48,6 +99,7 @@ export class SelfReflectionService {
         data: {
           verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
           rating: payload.rating,
+          supervisorFeedback: payload.feedback,
         },
       }),
       db.checkInCheckOut.updateMany({

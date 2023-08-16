@@ -103,6 +103,7 @@ export class StudentHandler {
           return {
             skillId: c.id,
             skillName: c.skill?.name,
+            skillTypeId: c.skillTypeId,
             skillType: c.competencyType,
             verificationStatus: c.verificationStatus,
           };
@@ -130,6 +131,7 @@ export class StudentHandler {
             caseId: c.id,
             caseName: c.case?.name,
             caseType: c.competencyType,
+            caseTypeId: c.caseTypeId,
             verificationStatus: c.verificationStatus,
           };
         }),
