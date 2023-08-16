@@ -111,6 +111,10 @@ export class Competency {
         },
         type: "CASE",
       },
+      include: {
+        skill: true,
+        case: true,
+      },
     });
   }
 
@@ -135,6 +139,10 @@ export class Competency {
           studentId,
         },
         type: "SKILL",
+      },
+      include: {
+        case: true,
+        skill: true,
       },
     });
   }
@@ -182,7 +190,7 @@ export class Competency {
           unitId,
           competencyType: payload.type,
           type: "CASE",
-          name: payload.name,
+          caseTypeId: payload.caseTypeId,
         },
       });
     } catch (error) {
@@ -236,8 +244,8 @@ export class Competency {
           studentId,
           unitId,
           competencyType: payload.type,
-          name: payload.name,
           type: "SKILL",
+          skillTypeId: payload.skillTypeId,
         },
       });
     } catch (error) {

@@ -33,6 +33,14 @@ export class ManagementTypeRouter {
       this.managementTypeHandler.postManagementTypesUnit
     );
 
+    // * delete management type
+    this.router
+      .route(this.path + "/:id")
+      .delete(
+        AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+        this.managementTypeHandler.deleteManagementType
+      );
+
     return this.router;
   }
 }

@@ -9,6 +9,10 @@ export class ExaminationTypeService {
     this.examinationTypeModel = new ExaminationType();
   }
 
+  async deleteExaminationTypeById(id: string) {
+    return this.examinationTypeModel.deleteExaminationType(id);
+  }
+
   async insertExaminationTypesUnit(payload: IPostExaminationTypePayload) {
     return this.examinationTypeModel.insertExaminationTypeByUnitId(
       uuidv4(),

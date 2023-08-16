@@ -7,6 +7,9 @@ export class ScientificRoleService {
   constructor() {
     this.scientificRoleModel = new ScientificRole();
   }
+  async deleteScientificRoleById(id: number) {
+    return this.scientificRoleModel.deleteScientificRole(id);
+  }
 
   async insertScientificRole(payload: IPostScientificRolePayload) {
     return this.scientificRoleModel.insertScientificRole(payload);

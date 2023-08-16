@@ -33,6 +33,14 @@ export class AffectedPartRouter {
       this.affectedPartHandler.postAffectedPartsUnit
     );
 
+    // * delete affected part
+    this.router
+      .route(this.path + "/:id")
+      .delete(
+        AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+        this.affectedPartHandler.deleteAffectedPart
+      );
+
     return this.router;
   }
 }

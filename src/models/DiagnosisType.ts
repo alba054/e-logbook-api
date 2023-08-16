@@ -6,6 +6,22 @@ import { createErrorObject } from "../utils";
 export class DiagnosisType {
   constructor() {}
 
+  async deleteDiagnosisType(id: string) {
+    try {
+      return db.diagnosisType.delete({
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to delete new diagnosis type");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async insertDiagnosisTypeByUnitId(
     id: string,
     payload: IPostDiagnosisTypePayload

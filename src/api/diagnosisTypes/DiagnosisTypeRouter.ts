@@ -33,6 +33,14 @@ export class DiagnosisTypeRouter {
       this.diagnosisTypeHandler.postDiagnosisTypesUnit
     );
 
+    // * delete diagnosis type
+    this.router
+      .route(this.path + "/:id")
+      .delete(
+        AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+        this.diagnosisTypeHandler.deleteDiagnosisType
+      );
+
     return this.router;
   }
 }

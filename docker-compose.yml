@@ -1,0 +1,31 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  e-logbook-backend-main:
+    container_name: e-logbook-backend-main
+    image: docker.io/npedigihouse/app:e-logbook-backend-main
+    restart: always
+    ports:
+      - 7890:7890
+    environment:
+      DATABASE_URL: "mysql://root:np3digihous3@172.17.0.1:3306/e_logbook"
+      # token variable
+      ISSUER: api.localhost.com
+      ACCESS_SECRET_KEY: A0GALSJDF0813LJASDF08ZA03129AESF840ASDFSDF
+      REFRESH_SECRET_KEY: asdf0asdf823sdflj12308lf34234
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin
+      FRONTEND_HOST: localhost
+      PORT: 7890
+      HOST: 0.0.0.0
+      ELOGBOOK_MAIL_USERNAME: noreply.elogbookumi@gmail.com
+      ELOGBOOK_MAIL_PASSWORD: pwicprfuiswtqoop
+      ABS_PATH: "/app"
+    networks:
+      - proxy
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=proxy'
+      - 'traefik.http.routers.e-logbook-backend-main.rule=Host(`e-logbook.npedigihouse.tech`) && PathPrefix(`/api`)'

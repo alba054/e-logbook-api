@@ -9,6 +9,10 @@ export class AffectedPartService {
     this.affectedPartModel = new AffectedPart();
   }
 
+  async deleteAffectedPartById(id: string) {
+    return this.affectedPartModel.deleteAffectedPart(id);
+  }
+
   async insertAffectedPartsUnit(payload: IPostAffectedPartPayload) {
     return this.affectedPartModel.insertAffectedPartByUnitId(uuidv4(), payload);
   }

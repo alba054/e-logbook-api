@@ -1,44 +1,44 @@
 import { Router } from "express";
+import { SkillTypesHandler } from "./SkillTypesHandler";
 import { AuthorizationBearer } from "../../middleware/auth/AuthorizationBearer";
 import { constants } from "../../utils";
-import { ManagementRoleHandler } from "./ManagementRoleHandler";
 
-export class ManagementRoleRouter {
-  private managementRoleHandler: ManagementRoleHandler;
+export class SkillTypesRouter {
+  private skillTypesHandler: SkillTypesHandler;
   private path: string;
   private router: Router;
 
   constructor() {
-    this.path = "/management-roles";
+    this.path = "/skill-types";
     this.router = Router();
-    this.managementRoleHandler = new ManagementRoleHandler();
+    this.skillTypesHandler = new SkillTypesHandler();
   }
 
   register() {
-    // * get all Management roles based on unitId
+    // * get all skill types based on unitId
     this.router.get(
-      this.path,
+      this.path + "/units/:unitId",
       AuthorizationBearer.authorize([
         constants.ADMIN_ROLE,
         constants.STUDENT_ROLE,
         constants.SUPERVISOR_ROLE,
         constants.DPK_ROLE,
       ]),
-      this.managementRoleHandler.getManagementRolesUnit
+      this.skillTypesHandler.getSkillTypesUnit
     );
-    // * post unit Management roles
+    // * post unit skill types
     this.router.post(
-      this.path,
+      this.path + "/units",
       AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
-      this.managementRoleHandler.postManagementRolesUnit
+      this.skillTypesHandler.postSkillTypesUnit
     );
 
-    // * delete management role
+    // * delete skill type
     this.router
       .route(this.path + "/:id")
       .delete(
         AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
-        this.managementRoleHandler.deleteManagementRole
+        this.skillTypesHandler.deleteSkillTypes
       );
 
     return this.router;

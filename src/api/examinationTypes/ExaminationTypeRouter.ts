@@ -33,6 +33,14 @@ export class ExaminationTypeRouter {
       this.examinationType.postExaminationTypesUnit
     );
 
+    // * delete examination type
+    this.router
+      .route(this.path + "/:id")
+      .delete(
+        AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+        this.examinationType.deleteExaminationType
+      );
+
     return this.router;
   }
 }

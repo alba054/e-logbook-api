@@ -1,44 +1,44 @@
 import { Router } from "express";
+import { CaseTypesHandler } from "./CaseTypesHandler";
 import { AuthorizationBearer } from "../../middleware/auth/AuthorizationBearer";
 import { constants } from "../../utils";
-import { ManagementRoleHandler } from "./ManagementRoleHandler";
 
-export class ManagementRoleRouter {
-  private managementRoleHandler: ManagementRoleHandler;
+export class CaseTypesRouter {
+  private caseTypesHandler: CaseTypesHandler;
   private path: string;
   private router: Router;
 
   constructor() {
-    this.path = "/management-roles";
+    this.path = "/case-types";
     this.router = Router();
-    this.managementRoleHandler = new ManagementRoleHandler();
+    this.caseTypesHandler = new CaseTypesHandler();
   }
 
   register() {
-    // * get all Management roles based on unitId
+    // * get all affected parts based on unitId
     this.router.get(
-      this.path,
+      this.path + "/units/:unitId",
       AuthorizationBearer.authorize([
         constants.ADMIN_ROLE,
         constants.STUDENT_ROLE,
         constants.SUPERVISOR_ROLE,
         constants.DPK_ROLE,
       ]),
-      this.managementRoleHandler.getManagementRolesUnit
+      this.caseTypesHandler.getCaseTypesUnit
     );
-    // * post unit Management roles
+    // * post unit affected parts
     this.router.post(
-      this.path,
+      this.path + "/units",
       AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
-      this.managementRoleHandler.postManagementRolesUnit
+      this.caseTypesHandler.postCaseTypesUnit
     );
 
-    // * delete management role
+    // * delete affected part
     this.router
       .route(this.path + "/:id")
       .delete(
         AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
-        this.managementRoleHandler.deleteManagementRole
+        this.caseTypesHandler.deleteCaseTypes
       );
 
     return this.router;

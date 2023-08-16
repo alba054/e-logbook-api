@@ -17,6 +17,27 @@ export class ExaminationTypeHandler {
 
     this.getExaminationTypesUnit = this.getExaminationTypesUnit.bind(this);
     this.postExaminationTypesUnit = this.postExaminationTypesUnit.bind(this);
+    this.deleteExaminationType = this.deleteExaminationType.bind(this);
+  }
+
+  async deleteExaminationType(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+
+    try {
+      const result =
+        await this.examinationTypeService.deleteExaminationTypeById(id);
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully delete examination type"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async postExaminationTypesUnit(

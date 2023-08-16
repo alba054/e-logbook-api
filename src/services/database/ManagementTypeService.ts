@@ -9,6 +9,10 @@ export class ManagementTypeService {
     this.managementTypeModel = new ManagementType();
   }
 
+  async deleteManagementTypeById(id: string) {
+    return this.managementTypeModel.deleteManagementType(id);
+  }
+
   async insertManagementTypesUnit(payload: IPostManagementTypePayload) {
     return this.managementTypeModel.insertManagementTypeByUnitId(
       uuidv4(),
