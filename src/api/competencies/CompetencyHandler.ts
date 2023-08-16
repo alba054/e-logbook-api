@@ -287,7 +287,7 @@ export class CompetencyHandler {
             return {
               caseId: s.id,
               caseType: s.competencyType,
-              caseName: s.name,
+              caseName: s.case?.name,
               verificationStatus: s.verificationStatus,
             };
           }),
@@ -331,7 +331,7 @@ export class CompetencyHandler {
             return {
               skillId: s.id,
               skillType: s.competencyType,
-              skillName: s.name,
+              skillName: s.skill?.name,
               verificationStatus: s.verificationStatus,
             };
           }),
