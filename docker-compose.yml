@@ -1,6 +1,9 @@
 networks:
   proxy:
     external: true
+volumes:
+  e-logbook-data:
+    external: true
 
 services:
   e-logbook-backend-main:
@@ -25,6 +28,8 @@ services:
       ABS_PATH: "/app"
     networks:
       - proxy
+    volumes:
+      - e-logbook-data:/app/storage
     labels:
       - 'traefik.enable=true'
       - 'traefik.docker.network=proxy'
