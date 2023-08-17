@@ -147,6 +147,8 @@ model CheckInCheckOut {
   selfReflectionDone    Boolean             @default(false)
   skillDone             Boolean             @default(false)
   caseDone              Boolean             @default(false)
+  sglDone               Boolean             @default(false)
+  cstDone               Boolean             @default(false)
 
   @@unique([unitId, studentId])
   @@map("check_ins_check_outs")
@@ -432,8 +434,7 @@ model SglTopic {
   endTime            BigInt?            @db.UnsignedBigInt
   supervisor         Supervisor         @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   supervisorId       String             @db.VarChar(100)
-  topic              Topic?             @relation(fields: [topicId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  topicId            Int?
+  topic              Topic[]
   SGL                SGL?               @relation(fields: [sGLId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   sGLId              String?            @db.VarChar(100)
 
@@ -464,10 +465,9 @@ model CstTopic {
   endTime            BigInt?            @db.UnsignedBigInt
   supervisor         Supervisor         @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   supervisorId       String             @db.VarChar(100)
-  topic              Topic?             @relation(fields: [topicId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  topic              Topic[]
+  CST                CST[]
   topicId            Int?
-  CST                CST?               @relation(fields: [cSTId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  cSTId              String?            @db.VarChar(100)
 
   @@map("cst_topics")
 }

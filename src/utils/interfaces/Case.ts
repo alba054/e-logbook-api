@@ -7,3 +7,7 @@ export interface IPutCaseVerificationStatus {
   readonly verified: boolean;
   readonly rating?: number;
 }
+
+export interface IPutCasesVerificationStatus {
+  readonly rating?: number;
+}

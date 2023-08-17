@@ -7,3 +7,7 @@ export interface IPutSkillVerificationStatus {
   readonly verified: boolean;
   readonly rating?: number;
 }
+
+export interface IPutSkillsVerificationStatus {
+  readonly rating?: number;
+}

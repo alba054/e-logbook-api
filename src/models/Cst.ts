@@ -2,14 +2,14 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
 import { createErrorObject } from "../utils";
 import {
-  IPostSGL,
-  IPutSglTopicVerificationStatus,
-} from "../utils/interfaces/Sgl";
+  IPostCST,
+  IPutCstTopicVerificationStatus,
+} from "../utils/interfaces/Cst";
 
-export class Sgl {
-  async verifySglById(id: string, payload: IPutSglTopicVerificationStatus) {
+export class Cst {
+  async verifyCstById(id: string, payload: IPutCstTopicVerificationStatus) {
     try {
-      return db.sGL.update({
+      return db.cST.update({
         where: {
           id,
         },
@@ -19,15 +19,15 @@ export class Sgl {
       });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        return createErrorObject(400, "failed to insert sgl");
+        return createErrorObject(400, "failed to insert Cst");
       } else {
         return createErrorObject(500);
       }
     }
   }
 
-  async getSglById(id: string) {
-    return db.sGL.findUnique({
+  async getCstById(id: string) {
+    return db.cST.findUnique({
       where: {
         id,
       },
@@ -37,12 +37,12 @@ export class Sgl {
     });
   }
 
-  async verifySglTopicById(
+  async verifyCstTopicById(
     topicId: string,
-    payload: IPutSglTopicVerificationStatus
+    payload: IPutCstTopicVerificationStatus
   ) {
     try {
-      return db.sglTopic.update({
+      return db.cstTopic.update({
         where: {
           id: topicId,
         },
@@ -52,26 +52,26 @@ export class Sgl {
       });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        return createErrorObject(400, "failed to insert sgl");
+        return createErrorObject(400, "failed to insert Cst");
       } else {
         return createErrorObject(500);
       }
     }
   }
 
-  async getSglTopicById(topicId: string) {
-    return db.sglTopic.findUnique({
+  async getCstTopicById(topicId: string) {
+    return db.cstTopic.findUnique({
       where: {
         id: topicId,
       },
     });
   }
 
-  async getSglsBySupervisorIdAndStudentId(
+  async getCstsBySupervisorIdAndStudentId(
     supervisorId: string | undefined,
     studentId: string
   ) {
-    return db.sGL.findMany({
+    return db.cST.findMany({
       where: {
         Student: {
           studentId,
@@ -96,8 +96,8 @@ export class Sgl {
     });
   }
 
-  async getSglsBySupervisorId(supervisorId: string | undefined) {
-    return db.sGL.findMany({
+  async getCstsBySupervisorId(supervisorId: string | undefined) {
+    return db.cST.findMany({
       where: {
         topics: {
           some: {
@@ -116,15 +116,15 @@ export class Sgl {
     });
   }
 
-  async insertSgl(
+  async insertCst(
     id: string,
     topicId: string,
-    payload: IPostSGL,
+    payload: IPostCST,
     studentId: string | undefined,
     unitId: string | undefined
   ) {
     try {
-      return db.sGL.create({
+      return db.cST.create({
         data: {
           id,
           studentId,
@@ -147,7 +147,7 @@ export class Sgl {
       });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        return createErrorObject(400, "failed to insert sgl");
+        return createErrorObject(400, "failed to insert Cst");
       } else {
         return createErrorObject(500);
       }

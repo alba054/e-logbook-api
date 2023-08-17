@@ -1,23 +1,23 @@
-export interface ISubmittedSgl {
+export interface ISubmittedCst {
   studentName: string;
   latest: Date | string;
   studentId: string;
 }
 
-export interface IStudentSgl {
+export interface IStudentCst {
   studentName: string;
   studentId: string;
-  sgls: ISglDetail[];
+  csts: ICstDetail[];
 }
 
-export interface ISglDetail {
+export interface ICstDetail {
   createdAt: Date | string;
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
-  sglId: string;
-  topic: ISglTopic[];
+  cstId: string;
+  topic: ICstTopic[];
 }
 
-export interface ISglTopic {
+export interface ICstTopic {
   topicName: string[];
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
   startTime?: number;

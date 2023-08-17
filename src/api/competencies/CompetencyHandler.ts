@@ -10,10 +10,12 @@ import { ICompetencySubmitted } from "../../utils/dto/CompetencyDTO";
 import { IStudentSkills, ISubmittedSkill } from "../../utils/dto/SkillDTO";
 import {
   IPostCase,
+  IPutCasesVerificationStatus,
   IPutCaseVerificationStatus,
 } from "../../utils/interfaces/Case";
 import {
   IPostSkill,
+  IPutSkillsVerificationStatus,
   IPutSkillVerificationStatus,
 } from "../../utils/interfaces/Skill";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
@@ -186,11 +188,13 @@ export class CompetencyHandler {
   ) {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { studentId } = req.params;
+    const payload: IPutSkillsVerificationStatus = req.body;
 
     try {
       const result = await this.competencyService.verifyAllStudentSkills(
         tokenPayload,
-        studentId
+        studentId,
+        payload
       );
 
       if (result && "error" in result) {
@@ -224,11 +228,13 @@ export class CompetencyHandler {
   ) {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { studentId } = req.params;
+    const payload: IPutCasesVerificationStatus = req.body;
 
     try {
       const result = await this.competencyService.verifyAllStudentCases(
         tokenPayload,
-        studentId
+        studentId,
+        payload
       );
 
       if (result && "error" in result) {
