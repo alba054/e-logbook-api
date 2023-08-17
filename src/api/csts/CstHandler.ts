@@ -2,51 +2,51 @@ import { NextFunction, Request, Response } from "express";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
-import { SglService } from "../../services/database/SglService";
+import { CstService } from "../../services/database/CstService";
 import { StudentService } from "../../services/database/StudentService";
 import { constants, createResponse } from "../../utils";
-import { ISglDetail, IStudentSgl, ISubmittedSgl } from "../../utils/dto/SglDTO";
+import { ICstDetail, IStudentCst, ISubmittedCst } from "../../utils/dto/CstDTO";
 import {
-  IPostSGL,
-  IPutSglTopicVerificationStatus,
-} from "../../utils/interfaces/Sgl";
+  IPostCST,
+  IPutCstTopicVerificationStatus,
+} from "../../utils/interfaces/Cst";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import {
-  SglPayloadSchema,
-  SglTopicVerificationStatusSchema,
-} from "../../validator/sgl/SglSchema";
+  CstPayloadSchema,
+  CstTopicVerificationStatusSchema,
+} from "../../validator/cst/CstSchema";
 import { Validator } from "../../validator/Validator";
 
-export class SglHandler {
+export class CstHandler {
   private validator: Validator;
-  private sglService: SglService;
+  private cstService: CstService;
   private studentService: StudentService;
 
   constructor() {
-    this.sglService = new SglService();
+    this.cstService = new CstService();
     this.validator = new Validator();
     this.studentService = new StudentService();
 
-    this.getSgls = this.getSgls.bind(this);
-    this.postSgl = this.postSgl.bind(this);
-    this.getSglTopics = this.getSglTopics.bind(this);
-    this.putVerificationStatusSglTopic =
-      this.putVerificationStatusSglTopic.bind(this);
-    this.putVerificationStatusSgl = this.putVerificationStatusSgl.bind(this);
+    this.getCsts = this.getCsts.bind(this);
+    this.postCst = this.postCst.bind(this);
+    this.getCstTopics = this.getCstTopics.bind(this);
+    this.putVerificationStatusCstTopic =
+      this.putVerificationStatusCstTopic.bind(this);
+    this.putVerificationStatusCst = this.putVerificationStatusCst.bind(this);
   }
 
-  async putVerificationStatusSgl(
+  async putVerificationStatusCst(
     req: Request,
     res: Response,
     next: NextFunction
   ) {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { id } = req.params;
-    const payload: IPutSglTopicVerificationStatus = req.body;
+    const payload: IPutCstTopicVerificationStatus = req.body;
 
     try {
       const validationResult = this.validator.validate(
-        SglTopicVerificationStatusSchema,
+        CstTopicVerificationStatusSchema,
         payload
       );
 
@@ -61,7 +61,7 @@ export class SglHandler {
         }
       }
 
-      const result = await this.sglService.verifySgl(id, tokenPayload, payload);
+      const result = await this.cstService.verifyCst(id, tokenPayload, payload);
 
       if (result && "error" in result) {
         switch (result.error) {
@@ -79,7 +79,7 @@ export class SglHandler {
         .json(
           createResponse(
             constants.SUCCESS_RESPONSE_MESSAGE,
-            "verify sgl successfully"
+            "verify Cst successfully"
           )
         );
     } catch (error) {
@@ -87,18 +87,18 @@ export class SglHandler {
     }
   }
 
-  async putVerificationStatusSglTopic(
+  async putVerificationStatusCstTopic(
     req: Request,
     res: Response,
     next: NextFunction
   ) {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { topicId } = req.params;
-    const payload: IPutSglTopicVerificationStatus = req.body;
+    const payload: IPutCstTopicVerificationStatus = req.body;
 
     try {
       const validationResult = this.validator.validate(
-        SglTopicVerificationStatusSchema,
+        CstTopicVerificationStatusSchema,
         payload
       );
 
@@ -113,7 +113,7 @@ export class SglHandler {
         }
       }
 
-      const result = await this.sglService.verifySglTopic(
+      const result = await this.cstService.verifyCstTopic(
         topicId,
         tokenPayload,
         payload
@@ -143,11 +143,11 @@ export class SglHandler {
     }
   }
 
-  async getSglTopics(req: Request, res: Response, next: NextFunction) {
+  async getCstTopics(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { studentId } = req.params;
 
-    const result = await this.sglService.getSglsBySupervisorAndStudentId(
+    const result = await this.cstService.getCstsBySupervisorAndStudentId(
       tokenPayload,
       studentId
     );
@@ -168,30 +168,30 @@ export class SglHandler {
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
         studentId: student.studentId,
         studentName: student.fullName,
-        sgls: result.map(
+        csts: result.map(
           (r) =>
             ({
               createdAt: r.createdAt,
               verificationStatus: r.verificationStatus,
-              sglId: r.id,
+              cstId: r.id,
               topic: r.topics.map((t) => ({
-                topicName: t.topic.map((n) => n.name),
+                topicName: t.topic?.map((n) => n.name),
                 verificationStatus: t.verificationStatus,
                 endTime: Number(t.endTime),
                 notes: t.notes,
                 startTime: Number(t.startTime),
                 id: t.id,
               })),
-            } as ISglDetail)
+            } as ICstDetail)
         ),
-      } as IStudentSgl)
+      } as IStudentCst)
     );
   }
 
-  async getSgls(req: Request, res: Response, next: NextFunction) {
+  async getCsts(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
 
-    const result = await this.sglService.getSglsBySupervisor(tokenPayload);
+    const result = await this.cstService.getCstsBySupervisor(tokenPayload);
 
     return res.status(200).json(
       createResponse(
@@ -201,18 +201,18 @@ export class SglHandler {
             latest: r.updatedAt,
             studentId: r.Student?.studentId,
             studentName: r.Student?.fullName,
-          } as ISubmittedSgl;
+          } as ISubmittedCst;
         })
       )
     );
   }
 
-  async postSgl(req: Request, res: Response, next: NextFunction) {
+  async postCst(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
-    const payload: IPostSGL = req.body;
+    const payload: IPostCST = req.body;
 
     try {
-      const result = this.validator.validate(SglPayloadSchema, payload);
+      const result = this.validator.validate(CstPayloadSchema, payload);
 
       if (result && "error" in result) {
         switch (result.error) {
@@ -225,7 +225,7 @@ export class SglHandler {
         }
       }
 
-      const testError = await this.sglService.insertNewSgl(
+      const testError = await this.cstService.insertNewCst(
         tokenPayload,
         payload
       );
@@ -246,7 +246,7 @@ export class SglHandler {
         .json(
           createResponse(
             constants.SUCCESS_RESPONSE_MESSAGE,
-            "successfully post sgl"
+            "successfully post Cst"
           )
         );
     } catch (error) {

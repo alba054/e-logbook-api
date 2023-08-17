@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-export const SglPayloadSchema = Joi.object({
+export const CstPayloadSchema = Joi.object({
   supervisorId: Joi.string().required(),
   startTime: Joi.number().required(),
   endTime: Joi.number().required(),
@@ -8,6 +8,6 @@ export const SglPayloadSchema = Joi.object({
   notes: Joi.string().optional(),
 });
 
-export const SglTopicVerificationStatusSchema = Joi.object({
+export const CstTopicVerificationStatusSchema = Joi.object({
   verified: Joi.boolean().required(),
 });

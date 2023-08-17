@@ -2,28 +2,28 @@ import { Router } from "express";
 import { AuthorizationBearer } from "../../middleware/auth/AuthorizationBearer";
 import { UnitCheckIn } from "../../middleware/unitActivity/UnitCheckIn";
 import { constants } from "../../utils";
-import { SglHandler } from "./SglHandler";
+import { CstHandler } from "./CstHandler";
 
-export class SglRouter {
+export class CstRouter {
   private path: string;
   private router: Router;
-  private handler: SglHandler;
+  private handler: CstHandler;
 
   constructor() {
-    this.path = "/sgls";
+    this.path = "/csts";
     this.router = Router();
-    this.handler = new SglHandler();
+    this.handler = new CstHandler();
   }
 
   register() {
-    // * post sgl
-    // * get sgl submitted by student
+    // * post cst
+    // * get cst submitted by student
     this.router
       .route(this.path)
       .post(
         AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
         UnitCheckIn.restrictUncheckInActiveUnit(),
-        this.handler.postSgl
+        this.handler.postCst
       )
       .get(
         AuthorizationBearer.authorize([
@@ -31,18 +31,18 @@ export class SglRouter {
           constants.DPK_ROLE,
           constants.CEU_BADGE,
         ]),
-        this.handler.getSgls
+        this.handler.getCsts
       );
 
-    // * verify sgl by ceu after all topics is verified
+    // * verify cst by ceu after all topics is verified
     this.router
       .route(this.path + "/:id")
       .put(
         AuthorizationBearer.authorize([constants.CEU_BADGE]),
-        this.handler.putVerificationStatusSgl
+        this.handler.putVerificationStatusCst
       );
 
-    // * get sgl topics of student
+    // * get cst topics of student
     this.router
       .route(this.path + "/students/:studentId")
       .get(
@@ -51,10 +51,10 @@ export class SglRouter {
           constants.DPK_ROLE,
           constants.CEU_BADGE,
         ]),
-        this.handler.getSglTopics
+        this.handler.getCstTopics
       );
 
-    // * verify sgl topic
+    // * verify cst topic
     this.router
       .route(this.path + "/topics/:topicId")
       .put(
@@ -62,7 +62,7 @@ export class SglRouter {
           constants.SUPERVISOR_ROLE,
           constants.DPK_ROLE,
         ]),
-        this.handler.putVerificationStatusSglTopic
+        this.handler.putVerificationStatusCstTopic
       );
 
     return this.router;

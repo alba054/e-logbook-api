@@ -1,4 +1,4 @@
-export interface IPostSGL {
+export interface IPostCST {
   supervisorId: string;
   startTime: number;
   endTime: number;
@@ -6,6 +6,6 @@ export interface IPostSGL {
   notes?: string;
 }
 
-export interface IPutSglTopicVerificationStatus {
+export interface IPutCstTopicVerificationStatus {
   readonly verified: boolean;
 }

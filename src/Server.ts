@@ -22,6 +22,7 @@ import { TopicRouter } from "./api/topics/TopicRouter";
 import { SglRouter } from "./api/sgls/SglRouter";
 import { SkillTypesRouter } from "./api/skillTypes/SkillTypesRouter";
 import { CaseTypesRouter } from "./api/caseTypes/CaseTypesRouter";
+import { CstRouter } from "./api/csts/CstRouter";
 
 dotenv.config();
 
@@ -65,6 +66,7 @@ class Server {
     this.app.use("/api", new ScientificRoleRouter().register());
     this.app.use("/api", new CompetencyRouter().register());
     this.app.use("/api", new SglRouter().register());
+    this.app.use("/api", new CstRouter().register());
     this.app.use("/api", new TopicRouter().register());
     this.app.use("/api", new SkillTypesRouter().register());
     this.app.use("/api", new CaseTypesRouter().register());

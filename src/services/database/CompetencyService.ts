@@ -5,10 +5,12 @@ import { Competency } from "../../models/Competency";
 import { createErrorObject } from "../../utils";
 import {
   IPostCase,
+  IPutCasesVerificationStatus,
   IPutCaseVerificationStatus,
 } from "../../utils/interfaces/Case";
 import {
   IPostSkill,
+  IPutSkillsVerificationStatus,
   IPutSkillVerificationStatus,
 } from "../../utils/interfaces/Skill";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
@@ -149,7 +151,11 @@ export class CompetencyService {
     );
   }
 
-  async verifyAllStudentSkills(tokenPayload: ITokenPayload, studentId: string) {
+  async verifyAllStudentSkills(
+    tokenPayload: ITokenPayload,
+    studentId: string,
+    payload?: IPutSkillsVerificationStatus
+  ) {
     try {
       return db.$transaction([
         db.competency.updateMany({
@@ -172,6 +178,7 @@ export class CompetencyService {
           },
           data: {
             verificationStatus: "VERIFIED",
+            rating: payload?.rating ?? 3,
           },
         }),
         db.checkInCheckOut.updateMany({
@@ -199,7 +206,11 @@ export class CompetencyService {
     );
   }
 
-  async verifyAllStudentCases(tokenPayload: ITokenPayload, studentId: string) {
+  async verifyAllStudentCases(
+    tokenPayload: ITokenPayload,
+    studentId: string,
+    payload?: IPutCasesVerificationStatus
+  ) {
     try {
       return db.$transaction([
         db.competency.updateMany({
@@ -222,6 +233,7 @@ export class CompetencyService {
           },
           data: {
             verificationStatus: "VERIFIED",
+            rating: payload?.rating ?? 3,
           },
         }),
         db.checkInCheckOut.updateMany({
