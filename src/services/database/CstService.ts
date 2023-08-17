@@ -1,7 +1,7 @@
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentService } from "./StudentService";
 import { v4 as uuidv4 } from "uuid";
-import { createErrorObject } from "../../utils";
+import { constants, createErrorObject } from "../../utils";
 import db from "../../database";
 import {
   IPostCST,
@@ -82,6 +82,10 @@ export class CstService {
     tokenPayload: ITokenPayload,
     studentId: string
   ) {
+    if (tokenPayload.badges?.includes(constants.CEU_BADGE)) {
+      return this.cstModel.getCstsByStudentId(studentId);
+    }
+
     return this.cstModel.getCstsBySupervisorIdAndStudentId(
       tokenPayload.supervisorId,
       studentId
@@ -89,6 +93,9 @@ export class CstService {
   }
 
   async getCstsBySupervisor(tokenPayload: ITokenPayload) {
+    if (tokenPayload.badges?.includes(constants.CEU_BADGE)) {
+      return this.cstModel.getCsts();
+    }
     return this.cstModel.getCstsBySupervisorId(tokenPayload.supervisorId);
   }
 

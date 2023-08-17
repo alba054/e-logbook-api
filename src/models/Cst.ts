@@ -7,6 +7,33 @@ import {
 } from "../utils/interfaces/Cst";
 
 export class Cst {
+  async getCstsByStudentId(studentId: string) {
+    return db.sGL.findMany({
+      where: {
+        Student: {
+          studentId,
+        },
+      },
+      include: {
+        topics: {
+          include: {
+            topic: true,
+          },
+        },
+        Student: true,
+      },
+    });
+  }
+
+  async getCsts() {
+    return db.cST.findMany({
+      include: {
+        topics: true,
+        Student: true,
+      },
+    });
+  }
+
   async verifyCstById(id: string, payload: IPutCstTopicVerificationStatus) {
     try {
       return db.cST.update({

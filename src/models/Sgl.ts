@@ -7,6 +7,33 @@ import {
 } from "../utils/interfaces/Sgl";
 
 export class Sgl {
+  async getSglsByStudentId(studentId: string) {
+    return db.sGL.findMany({
+      where: {
+        Student: {
+          studentId,
+        },
+      },
+      include: {
+        topics: {
+          include: {
+            topic: true,
+          },
+        },
+        Student: true,
+      },
+    });
+  }
+
+  async getSgls() {
+    return db.sGL.findMany({
+      include: {
+        topics: true,
+        Student: true,
+      },
+    });
+  }
+
   async verifySglById(id: string, payload: IPutSglTopicVerificationStatus) {
     try {
       return db.sGL.update({
