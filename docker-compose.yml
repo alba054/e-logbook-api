@@ -20,7 +20,7 @@ services:
       REFRESH_SECRET_KEY: asdf0asdf823sdflj12308lf34234
       ADMIN_USERNAME: admin
       ADMIN_PASSWORD: admin
-      FRONTEND_HOST: https://e-logbook.npedigihouse.tech
+      FRONTEND_HOST: https://elogbook-umi.com
       PORT: 7890
       HOST: 0.0.0.0
       ELOGBOOK_MAIL_USERNAME: noreply.elogbookumi@gmail.com
