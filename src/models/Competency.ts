@@ -68,7 +68,7 @@ export class Competency {
   }
 
   async getCaseById(id: string) {
-    return db.case.findUnique({
+    return db.competency.findUnique({
       where: {
         id,
       },
@@ -79,7 +79,7 @@ export class Competency {
   }
 
   async getSkillById(id: string) {
-    return db.skill.findUnique({
+    return db.competency.findUnique({
       where: {
         id,
       },
