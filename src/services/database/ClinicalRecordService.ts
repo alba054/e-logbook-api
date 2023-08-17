@@ -174,17 +174,11 @@ export class ClinicalRecordService {
     if (status) {
       return this.clinicalRecordModel.getClinicalRecordsByStatusAndSupervisorId(
         status,
-        page,
-        offset,
-        query,
         supervisorId
       );
     }
 
     return this.clinicalRecordModel.getClinicalRecordsBySupervisorId(
-      page,
-      offset,
-      query,
       supervisorId
     );
   }
