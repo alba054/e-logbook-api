@@ -32,6 +32,8 @@ import { StudentDataPayloadSchema } from "../../validator/students/StudentSchema
 import { IStudentCases } from "../../utils/dto/CaseDTO";
 import { IStudentSkills } from "../../utils/dto/SkillDTO";
 import { CompetencyService } from "../../services/database/CompetencyService";
+import { DailyActivityService } from "../../services/database/DailyActivityService";
+import { IActivitiesDetail, IListActivitiesPerWeek } from "../../utils/dto/DailyActiveDTO";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -47,6 +49,7 @@ export class StudentHandler {
   private scientificSessionService: ScientificSessionService;
   private selfReflectionService: SelfReflectionService;
   private competencyService: CompetencyService;
+  private dailyActivityService: DailyActivityService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -63,6 +66,7 @@ export class StudentHandler {
     this.scientificSessionService = new ScientificSessionService();
     this.selfReflectionService = new SelfReflectionService();
     this.competencyService = new CompetencyService();
+    this.dailyActivityService = new DailyActivityService();
 
     this.postStudent = this.postStudent.bind(this);
     this.postStudentForgetPassword = this.postStudentForgetPassword.bind(this);
@@ -84,6 +88,58 @@ export class StudentHandler {
     this.getStudentSelfReflections = this.getStudentSelfReflections.bind(this);
     this.getStudentCases = this.getStudentCases.bind(this);
     this.getStudentSkills = this.getStudentSkills.bind(this);
+    this.getDailyActivitiesPerWeek = this.getDailyActivitiesPerWeek.bind(this);
+  }
+
+  async getDailyActivitiesPerWeek(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const { id } = req.params;
+
+    try {
+      const result =
+        await this.dailyActivityService.getActivitiesByDailyActivityId(
+          tokenPayload,
+          id
+        );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          alpha: result.activities.filter((a) => a.activityStatus !== "ATTEND")
+            .length,
+          attend: result.activities.filter((a) => a.activityStatus === "ATTEND")
+            .length,
+          weekName: result.weekNum,
+          verificationStatus: result.verificationStatus,
+          activities: result.activities.map(a => {
+            return {
+              activityStatus: a.activityStatus,
+              day: a.day,
+              verificationStatus: a.verificationStatus,
+              activityName: a.ActivityName?.name,
+              detail: a.detail,
+              location: a.location?.name
+            } as IActivitiesDetail
+          })
+        } as IListActivitiesPerWeek)
+      );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getStudentSkills(req: Request, res: Response, next: NextFunction) {
