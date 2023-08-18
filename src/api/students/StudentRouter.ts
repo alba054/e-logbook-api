@@ -139,6 +139,14 @@ export class StudentRouter {
         this.studentHandler.getStudentSkills
       );
 
+    // * get list of activities per week
+    this.router
+      .route(this.path + "/daily-activities/:id")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getDailyActivitiesPerWeek
+      );
+
     return this.router;
   }
 }

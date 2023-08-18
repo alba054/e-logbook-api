@@ -8,7 +8,7 @@ import {
 
 export class Cst {
   async getCstsByStudentId(studentId: string) {
-    return db.sGL.findMany({
+    return db.cST.findMany({
       where: {
         Student: {
           studentId,

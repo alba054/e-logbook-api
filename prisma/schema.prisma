@@ -62,6 +62,7 @@ model Student {
   Competency              Competency[]
   SGL                     SGL[]
   CST                     CST[]
+  DailyActivity           DailyActivity[]
 
   @@map("students")
 }
@@ -78,6 +79,7 @@ model Supervisor {
   ScientificSession  ScientificSession[]
   SglTopic           SglTopic[]
   CstTopic           CstTopic[]
+  Activity           Activity[]
 
   @@map("supervisors")
 }
@@ -122,6 +124,7 @@ model Unit {
   CaseType          CaseType[]
   SGL               SGL[]
   CST               CST[]
+  DailyActivity     DailyActivity[]
 
   @@map("units")
 }
@@ -149,6 +152,7 @@ model CheckInCheckOut {
   caseDone              Boolean             @default(false)
   sglDone               Boolean             @default(false)
   cstDone               Boolean             @default(false)
+  dailyActiviyDone      Boolean             @default(false)
 
   @@unique([unitId, studentId])
   @@map("check_ins_check_outs")
@@ -472,6 +476,55 @@ model CstTopic {
   @@map("cst_topics")
 }
 
+model DailyActivity {
+  id                 String             @id @db.VarChar(100)
+  weekNum            Int                @db.UnsignedTinyInt
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @default(now()) @updatedAt
+  verificationStatus VerificationStatus @default(INPROCESS)
+  Student            Student?           @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId          String?            @db.VarChar(100)
+  Unit               Unit?              @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId             String?            @db.VarChar(100)
+  activities         Activity[]
+
+  @@map("daily_activities")
+}
+
+model Activity {
+  id                 String             @id @db.VarChar(100)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @default(now()) @updatedAt
+  day                String
+  activityStatus     ActivityStatus     @default(NOT_ATTEND)
+  detail             String?            @db.Text
+  supervisor         Supervisor?        @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  supervisorId       String?            @db.VarChar(100)
+  location           ActivityLocation?  @relation(fields: [activityLocationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  verificationStatus VerificationStatus @default(INPROCESS)
+  activityLocationId Int?
+  ActivityName       ActivityName?      @relation(fields: [activityNameId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  activityNameId     Int?
+  DailyActivity      DailyActivity?     @relation(fields: [dailyActivityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  dailyActivityId    String?            @db.VarChar(100)
+
+  @@map("activities")
+}
+
+model ActivityName {
+  id       Int        @id @default(autoincrement())
+  name     String
+  Activity Activity[]
+}
+
+model ActivityLocation {
+  id       Int        @id @default(autoincrement())
+  name     String
+  Activity Activity[]
+
+  @@map("activity_locations")
+}
+
 enum CompetencyType {
   OBTAINED
   DISCUSSED
@@ -505,4 +558,10 @@ enum VerificationStatus {
   VERIFIED
   INPROCESS
   UNVERIFIED
+}
+
+enum ActivityStatus {
+  SICK
+  ATTEND
+  NOT_ATTEND
 }
