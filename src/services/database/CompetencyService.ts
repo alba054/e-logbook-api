@@ -175,6 +175,14 @@ export class CompetencyService {
               studentId,
             },
             type: "SKILL",
+            OR: [
+              {
+                verificationStatus: "INPROCESS",
+              },
+              {
+                verificationStatus: "UNVERIFIED",
+              },
+            ],
           },
           data: {
             verificationStatus: "VERIFIED",
@@ -230,6 +238,14 @@ export class CompetencyService {
               studentId,
             },
             type: "CASE",
+            OR: [
+              {
+                verificationStatus: "INPROCESS",
+              },
+              {
+                verificationStatus: "UNVERIFIED",
+              },
+            ],
           },
           data: {
             verificationStatus: "VERIFIED",
