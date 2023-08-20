@@ -23,6 +23,9 @@ import { SglRouter } from "./api/sgls/SglRouter";
 import { SkillTypesRouter } from "./api/skillTypes/SkillTypesRouter";
 import { CaseTypesRouter } from "./api/caseTypes/CaseTypesRouter";
 import { CstRouter } from "./api/csts/CstRouter";
+import { ActivityLocationRouter } from "./api/activityLocation/ActivityLocationRouter";
+import { ActivityNameRouter } from "./api/activityName/ActivityNameRouter";
+import { DailyActivityRouter } from "./api/dailyActivities/DailyActivityRouter";
 
 dotenv.config();
 
@@ -70,6 +73,9 @@ class Server {
     this.app.use("/api", new TopicRouter().register());
     this.app.use("/api", new SkillTypesRouter().register());
     this.app.use("/api", new CaseTypesRouter().register());
+    this.app.use("/api", new ActivityLocationRouter().register());
+    this.app.use("/api", new ActivityNameRouter().register());
+    this.app.use("/api", new DailyActivityRouter().register());
     // * error handling
     this.app.use(ErrorHandler);
   }

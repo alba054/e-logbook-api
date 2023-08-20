@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { AuthorizationBearer } from "../../middleware/auth/AuthorizationBearer";
+import { constants } from "../../utils";
 import { DailyActivityHandler } from "./DailyActivityHandler";
 
 export class DailyActivityRouter {
@@ -13,7 +15,21 @@ export class DailyActivityRouter {
   }
 
   register() {
-    this.router.route(this.path);
+    // // * get list of activities per week
+    // this.router
+    //   .route(this.path)
+    //   .get(
+    //     AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+    //     this.handler.getDailySubmitted
+    //   );
+
+    // * fill daily activity
+    this.router
+      .route(this.path + "/activities/:id")
+      .put(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.handler.putDailyActivityActivity
+      );
 
     return this.router;
   }
