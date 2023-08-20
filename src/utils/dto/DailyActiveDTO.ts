@@ -14,3 +14,18 @@ export interface IActivitiesDetail {
   activityName?: string;
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
 }
+
+export interface IStudentDailyActivities {
+  unitName: string;
+  inprocessDailyActivity: number;
+  verifiedDailyActivity: number;
+  unverifiedDailyActivity: number;
+  dailyActivities: IDailyActivities[];
+}
+
+interface IDailyActivities {
+  dailyActivityId: string;
+  verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
+  weekName: number;
+  activitiesStatus: IActivitiesDetail[];
+}
