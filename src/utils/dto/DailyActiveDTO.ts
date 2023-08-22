@@ -16,11 +16,17 @@ export interface IActivitiesDetail {
 }
 
 export interface IStudentDailyActivities {
-  unitName: string;
-  inprocessDailyActivity: number;
-  verifiedDailyActivity: number;
-  unverifiedDailyActivity: number;
+  unitName?: string;
+  inprocessDailyActivity?: number;
+  verifiedDailyActivity?: number;
+  unverifiedDailyActivity?: number;
   dailyActivities: IDailyActivities[];
+}
+
+export interface ISubmittedActivities {
+  studentName: string;
+  latest: Date | string;
+  studentId: string;
 }
 
 interface IDailyActivities {

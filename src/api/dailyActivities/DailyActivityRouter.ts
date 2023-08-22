@@ -15,20 +15,49 @@ export class DailyActivityRouter {
   }
 
   register() {
-    // // * get list of activities per week
-    // this.router
-    //   .route(this.path)
-    //   .get(
-    //     AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
-    //     this.handler.getDailySubmitted
-    //   );
-
     // * fill daily activity
     this.router
       .route(this.path + "/activities/:id")
       .put(
         AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
         this.handler.putDailyActivityActivity
+      );
+
+    // * get submitted daily activities by supervisor or dpk
+    this.router
+      .route(this.path + "/students/:studentId")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.getSubmittedActivities
+      )
+      .put(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.putVerificationStatusOfDailyActivities
+      );
+
+    // * get submitted activities of daily activity by supervisor or dpk
+    // * verify daily activity per week
+    this.router
+      .route(this.path + "/:id")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.getActivitiesOfDailyActivity
+      )
+      .put(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.putVerificationStatusOfDailyActivity
       );
 
     return this.router;

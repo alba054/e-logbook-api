@@ -4,6 +4,38 @@ import { createErrorObject } from "../utils";
 import { IPutDailyActivityActivity } from "../utils/interfaces/DailyActivity";
 
 export class DailyActivity {
+  async getActivitiesBySupervisorAndStudentId(
+    supervisorId: string | undefined,
+    studentId: string
+  ) {
+    return db.dailyActivity.findMany({
+      where: {
+        Student: {
+          OR: [
+            {
+              academicSupervisorId: supervisorId,
+            },
+            {
+              supervisingSupervisorId: supervisorId,
+            },
+            {
+              examinerSupervisorId: supervisorId,
+            },
+          ],
+          studentId,
+        },
+      },
+      include: {
+        activities: {
+          include: {
+            ActivityName: true,
+            location: true,
+          },
+        },
+      },
+    });
+  }
+
   async getDailyActivitiesByStudentIdAndUnitId(
     studentId: string | undefined,
     unitId: string | undefined
