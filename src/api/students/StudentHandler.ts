@@ -112,7 +112,7 @@ export class StudentHandler {
 
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-        unitName: result[0].Unit?.name,
+        unitName: result[0]?.Unit?.name,
         inprocessDailyActivity: result.filter(
           (r) => r.verificationStatus === "INPROCESS"
         ).length,
