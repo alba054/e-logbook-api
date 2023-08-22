@@ -5,3 +5,7 @@ export interface IPutDailyActivityActivity {
   locationId: number;
   activityNameId: number;
 }
+
+export interface IPutDailyActivityVerificationStatus {
+  readonly verified: boolean;
+}

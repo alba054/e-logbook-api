@@ -7,3 +7,7 @@ export const DailyActivityActivityPayloadSchema = Joi.object({
   locationId: Joi.number().required(),
   activityNameId: Joi.number().required(),
 });
+
+export const DailyActivityVerificationStatusSchema = Joi.object({
+  verified: Joi.boolean().required(),
+});
