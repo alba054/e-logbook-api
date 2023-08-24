@@ -130,6 +130,8 @@ export class ScientificSessionService {
       return createErrorObject(400, "scientific session's not for you");
     }
 
+    const scientificAssesmentId = uuidv4();
+
     return db.$transaction([
       db.scientificSession.update({
         where: {
@@ -147,6 +149,18 @@ export class ScientificSessionService {
         },
         data: {
           scientificSessionDone: payload.verified,
+        },
+      }),
+      db.scientificAssesment.create({
+        data: {
+          id: scientificAssesmentId,
+        },
+      }),
+      db.assesment.create({
+        data: {
+          id: uuidv4(),
+          type: "SCIENTIFIC_ASSESMENT",
+          scientificAssesmentId,
         },
       }),
     ]);
