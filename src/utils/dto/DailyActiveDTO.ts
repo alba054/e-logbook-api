@@ -7,6 +7,7 @@ export interface IListActivitiesPerWeek {
 }
 
 export interface IActivitiesDetail {
+  id: string;
   day: string;
   location?: string;
   detail?: string;

@@ -234,6 +234,7 @@ export class StudentHandler {
               activityName: a.ActivityName?.name,
               detail: a.detail,
               location: a.location?.name,
+              id: a.id
             } as IActivitiesDetail;
           }),
         } as IListActivitiesPerWeek)
