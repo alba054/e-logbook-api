@@ -26,6 +26,8 @@ import { CstRouter } from "./api/csts/CstRouter";
 import { ActivityLocationRouter } from "./api/activityLocation/ActivityLocationRouter";
 import { ActivityNameRouter } from "./api/activityName/ActivityNameRouter";
 import { DailyActivityRouter } from "./api/dailyActivities/DailyActivityRouter";
+import { AssesmentRouter } from "./api/assesments/AssesmentRouter";
+import { scientificAssesmentGradeItemRouter } from "./api/scientificAssesmentGradeItems/ScientificAssesmentGradeItemRouter";
 
 dotenv.config();
 
@@ -76,6 +78,8 @@ class Server {
     this.app.use("/api", new ActivityLocationRouter().register());
     this.app.use("/api", new ActivityNameRouter().register());
     this.app.use("/api", new DailyActivityRouter().register());
+    this.app.use("/api", new AssesmentRouter().register());
+    this.app.use("/api", new scientificAssesmentGradeItemRouter().register());
     // * error handling
     this.app.use(ErrorHandler);
   }

@@ -63,6 +63,7 @@ model Student {
   SGL                     SGL[]
   CST                     CST[]
   DailyActivity           DailyActivity[]
+  Assesment               Assesment[]
 
   @@map("students")
 }
@@ -125,6 +126,7 @@ model Unit {
   SGL               SGL[]
   CST               CST[]
   DailyActivity     DailyActivity[]
+  Assesment         Assesment[]
 
   @@map("units")
 }
@@ -521,8 +523,94 @@ model ActivityLocation {
   id       Int        @id @default(autoincrement())
   name     String
   Activity Activity[]
+  MiniCex  MiniCex[]
 
   @@map("activity_locations")
+}
+
+model Assesment {
+  id                    String               @id @db.VarChar(100)
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @default(now()) @updatedAt
+  Student               Student?             @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId             String?              @db.VarChar(100)
+  Unit                  Unit?                @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId                String?              @db.VarChar(100)
+  type                  AssesmentType
+  MiniCex               MiniCex?             @relation(fields: [miniCexId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ScientificAssesment   ScientificAssesment? @relation(fields: [scientificAssesmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  miniCexId             String?              @unique @db.VarChar(100)
+  scientificAssesmentId String?              @unique @db.VarChar(100)
+
+  @@map("assesments")
+}
+
+model MiniCex {
+  id                 String            @id @db.VarChar(100)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @default(now()) @updatedAt
+  assesmentId        String?           @db.VarChar(100)
+  case               String?
+  location           ActivityLocation? @relation(fields: [activityLocationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Assesment          Assesment?
+  MiniCexGrade       MiniCexGrade[]
+  activityLocationId Int?
+
+  @@map("mini_cexs")
+}
+
+model ScientificAssesment {
+  id          String                     @id @db.VarChar(100)
+  createdAt   DateTime                   @default(now())
+  updatedAt   DateTime                   @default(now()) @updatedAt
+  assesmentId String?                    @db.VarChar(100)
+  grades      ScientificAssesmentGrade[]
+  Assesment   Assesment?
+
+  @@map("scientific_assesments")
+}
+
+model ScientificAssesmentGradeItem {
+  id                       Int                        @id @default(autoincrement())
+  name                     String                     @db.VarChar(255)
+  scientificGradeType      ScientificGradeType
+  ScientificAssesmentGrade ScientificAssesmentGrade[]
+}
+
+model ScientificAssesmentGrade {
+  id                             Int                          @id @default(autoincrement())
+  score                          Int                          @db.UnsignedInt
+  gradeItem                      ScientificAssesmentGradeItem @relation(fields: [scientificAssesmentGradeItemId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ScientificAssesment            ScientificAssesment?         @relation(fields: [scientificAssesmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  scientificAssesmentId          String?                      @db.VarChar(100)
+  scientificAssesmentGradeItemId Int
+}
+
+model MiniCexGradeItem {
+  id           Int            @id @default(autoincrement())
+  name         String         @db.VarChar(255)
+  MiniCexGrade MiniCexGrade[]
+}
+
+model MiniCexGrade {
+  id                 Int               @id @default(autoincrement())
+  score              Int               @db.UnsignedInt
+  gradeItem          MiniCexGradeItem? @relation(fields: [miniCexGradeItemId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  MiniCex            MiniCex?          @relation(fields: [miniCexId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  miniCexId          String?           @db.VarChar(100)
+  miniCexGradeItemId Int?
+}
+
+enum ScientificGradeType {
+  SAJIAN
+  CARA_PENYAJIAN
+  DISKUSI
+}
+
+enum AssesmentType {
+  MINI_CEX
+  SCIENTIFIC_ASSESMENT
+  PERSONAL_BEHAVIOUR
 }
 
 enum CompetencyType {
