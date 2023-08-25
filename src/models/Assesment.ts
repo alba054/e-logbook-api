@@ -5,14 +5,28 @@ import {
 } from "../utils/interfaces/Assesment";
 
 export class Assesment {
-  async getMiniCexAssesmentByStudentIdAndUnitId(
-    studentId: string | undefined,
-    unitId: string | undefined
+  async getScientificAssesmentByStudentIdAndUnitId(
+    studentId: string | null,
+    unitId: string | null
   ) {
     return db.assesment.findMany({
       where: {
         studentId,
         unitId,
+        type: "SCIENTIFIC_ASSESMENT",
+      },
+    });
+  }
+
+  async getMiniCexAssesmentByStudentIdAndUnitId(
+    studentId: string | undefined | null,
+    unitId: string | undefined | null
+  ) {
+    return db.assesment.findMany({
+      where: {
+        studentId,
+        unitId,
+        type: "MINI_CEX",
       },
       include: {
         MiniCex: {

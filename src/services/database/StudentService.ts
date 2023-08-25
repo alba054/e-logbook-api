@@ -17,6 +17,12 @@ export class StudentService {
     this.checkInCheckoutModel = new CheckInCheckOut();
   }
 
+  async getStudentBySupervisorId(tokenPayload: ITokenPayload) {
+    return this.studentModel.getStudentBySupervisorId(
+      tokenPayload.supervisorId
+    );
+  }
+
   async getStudentByStudentId(studentId: string) {
     const student = await this.studentModel.getStudentByStudentId(studentId);
 

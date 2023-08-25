@@ -16,6 +16,12 @@ export interface IMiniCexDetail {
   scores: IMiniCexGradeItem[];
 }
 
+export interface IListScientificAssesment {
+  studentId: string;
+  id: string;
+  studentName: string;
+}
+
 interface IMiniCexGradeItem {
   name: string;
   score: number;

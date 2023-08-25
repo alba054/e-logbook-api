@@ -37,6 +37,17 @@ export class SupervisorRouter {
       this.supervisorHandler.postBadgeToSupervisor
     );
 
+    // * get supervisor's students
+    this.router
+      .route(this.path + "/students")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.supervisorHandler.getSupervisorStudents
+      );
+
     return this.router;
   }
 }

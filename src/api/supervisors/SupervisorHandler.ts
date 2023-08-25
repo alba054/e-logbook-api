@@ -2,15 +2,18 @@ import { NextFunction, Request, Response } from "express";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
+import { StudentService } from "../../services/database/StudentService";
 import { UserService } from "../../services/database/UserService";
 import { SupervisorBadgeService } from "../../services/facade/SupervisorBadgeService";
 import { UserSupervisorRegistrationService } from "../../services/facade/UserSupervisorRegistrationService";
 import { constants, createResponse } from "../../utils";
+import { IListSupervisorStudent } from "../../utils/dto/StudentDTO";
 import { ISupervisorProfileDTO } from "../../utils/dto/SupervisorDTO";
 import {
   IPostSupervisorBadgePayload,
   IPostSupervisorPayload,
 } from "../../utils/interfaces/Supervisor";
+import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { SupervisorPayloadValidator } from "../../validator/supervisors/SupervisorValidator";
 
 export class SupervisorHandler {
@@ -18,6 +21,7 @@ export class SupervisorHandler {
   private userSupervisorRegistrationService: UserSupervisorRegistrationService;
   private supervisorBadgeService: SupervisorBadgeService;
   private userService: UserService;
+  private studentService: StudentService;
 
   constructor() {
     this.supervisorValidator = new SupervisorPayloadValidator();
@@ -25,10 +29,33 @@ export class SupervisorHandler {
       new UserSupervisorRegistrationService();
     this.supervisorBadgeService = new SupervisorBadgeService();
     this.userService = new UserService();
+    this.studentService = new StudentService();
 
     this.postSupervisor = this.postSupervisor.bind(this);
     this.postBadgeToSupervisor = this.postBadgeToSupervisor.bind(this);
     this.getSupervisors = this.getSupervisors.bind(this);
+    this.getSupervisorStudents = this.getSupervisorStudents.bind(this);
+  }
+
+  async getSupervisorStudents(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    const students = await this.studentService.getStudentBySupervisorId(
+      tokenPayload
+    );
+
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        students.map((s) => {
+          return {
+            id: s.id,
+            studentId: s.studentId,
+            studentName: s.fullName,
+          } as IListSupervisorStudent;
+        })
+      )
+    );
   }
 
   async getSupervisors(req: Request, res: Response, next: NextFunction) {
