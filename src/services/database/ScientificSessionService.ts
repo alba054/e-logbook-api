@@ -11,15 +11,19 @@ import { StudentService } from "./StudentService";
 import { v4 as uuidv4 } from "uuid";
 import db from "../../database";
 import { Assesment } from "../../models/Assesment";
+import { ScientificAssesmentGradeItemService } from "./ScientificAssesmentGradeItemService";
 
 export class ScientificSessionService {
   private studentService: StudentService;
   private scientificSessionModel: ScientificSession;
   private assesmentModel: Assesment;
+  private scientificAssesmentGradeItemService: ScientificAssesmentGradeItemService;
   constructor() {
     this.scientificSessionModel = new ScientificSession();
     this.assesmentModel = new Assesment();
     this.studentService = new StudentService();
+    this.scientificAssesmentGradeItemService =
+      new ScientificAssesmentGradeItemService();
   }
 
   async giveFeedbackToScientificSession(
@@ -142,11 +146,21 @@ export class ScientificSessionService {
     const scientificAssesmentId = uuidv4();
     let scientificAssesmentQuery: any[] = [];
 
+    const scientificAssesmentGradeItems =
+      await this.scientificAssesmentGradeItemService.getScientificAssesmentGradeItemByUnitId();
     if (!scientificAssesment.length) {
       scientificAssesmentQuery = [
         db.scientificAssesment.create({
           data: {
             id: scientificAssesmentId,
+            grades: {
+              create: scientificAssesmentGradeItems.map((s) => {
+                return {
+                  scientificAssesmentGradeItemId: s.id,
+                  score: 0,
+                };
+              }),
+            },
           },
         }),
         db.assesment.create({

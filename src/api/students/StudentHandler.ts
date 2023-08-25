@@ -42,7 +42,10 @@ import { IPutDailyActivityActivity } from "../../utils/interfaces/DailyActivity"
 import { Validator } from "../../validator/Validator";
 import { DailyActivityActivityPayloadSchema } from "../../validator/dailyActivities/DailyActivitySchema";
 import { AssesmentService } from "../../services/database/AssesmentService";
-import { IListMiniCex } from "../../utils/dto/AssesmentDTO";
+import {
+  IListMiniCex,
+  IListScientificAssesment,
+} from "../../utils/dto/AssesmentDTO";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -107,6 +110,36 @@ export class StudentHandler {
     this.getMiniCexs = this.getMiniCexs.bind(this);
   }
 
+  async getScientificAssesments(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    const result =
+      await this.assesmentService.getScientificAssesmentsByStudentIdAndUnitId(
+        tokenPayload
+      );
+
+    const student = await this.studentService.getStudentById(
+      tokenPayload.studentId
+    );
+
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        result.map((r) => {
+          return {
+            id: r.scientificAssesmentId,
+            studentId: student?.studentId,
+            studentName: student?.fullName,
+          } as IListScientificAssesment;
+        })
+      )
+    );
+  }
+
   async getMiniCexs(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
 
@@ -114,7 +147,9 @@ export class StudentHandler {
       tokenPayload
     );
 
-    const student = await this.studentService.getStudentById(tokenPayload.studentId);
+    const student = await this.studentService.getStudentById(
+      tokenPayload.studentId
+    );
 
     return res.status(200).json(
       createResponse(
@@ -125,7 +160,7 @@ export class StudentHandler {
             id: r.miniCexId,
             location: r.MiniCex?.location?.name,
             studentId: student?.studentId,
-            studentName: student?.fullName
+            studentName: student?.fullName,
           } as IListMiniCex;
         })
       )

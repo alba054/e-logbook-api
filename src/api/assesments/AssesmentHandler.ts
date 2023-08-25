@@ -36,7 +36,110 @@ export class AssesmentHandler {
     this.getMiniCexDetail = this.getMiniCexDetail.bind(this);
     this.putMiniCexGradeItem = this.putMiniCexGradeItem.bind(this);
     this.putMiniCexGradeItemScore = this.putMiniCexGradeItemScore.bind(this);
+    this.getScientificAssesmentDetail =
+      this.getScientificAssesmentDetail.bind(this);
+    this.putScientificAssesmentGradeItemScore =
+      this.putScientificAssesmentGradeItemScore.bind(this);
   }
+
+  async putScientificAssesmentGradeItemScore(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { id } = req.params;
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const payload: IPutGradeItemMiniCexScore = req.body;
+
+    try {
+      const validationResult = this.validator.validate(
+        GradeItemMiniCexScoreSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        throw new BadRequestError(validationResult.message);
+      }
+
+      const miniCex = await this.assesmentService.scoreScientificAssesment(
+        tokenPayload,
+        id,
+        payload
+      );
+
+      if (miniCex && "error" in miniCex) {
+        switch (miniCex.error) {
+          case 400:
+            throw new BadRequestError(miniCex.message);
+          case 404:
+            throw new NotFoundError(miniCex.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, miniCex));
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getScientificAssesmentDetail(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { id } = req.params;
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    try {
+      const miniCex = await this.assesmentService.getScientificAssesmentById(
+        tokenPayload,
+        id
+      );
+
+      if (miniCex && "error" in miniCex) {
+        switch (miniCex.error) {
+          case 400:
+            throw new BadRequestError(miniCex.message);
+          case 404:
+            throw new NotFoundError(miniCex.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      // * grade will be zero if no minicexgrade
+      let grade = 0;
+      if (miniCex.ScientificAssesment?.grades) {
+        miniCex.ScientificAssesment?.grades.forEach((g) => {
+          grade += g.score;
+        });
+        grade = grade / miniCex.ScientificAssesment?.grades.length;
+      }
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          id: miniCex.miniCexId,
+          studentId: miniCex.Student?.studentId,
+          studentName: miniCex.Student?.fullName,
+          scores: miniCex.ScientificAssesment?.grades.map((g) => {
+            return {
+              name: g.gradeItem.name,
+              score: g.score,
+              id: g.id,
+            };
+          }),
+          grade,
+        } as IMiniCexDetail)
+      );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
   async putMiniCexGradeItemScore(
     req: Request,
     res: Response,
@@ -189,7 +292,7 @@ export class AssesmentHandler {
 
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-        id: scientificAssesment?.id,
+        id: scientificAssesment?.scientificAssesmentId,
         studentId: scientificAssesment?.Student?.studentId,
         studentName: scientificAssesment?.Student?.fullName,
       } as IListScientificAssesment)
