@@ -41,6 +41,8 @@ import {
 import { IPutDailyActivityActivity } from "../../utils/interfaces/DailyActivity";
 import { Validator } from "../../validator/Validator";
 import { DailyActivityActivityPayloadSchema } from "../../validator/dailyActivities/DailyActivitySchema";
+import { AssesmentService } from "../../services/database/AssesmentService";
+import { IListMiniCex } from "../../utils/dto/AssesmentDTO";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -58,6 +60,7 @@ export class StudentHandler {
   private competencyService: CompetencyService;
   private dailyActivityService: DailyActivityService;
   private validator: Validator;
+  private assesmentService: AssesmentService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -75,6 +78,7 @@ export class StudentHandler {
     this.selfReflectionService = new SelfReflectionService();
     this.competencyService = new CompetencyService();
     this.dailyActivityService = new DailyActivityService();
+    this.assesmentService = new AssesmentService();
     this.validator = new Validator();
 
     this.postStudent = this.postStudent.bind(this);
@@ -100,6 +104,32 @@ export class StudentHandler {
     this.getDailyActivitiesPerWeek = this.getDailyActivitiesPerWeek.bind(this);
     this.putDailyActivityActivity = this.putDailyActivityActivity.bind(this);
     this.getDailyActivities = this.getDailyActivities.bind(this);
+    this.getMiniCexs = this.getMiniCexs.bind(this);
+  }
+
+  async getMiniCexs(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    const result = await this.assesmentService.getMiniCexsByStudentIdAndUnitId(
+      tokenPayload
+    );
+
+    const student = await this.studentService.getStudentById(tokenPayload.studentId);
+
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        result.map((r) => {
+          return {
+            case: r.MiniCex?.case,
+            id: r.miniCexId,
+            location: r.MiniCex?.location?.name,
+            studentId: student?.studentId,
+            studentName: student?.fullName
+          } as IListMiniCex;
+        })
+      )
+    );
   }
 
   async getDailyActivities(req: Request, res: Response, next: NextFunction) {
@@ -234,7 +264,7 @@ export class StudentHandler {
               activityName: a.ActivityName?.name,
               detail: a.detail,
               location: a.location?.name,
-              id: a.id
+              id: a.id,
             } as IActivitiesDetail;
           }),
         } as IListActivitiesPerWeek)

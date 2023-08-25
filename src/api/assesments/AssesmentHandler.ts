@@ -8,10 +8,12 @@ import { IListMiniCex, IMiniCexDetail } from "../../utils/dto/AssesmentDTO";
 import {
   IPostMiniCex,
   IPutGradeItemMiniCex,
+  IPutGradeItemMiniCexScore,
 } from "../../utils/interfaces/Assesment";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import {
   GradeItemMiniCexSchema,
+  GradeItemMiniCexScoreSchema,
   MiniCexPayloadSchema,
 } from "../../validator/assesment/AssesmentSchema";
 import { Validator } from "../../validator/Validator";
@@ -29,6 +31,50 @@ export class AssesmentHandler {
     this.getScientificAssesments = this.getScientificAssesments.bind(this);
     this.getMiniCexDetail = this.getMiniCexDetail.bind(this);
     this.putMiniCexGradeItem = this.putMiniCexGradeItem.bind(this);
+    this.putMiniCexGradeItemScore = this.putMiniCexGradeItemScore.bind(this);
+  }
+  async putMiniCexGradeItemScore(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { id } = req.params;
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const payload: IPutGradeItemMiniCexScore = req.body;
+
+    try {
+      const validationResult = this.validator.validate(
+        GradeItemMiniCexScoreSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        throw new BadRequestError(validationResult.message);
+      }
+
+      const miniCex = await this.assesmentService.scoreMiniCex(
+        tokenPayload,
+        id,
+        payload
+      );
+
+      if (miniCex && "error" in miniCex) {
+        switch (miniCex.error) {
+          case 400:
+            throw new BadRequestError(miniCex.message);
+          case 404:
+            throw new NotFoundError(miniCex.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, miniCex));
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async putMiniCexGradeItem(req: Request, res: Response, next: NextFunction) {
@@ -112,6 +158,7 @@ export class AssesmentHandler {
             return {
               name: g.name,
               score: g.score,
+              id: g.id,
             };
           }),
           grade,
@@ -199,6 +246,7 @@ export class AssesmentHandler {
         location: miniCexs?.MiniCex?.location?.name,
         studentId: miniCexs?.Student?.studentId,
         id: miniCexs?.MiniCex?.id,
+        studentName: miniCexs?.Student?.fullName,
       } as IListMiniCex)
     );
   }

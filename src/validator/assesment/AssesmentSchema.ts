@@ -8,3 +8,14 @@ export const MiniCexPayloadSchema = Joi.object({
 export const GradeItemMiniCexSchema = Joi.object({
   name: Joi.string().required(),
 });
+
+export const GradeItemMiniCexScoreSchema = Joi.object({
+  scores: Joi.array()
+    .items(
+      Joi.object({
+        score: Joi.number().required(),
+        id: Joi.number().required(),
+      })
+    )
+    .min(0),
+});

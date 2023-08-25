@@ -6,3 +6,10 @@ export interface IPostMiniCex {
 export interface IPutGradeItemMiniCex {
   name: string;
 }
+
+export interface IPutGradeItemMiniCexScore {
+  scores: {
+    score: number;
+    id: number;
+  }[];
+}
