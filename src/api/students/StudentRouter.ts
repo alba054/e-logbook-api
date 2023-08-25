@@ -163,6 +163,14 @@ export class StudentRouter {
         this.studentHandler.getMiniCexs
       );
 
+    // * get student scientific assesment
+    this.router
+      .route(this.path + "/scientific-assesments")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getScientificAssesments
+      );
+
     return this.router;
   }
 }

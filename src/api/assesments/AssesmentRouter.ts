@@ -65,6 +65,29 @@ export class AssesmentRouter {
         this.handler.getAssesmentMiniCexs
       );
 
+    // * get scientific assesment detail
+    this.router
+      .route(this.path + "/scientific-assesments/:id")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.STUDENT_ROLE,
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.getScientificAssesmentDetail
+      );
+
+    // * give a score to each scientific assesment grade item
+    this.router
+      .route(this.path + "/scientific-assesments/:id/score")
+      .put(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.putScientificAssesmentGradeItemScore
+      );
+
     // * get scientific assesment of spesific student
     this.router
       .route(this.path + "/scientific-assesments/students/:studentId")

@@ -1,10 +1,43 @@
 import db from "../database";
-import {
-  IPutGradeItemMiniCex,
-  IPutGradeItemMiniCexScore,
-} from "../utils/interfaces/Assesment";
+import { IPutGradeItemMiniCex } from "../utils/interfaces/Assesment";
 
 export class Assesment {
+  async getScientificAssesmentsByStudentIdAndUnitId(
+    studentId: string | undefined | null,
+    unitId: string | undefined | null
+  ) {
+    return db.assesment.findMany({
+      where: {
+        studentId,
+        unitId,
+        type: "SCIENTIFIC_ASSESMENT",
+      },
+      include: {
+        ScientificAssesment: true,
+      },
+    });
+  }
+
+  async getScientificAssesmentById(id: string) {
+    return db.assesment.findUnique({
+      where: {
+        scientificAssesmentId: id,
+      },
+      include: {
+        Student: true,
+        ScientificAssesment: {
+          include: {
+            grades: {
+              include: {
+                gradeItem: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   async getScientificAssesmentByStudentIdAndUnitId(
     studentId: string | null,
     unitId: string | null

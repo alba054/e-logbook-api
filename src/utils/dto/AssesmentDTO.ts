@@ -22,6 +22,14 @@ export interface IListScientificAssesment {
   studentName: string;
 }
 
+export interface IScientificAssesmentDetail {
+  studentId: string;
+  studentName: string;
+  id: string;
+  grade: number;
+  scores: IMiniCexGradeItem[];
+}
+
 interface IMiniCexGradeItem {
   name: string;
   score: number;

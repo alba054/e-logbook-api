@@ -20,6 +20,71 @@ export class AssesmentService {
     this.studentService = new StudentService();
   }
 
+  async scoreScientificAssesment(
+    tokenPayload: ITokenPayload,
+    id: string,
+    payload: IPutGradeItemMiniCexScore
+  ) {
+    const miniCex = await this.assesmentModel.getScientificAssesmentById(id);
+
+    if (!miniCex) {
+      return createErrorObject(404, "scientific assesment's not found");
+    }
+
+    if (
+      miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.academicSupervisorId !== tokenPayload.supervisorId
+    ) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return db.$transaction(
+      payload.scores.map((s) => {
+        return db.scientificAssesmentGrade.update({
+          where: {
+            id: s.id,
+          },
+          data: {
+            score: s.score,
+          },
+        });
+      })
+    );
+  }
+
+  async getScientificAssesmentsByStudentIdAndUnitId(
+    tokenPayload: ITokenPayload
+  ) {
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+
+    return this.assesmentModel.getScientificAssesmentsByStudentIdAndUnitId(
+      tokenPayload.studentId,
+      activeUnit?.activeUnit.activeUnit?.id
+    );
+  }
+
+  async getScientificAssesmentById(tokenPayload: ITokenPayload, id: string) {
+    const miniCex = await this.assesmentModel.getScientificAssesmentById(id);
+
+    if (!miniCex) {
+      return createErrorObject(404, "scientific assesment's not found");
+    }
+
+    if (
+      miniCex.studentId !== tokenPayload.studentId &&
+      miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.academicSupervisorId !== tokenPayload.supervisorId
+    ) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return miniCex;
+  }
+
   async scoreMiniCex(
     tokenPayload: ITokenPayload,
     id: string,
