@@ -132,6 +132,34 @@ const main = async () => {
       },
     ],
   });
+
+  await db.activityLocation.createMany({
+    data: [
+      {
+        name: "location 1",
+      },
+      {
+        name: "location 2",
+      },
+      {
+        name: "location 3",
+      },
+    ],
+  });
+
+  await db.activityName.createMany({
+    data: [
+      {
+        name: "activity 1",
+      },
+      {
+        name: "activity 2",
+      },
+      {
+        name: "activity 3",
+      },
+    ],
+  });
 };
 
 main();

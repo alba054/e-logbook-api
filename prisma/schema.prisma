@@ -594,7 +594,8 @@ model MiniCexGradeItem {
 
 model MiniCexGrade {
   id                 Int               @id @default(autoincrement())
-  score              Int               @db.UnsignedInt
+  name               String
+  score              Int               @default(0) @db.UnsignedInt
   gradeItem          MiniCexGradeItem? @relation(fields: [miniCexGradeItemId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   MiniCex            MiniCex?          @relation(fields: [miniCexId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   miniCexId          String?           @db.VarChar(100)
