@@ -32,6 +32,33 @@ export class CheckInCheckOut {
     }
   }
 
+  async verifyInProcessCheckOut(
+    verified: boolean,
+    userId: string,
+    studentId?: string,
+    unitId?: string
+  ) {
+    try {
+      return db.checkInCheckOut.updateMany({
+        where: {
+          unitId,
+          studentId,
+          checkOutStatus: "INPROCESS",
+        },
+        data: {
+          checkOutStatus: verified ? "VERIFIED" : "UNVERIFIED",
+          userId,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to update in process checkin");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async getStudentCheckIn() {
     return db.checkInCheckOut.findMany({
       where: {

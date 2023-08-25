@@ -47,4 +47,29 @@ export class StudentCheckInCheckOutService {
 
     return checkIn;
   }
+
+  async verifyStudentCheckOut(
+    studentId: string,
+    userId: string,
+    payload: { verified: boolean }
+  ) {
+    const studentActiveUnit = await this.studentModel.getActiveUnitByStudentId(
+      studentId
+    );
+    const student = await this.studentModel.getStudentByStudentId(studentId);
+
+    const checkIn = this.checkInCheckOutModel.verifyInProcessCheckOut(
+      payload.verified,
+      userId,
+      studentActiveUnit?.id,
+      studentActiveUnit?.activeUnit?.id
+    );
+
+    this.studentDailyActivityService.generateDailyActivity(
+      student?.id,
+      studentActiveUnit?.activeUnit?.id
+    );
+
+    return checkIn;
+  }
 }

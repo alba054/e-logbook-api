@@ -99,6 +99,13 @@ export class StudentRouter {
       this.studentHandler.putVerificationCheckIn
     );
 
+    // * verify student inprocess checkout
+    this.router.put(
+      this.path + "/checkouts/:studentId",
+      AuthorizationBearer.authorize([constants.HEAD_DIV_BADGE]),
+      this.studentHandler.putVerificationCheckOut
+    );
+
     // * assign supervisors to student
     this.router
       .route(this.path + "/supervisors")
