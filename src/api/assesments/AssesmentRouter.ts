@@ -43,6 +43,17 @@ export class AssesmentRouter {
         this.handler.putMiniCexGradeItem
       );
 
+    // * give a score to each mini cex grade item
+    this.router
+      .route(this.path + "/mini-cexs/:id/score")
+      .put(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.putMiniCexGradeItemScore
+      );
+
     // * get mini cex of spesific student
     this.router
       .route(this.path + "/mini-cexs/students/:studentId")

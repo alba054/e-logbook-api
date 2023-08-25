@@ -155,6 +155,14 @@ export class StudentRouter {
         this.studentHandler.getDailyActivitiesPerWeek
       );
 
+    // * get student mini cex
+    this.router
+      .route(this.path + "/mini-cexs")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getMiniCexs
+      );
+
     return this.router;
   }
 }

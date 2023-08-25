@@ -7,6 +7,7 @@ import { createErrorObject } from "../../utils";
 import {
   IPostMiniCex,
   IPutGradeItemMiniCex,
+  IPutGradeItemMiniCexScore,
 } from "../../utils/interfaces/Assesment";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
@@ -17,6 +18,50 @@ export class AssesmentService {
   constructor() {
     this.assesmentModel = new Assesment();
     this.studentService = new StudentService();
+  }
+
+  async scoreMiniCex(
+    tokenPayload: ITokenPayload,
+    id: string,
+    payload: IPutGradeItemMiniCexScore
+  ) {
+    const miniCex = await this.assesmentModel.getMiniCexById(id);
+
+    if (!miniCex) {
+      return createErrorObject(404, "mini cex's not found");
+    }
+
+    if (
+      miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.academicSupervisorId !== tokenPayload.supervisorId
+    ) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return db.$transaction(
+      payload.scores.map((s) => {
+        return db.miniCexGrade.update({
+          where: {
+            id: s.id,
+          },
+          data: {
+            score: s.score,
+          },
+        });
+      })
+    );
+  }
+
+  async getMiniCexsByStudentIdAndUnitId(tokenPayload: ITokenPayload) {
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+
+    return this.assesmentModel.getMiniCexAssesmentByStudentIdAndUnitId(
+      tokenPayload.studentId,
+      activeUnit?.activeUnit.activeUnit?.id
+    );
   }
 
   async addGradeItemToMiniCex(

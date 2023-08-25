@@ -3,6 +3,7 @@ export interface IListMiniCex {
   location: string;
   studentId: string;
   id: string;
+  studentName: string;
 }
 
 export interface IMiniCexDetail {
@@ -18,4 +19,5 @@ export interface IMiniCexDetail {
 interface IMiniCexGradeItem {
   name: string;
   score: number;
+  id: number;
 }

@@ -1,7 +1,29 @@
 import db from "../database";
-import { IPutGradeItemMiniCex } from "../utils/interfaces/Assesment";
+import {
+  IPutGradeItemMiniCex,
+  IPutGradeItemMiniCexScore,
+} from "../utils/interfaces/Assesment";
 
 export class Assesment {
+  async getMiniCexAssesmentByStudentIdAndUnitId(
+    studentId: string | undefined,
+    unitId: string | undefined
+  ) {
+    return db.assesment.findMany({
+      where: {
+        studentId,
+        unitId,
+      },
+      include: {
+        MiniCex: {
+          include: {
+            location: true,
+          },
+        },
+      },
+    });
+  }
+
   async insertGradeItemMiniCex(id: string, payload: IPutGradeItemMiniCex) {
     return db.miniCex.update({
       where: {
