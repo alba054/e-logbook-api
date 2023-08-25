@@ -108,6 +108,7 @@ export class StudentHandler {
     this.putDailyActivityActivity = this.putDailyActivityActivity.bind(this);
     this.getDailyActivities = this.getDailyActivities.bind(this);
     this.getMiniCexs = this.getMiniCexs.bind(this);
+    this.getScientificAssesments = this.getScientificAssesments.bind(this);
   }
 
   async getScientificAssesments(
