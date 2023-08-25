@@ -655,8 +655,9 @@ export class StudentHandler {
   }
 
   async getAllCheckOutsStudent(req: Request, res: Response, next: NextFunction) {
+    const { userId } = res.locals.user as ITokenPayload;
     const studentCheckIns =
-      await this.checkInCheckOutService.getAllCheckOutStudents();
+      await this.checkInCheckOutService.getAllCheckOutStudents(userId);
 
     return res.status(200).json(
       createResponse(

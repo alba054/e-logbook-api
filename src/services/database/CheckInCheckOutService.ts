@@ -12,8 +12,8 @@ export class CheckInCheckOutService {
     return this.checkInCheckOutModel.getStudentCheckIn();
   }
 
-  async getAllCheckOutStudents() {
-    return this.checkInCheckOutModel.getStudentCheckOut();
+  async getAllCheckOutStudents(userId: string) {
+    return this.checkInCheckOutModel.getStudentCheckOut(userId);
   }
 
   async getCheckInCheckOutByUnitIdAndStudentId(studentId: string, id?: string) {

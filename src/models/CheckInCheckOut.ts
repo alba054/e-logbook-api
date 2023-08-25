@@ -43,11 +43,11 @@ export class CheckInCheckOut {
         where: {
           unitId,
           studentId,
+          userId,
           checkOutStatus: "INPROCESS",
         },
         data: {
           checkOutStatus: verified ? "VERIFIED" : "UNVERIFIED",
-          userId,
         },
       });
     } catch (error) {
@@ -72,11 +72,12 @@ export class CheckInCheckOut {
     });
   }
 
-  async getStudentCheckOut() {
+  async getStudentCheckOut(userId: string) {
     return db.checkInCheckOut.findMany({
       where: {
         checkOut: true,
         checkOutStatus: "INPROCESS",
+        userId
       },
       include: {
         student: true,
