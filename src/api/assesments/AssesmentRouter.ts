@@ -67,7 +67,7 @@ export class AssesmentRouter {
 
     // * get scientific assesment of spesific student
     this.router
-      .route(this.path + "/mini-cexs/students/:studentId")
+      .route(this.path + "/scientific-assesments/students/:studentId")
       .get(
         AuthorizationBearer.authorize([
           constants.SUPERVISOR_ROLE,

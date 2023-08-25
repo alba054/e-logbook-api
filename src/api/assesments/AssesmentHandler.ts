@@ -4,7 +4,11 @@ import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 import { AssesmentService } from "../../services/database/AssesmentService";
 import { constants, createResponse } from "../../utils";
-import { IListMiniCex, IMiniCexDetail } from "../../utils/dto/AssesmentDTO";
+import {
+  IListMiniCex,
+  IListScientificAssesment,
+  IMiniCexDetail,
+} from "../../utils/dto/AssesmentDTO";
 import {
   IPostMiniCex,
   IPutGradeItemMiniCex,
@@ -183,9 +187,13 @@ export class AssesmentHandler {
         studentId
       );
 
-    return res
-      .status(200)
-      .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE));
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        id: scientificAssesment?.id,
+        studentId: scientificAssesment?.Student?.studentId,
+        studentName: scientificAssesment?.Student?.fullName,
+      } as IListScientificAssesment)
+    );
   }
 
   async postAssesmentMiniCex(req: Request, res: Response, next: NextFunction) {

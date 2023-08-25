@@ -10,12 +10,15 @@ import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentService } from "./StudentService";
 import { v4 as uuidv4 } from "uuid";
 import db from "../../database";
+import { Assesment } from "../../models/Assesment";
 
 export class ScientificSessionService {
   private studentService: StudentService;
   private scientificSessionModel: ScientificSession;
+  private assesmentModel: Assesment;
   constructor() {
     this.scientificSessionModel = new ScientificSession();
+    this.assesmentModel = new Assesment();
     this.studentService = new StudentService();
   }
 
@@ -130,7 +133,33 @@ export class ScientificSessionService {
       return createErrorObject(400, "scientific session's not for you");
     }
 
+    const scientificAssesment =
+      await this.assesmentModel.getScientificAssesmentByStudentIdAndUnitId(
+        scientificSession.studentId,
+        scientificSession.unitId
+      );
+
     const scientificAssesmentId = uuidv4();
+    let scientificAssesmentQuery: any[] = [];
+
+    if (!scientificAssesment.length) {
+      scientificAssesmentQuery = [
+        db.scientificAssesment.create({
+          data: {
+            id: scientificAssesmentId,
+          },
+        }),
+        db.assesment.create({
+          data: {
+            id: uuidv4(),
+            type: "SCIENTIFIC_ASSESMENT",
+            scientificAssesmentId,
+            studentId: scientificSession.studentId,
+            unitId: scientificSession.unitId,
+          },
+        }),
+      ];
+    }
 
     return db.$transaction([
       db.scientificSession.update({
@@ -151,18 +180,7 @@ export class ScientificSessionService {
           scientificSessionDone: payload.verified,
         },
       }),
-      db.scientificAssesment.create({
-        data: {
-          id: scientificAssesmentId,
-        },
-      }),
-      db.assesment.create({
-        data: {
-          id: uuidv4(),
-          type: "SCIENTIFIC_ASSESMENT",
-          scientificAssesmentId,
-        },
-      }),
+      ...scientificAssesmentQuery,
     ]);
   }
 
