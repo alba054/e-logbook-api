@@ -12,6 +12,10 @@ export class CheckInCheckOutService {
     return this.checkInCheckOutModel.getStudentCheckIn();
   }
 
+  async getAllCheckOutStudents() {
+    return this.checkInCheckOutModel.getStudentCheckOut();
+  }
+
   async getCheckInCheckOutByUnitIdAndStudentId(studentId: string, id?: string) {
     if (!id) {
       return createErrorObject(400, "no active unit");

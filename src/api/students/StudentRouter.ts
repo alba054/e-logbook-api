@@ -84,6 +84,14 @@ export class StudentRouter {
       this.studentHandler.getAllCheckInsStudent
     );
 
+    // * get all inprocess check outs student
+    // FIXME: ideally checkins and checkouts data should be done in 1 single API response.
+    this.router.get(
+      this.path + "/checkouts",
+      AuthorizationBearer.authorize([constants.HEAD_DIV_BADGE]),
+      this.studentHandler.getAllCheckOutsStudent
+    );
+
     // * verify student inprocess checkin
     this.router.put(
       this.path + "/checkins/:studentId",

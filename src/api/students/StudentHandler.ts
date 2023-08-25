@@ -19,6 +19,7 @@ import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentCheckInCheckOutService } from "../../services/facade/StudentCheckInCheckOutService";
 import { IActiveUnitDTO } from "../../utils/dto/ActiveUnitDTO";
 import { IListInProcessCheckInDTO } from "../../utils/dto/StudentCheckInDTO";
+import { IListInProcessCheckOutDTO } from "../../utils/dto/StudentCheckOutDTO";
 import { CheckInCheckOutValidator } from "../../validator/checkInCheckOut/CheckInCheckOutValidator";
 import { CheckInCheckOutService } from "../../services/database/CheckInCheckOutService";
 import { ClinicalRecordService } from "../../services/database/ClinicalRecordService";
@@ -93,6 +94,7 @@ export class StudentHandler {
     this.getActiveUnit = this.getActiveUnit.bind(this);
     this.postCheckInActiveUnit = this.postCheckInActiveUnit.bind(this);
     this.getAllCheckInsStudent = this.getAllCheckInsStudent.bind(this);
+    this.getAllCheckOutsStudent = this.getAllCheckOutsStudent.bind(this);
     this.putVerificationCheckIn = this.putVerificationCheckIn.bind(this);
     this.putStudentProfile = this.putStudentProfile.bind(this);
     this.putStudentSupervisors = this.putStudentSupervisors.bind(this);
@@ -595,6 +597,27 @@ export class StudentHandler {
             unitId: s.unit.id,
             unitName: s.unit.name,
           } as IListInProcessCheckInDTO;
+        })
+      )
+    );
+  }
+
+  async getAllCheckOutsStudent(req: Request, res: Response, next: NextFunction) {
+    const studentCheckIns =
+      await this.checkInCheckOutService.getAllCheckOutStudents();
+
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        studentCheckIns.map((s) => {
+          return {
+            checkOutStatus: s.checkOutStatus,
+            checkOutTime: Number(s.checkOutTime),
+            fullname: s.student.fullName,
+            studentId: s.student.studentId,
+            unitId: s.unit.id,
+            unitName: s.unit.name,
+          } as IListInProcessCheckOutDTO;
         })
       )
     );

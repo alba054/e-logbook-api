@@ -45,6 +45,19 @@ export class CheckInCheckOut {
     });
   }
 
+  async getStudentCheckOut() {
+    return db.checkInCheckOut.findMany({
+      where: {
+        checkOut: true,
+        checkOutStatus: "INPROCESS",
+      },
+      include: {
+        student: true,
+        unit: true,
+      }
+    })
+  }
+
   async insertNewCheckInCheckOutUnit(
     id: string,
     studentId: string,
