@@ -4,7 +4,10 @@ import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentService } from "./StudentService";
 import { Assesment } from "../../models/Assesment";
 import { createErrorObject } from "../../utils";
-import { IPostMiniCex } from "../../utils/interfaces/Assesment";
+import {
+  IPostMiniCex,
+  IPutGradeItemMiniCex,
+} from "../../utils/interfaces/Assesment";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export class AssesmentService {
@@ -14,6 +17,47 @@ export class AssesmentService {
   constructor() {
     this.assesmentModel = new Assesment();
     this.studentService = new StudentService();
+  }
+
+  async addGradeItemToMiniCex(
+    tokenPayload: ITokenPayload,
+    id: string,
+    payload: IPutGradeItemMiniCex
+  ) {
+    const miniCex = await this.assesmentModel.getMiniCexById(id);
+
+    if (!miniCex) {
+      return createErrorObject(404, "mini cex's not found");
+    }
+
+    if (
+      miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.academicSupervisorId !== tokenPayload.supervisorId
+    ) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return this.assesmentModel.insertGradeItemMiniCex(id, payload);
+  }
+
+  async getMiniCexsById(tokenPayload: ITokenPayload, id: string) {
+    const miniCex = await this.assesmentModel.getMiniCexById(id);
+
+    if (!miniCex) {
+      return createErrorObject(404, "mini cex's not found");
+    }
+
+    if (
+      miniCex.studentId !== tokenPayload.studentId &&
+      miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.academicSupervisorId !== tokenPayload.supervisorId
+    ) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return miniCex;
   }
 
   async getScientificAssesmentByStudentId(
