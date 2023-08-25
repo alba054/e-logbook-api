@@ -741,7 +741,7 @@ export class StudentHandler {
         .json(
           createResponse(
             constants.SUCCESS_RESPONSE_MESSAGE,
-            "successfully check in"
+            "successfully check out"
           )
         );
     } catch (error) {

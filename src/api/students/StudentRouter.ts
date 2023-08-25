@@ -74,7 +74,7 @@ export class StudentRouter {
     this.router.post(
       this.path + "/units/check-out",
       AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
-      UnitCheckIn.restrictUnitActiveChanges(),
+      UnitCheckIn.restrictUnitActiveChanges(true),
       this.studentHandler.postCheckOutActiveUnit
     );
 

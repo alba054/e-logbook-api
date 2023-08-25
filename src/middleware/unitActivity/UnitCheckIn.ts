@@ -46,23 +46,35 @@ export class UnitCheckIn {
     };
   }
 
-  static restrictUnitActiveChanges() {
+  static restrictUnitActiveChanges(checkout: boolean = false) {
     return function (req: Request, res: Response, next: NextFunction) {
       UnitCheckIn.checkCheckInStatus()(req, res, () => {
         const { checkedIn } = res.locals;
-        try {
-          if (
-            checkedIn &&
-            checkedIn.checkIn &&
-            checkedIn.checkInStatus !== "UNVERIFIED" &&
-            !checkedIn.checkOut
-          ) {
-            throw new BadRequestError("active unit has been checked in");
-          }
+        let error: Error|null = null;
 
-          return next();
-        } catch (error) {
-          return next(error);
+        if (checkout) {
+          if (
+            !checkedIn ||
+            !checkedIn.checkIn ||
+            checkedIn.checkInStatus === "UNVERIFIED"
+          ) {
+            error = new BadRequestError("active unit not checked in");
+          } else if (checkedIn.checkOut === true) {
+            error = new BadRequestError("already checked out");
+          }
+        } else if (
+          checkedIn &&
+          checkedIn.checkIn &&
+          checkedIn.checkInStatus !== "UNVERIFIED" &&
+          !checkedIn.checkOut
+        ) {
+          error = new BadRequestError("active unit has been checked in");
+        }
+
+        if (error) {
+          next(error);
+        } else {
+          next();
         }
       });
     };
