@@ -2,6 +2,7 @@ import { CheckInCheckOut } from "../../models/CheckInCheckOut";
 import { Student } from "../../models/Student";
 import { v4 as uuidv4 } from "uuid";
 import { StudentDailyActivityService } from "./StudentDailyActivityService";
+import { createErrorObject } from "../../utils";
 
 export class StudentCheckInCheckOutService {
   private studentModel: Student;
@@ -20,6 +21,20 @@ export class StudentCheckInCheckOutService {
       uuidv4(),
       studentId,
       studentActiveUnit?.activeUnit?.id
+    );
+  }
+
+  async studentCheckOutActiveUnit(studentId: string) {
+    const studentActiveUnit = await this.studentModel.getActiveUnit(studentId);
+    const id = studentActiveUnit?.activeUnit?.id
+
+    if (!id) {
+      return createErrorObject(400, "cannot checkout empty unit")
+    }
+
+    return await this.checkInCheckOutModel.updateCheckOutCheckInCheckOutUnit(
+      studentId,
+      id
     );
   }
 

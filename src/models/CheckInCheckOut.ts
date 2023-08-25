@@ -112,6 +112,32 @@ export class CheckInCheckOut {
     }
   }
 
+  // What is this name
+  async updateCheckOutCheckInCheckOutUnit(
+    studentId: string,
+    unitId: string
+  ) {
+    try {
+      return db.checkInCheckOut.updateMany({
+        where: {
+          unitId,
+          studentId,
+        },
+        data: {
+          checkOut: true,
+          checkOutStatus: "INPROCESS",
+          checkOutTime: Math.floor(new Date().getTime() / 1000),
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to update in process checkout");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async getCheckInCheckOutByUnitIdAndStudentId(
     studentId: string,
     unitId: string
