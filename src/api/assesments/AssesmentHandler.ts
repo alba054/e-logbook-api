@@ -13,11 +13,13 @@ import {
   IPostMiniCex,
   IPutGradeItemMiniCex,
   IPutGradeItemMiniCexScore,
+  IPutGradeItemMiniCexScoreV2,
 } from "../../utils/interfaces/Assesment";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import {
   GradeItemMiniCexSchema,
   GradeItemMiniCexScoreSchema,
+  GradeItemMiniCexScoreV2Schema,
   MiniCexPayloadSchema,
 } from "../../validator/assesment/AssesmentSchema";
 import { Validator } from "../../validator/Validator";
@@ -40,6 +42,52 @@ export class AssesmentHandler {
       this.getScientificAssesmentDetail.bind(this);
     this.putScientificAssesmentGradeItemScore =
       this.putScientificAssesmentGradeItemScore.bind(this);
+    this.putMiniCexGradeItemScoreV2 =
+      this.putMiniCexGradeItemScoreV2.bind(this);
+  }
+
+  async putMiniCexGradeItemScoreV2(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { id } = req.params;
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const payload: IPutGradeItemMiniCexScoreV2 = req.body;
+
+    try {
+      const validationResult = this.validator.validate(
+        GradeItemMiniCexScoreV2Schema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        throw new BadRequestError(validationResult.message);
+      }
+
+      const miniCex = await this.assesmentService.scoreMiniCexV2(
+        tokenPayload,
+        id,
+        payload
+      );
+
+      if (miniCex && "error" in miniCex) {
+        switch (miniCex.error) {
+          case 400:
+            throw new BadRequestError(miniCex.message);
+          case 404:
+            throw new NotFoundError(miniCex.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, miniCex));
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async putScientificAssesmentGradeItemScore(

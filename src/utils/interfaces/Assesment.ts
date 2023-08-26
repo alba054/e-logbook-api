@@ -13,3 +13,10 @@ export interface IPutGradeItemMiniCexScore {
     id: number;
   }[];
 }
+
+export interface IPutGradeItemMiniCexScoreV2 {
+  scores: {
+    score: number;
+    name: string;
+  }[];
+}
