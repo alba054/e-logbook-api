@@ -672,7 +672,7 @@ model MiniCexGrade {
 model History {
   id           Int         @id @default(autoincrement())
   type         HistoryType // Bisa merujuk ke UUID pada jenis-jenis riwayat
-  timestamp    DateTime    @default(now())
+  timestamp    BigInt      @db.UnsignedBigInt
   student      Student     @relation(fields: [studentId], references: [id])
   supervisor   Supervisor  @relation(fields: [supervisorId], references: [id])
   attachment   String?     @db.VarChar(100)
