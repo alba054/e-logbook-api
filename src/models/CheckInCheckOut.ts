@@ -12,11 +12,14 @@ export class CheckInCheckOut {
     unitId?: string
   ) {
     try {
+      const lastCheckin = await this.getLastCheckInByUnitIdAndStudentId(studentId ?? "", unitId ?? "", "INPROCESS")
+      if (lastCheckin === null) {
+        return createErrorObject(404, "cannot find last check-in");
+      }
+
       return db.checkInCheckOut.updateMany({
         where: {
-          unitId,
-          studentId,
-          checkInStatus: "INPROCESS",
+          id: lastCheckin.id
         },
         data: {
           checkInStatus: verified ? "VERIFIED" : "UNVERIFIED",
@@ -39,12 +42,14 @@ export class CheckInCheckOut {
     unitId?: string
   ) {
     try {
+      const lastCheckin = await this.getLastCheckInByUnitIdAndStudentId(studentId ?? "", unitId ?? "", "VERIFIED", userId)
+      if (lastCheckin === null) {
+        return createErrorObject(404, "cannot find last check-out");
+      }
+
       return db.checkInCheckOut.updateMany({
         where: {
-          unitId,
-          studentId,
-          userId,
-          checkOutStatus: "INPROCESS",
+          id: lastCheckin.id
         },
         data: {
           checkOutStatus: verified ? "VERIFIED" : "UNVERIFIED",
@@ -52,7 +57,7 @@ export class CheckInCheckOut {
       });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        return createErrorObject(400, "failed to update in process checkin");
+        return createErrorObject(400, "failed to update in process checkout");
       } else {
         return createErrorObject(500);
       }
@@ -114,15 +119,20 @@ export class CheckInCheckOut {
   }
 
   // What is this name
+  // this process student checkout though.
   async updateCheckOutCheckInCheckOutUnit(
     studentId: string,
     unitId: string
   ) {
     try {
+      const lastCheckin = await this.getLastCheckInByUnitIdAndStudentId(studentId, unitId, "VERIFIED")
+      if (lastCheckin === null) {
+        return createErrorObject(404, "cannot find last check-out");
+      }
+
       return db.checkInCheckOut.updateMany({
         where: {
-          unitId,
-          studentId,
+          id: lastCheckin.id
         },
         data: {
           checkOut: true,
@@ -149,5 +159,41 @@ export class CheckInCheckOut {
         studentId,
       },
     });
+  }
+
+  async getLastCheckInByUnitIdAndStudentId(
+    studentId: string,
+    unitId: string,
+    checkInStatus: "VERIFIED" | "UNVERIFIED" | "INPROCESS",
+    userId: string | undefined = undefined
+  ) {
+    return db.checkInCheckOut.findFirst({
+      where: {
+        unitId,
+        studentId,
+        userId,
+        checkInStatus
+      },
+      orderBy: {
+        checkInTime: "desc"
+      }
+    })
+  }
+
+  async getLastCheckOutByUnitIdAndStudentId(
+    studentId: string,
+    unitId: string
+  ) {
+    return db.checkInCheckOut.findFirst({
+      where: {
+        unitId,
+        studentId,
+        checkInStatus: "VERIFIED",
+        checkOut: true
+      },
+      orderBy: {
+        checkOutTime: "desc"
+      },
+    })
   }
 }
