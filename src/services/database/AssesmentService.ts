@@ -8,6 +8,7 @@ import {
   IPostMiniCex,
   IPutGradeItemMiniCex,
   IPutGradeItemMiniCexScore,
+  IPutGradeItemMiniCexScoreV2,
 } from "../../utils/interfaces/Assesment";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
@@ -116,6 +117,43 @@ export class AssesmentService {
         });
       })
     );
+  }
+
+  async scoreMiniCexV2(
+    tokenPayload: ITokenPayload,
+    id: string,
+    payload: IPutGradeItemMiniCexScoreV2
+  ) {
+    const miniCex = await this.assesmentModel.getMiniCexById(id);
+
+    if (!miniCex) {
+      return createErrorObject(404, "mini cex's not found");
+    }
+
+    if (
+      miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.academicSupervisorId !== tokenPayload.supervisorId
+    ) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return db.$transaction([
+      db.miniCexGrade.deleteMany({
+        where: {
+          miniCexId: id,
+        },
+      }),
+      db.miniCexGrade.createMany({
+        data: payload.scores.map((s) => {
+          return {
+            miniCexId: id,
+            score: s.score,
+            name: s.name,
+          };
+        }),
+      }),
+    ]);
   }
 
   async getMiniCexsByStudentIdAndUnitId(tokenPayload: ITokenPayload) {

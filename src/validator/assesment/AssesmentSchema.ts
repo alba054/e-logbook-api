@@ -19,3 +19,14 @@ export const GradeItemMiniCexScoreSchema = Joi.object({
     )
     .min(0),
 });
+
+export const GradeItemMiniCexScoreV2Schema = Joi.object({
+  scores: Joi.array()
+    .items(
+      Joi.object({
+        score: Joi.number().required(),
+        name: Joi.string().required(),
+      })
+    )
+    .min(0),
+});
