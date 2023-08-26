@@ -1,21 +1,21 @@
 import { Router } from "express";
 import { AuthorizationBearer } from "../../middleware/auth/AuthorizationBearer";
 import { constants } from "../../utils";
-import { ScientificAssesmentGradeItemHandler } from "./ScientificAssesmentGradeItemHandler";
+import { PersonalBehaviourGradeItemHandler } from "./PersonalBehaviourGradeItemHandler";
 
-export class ScientificAssesmentGradeItemRouter {
-  private handler: ScientificAssesmentGradeItemHandler;
+export class PersonalBehaviourGradeItemRouter {
+  private handler: PersonalBehaviourGradeItemHandler;
   private path: string;
   private router: Router;
 
   constructor() {
-    this.path = "/scientific-assesment-grade-items";
+    this.path = "/personal-behaviour-grade-items";
     this.router = Router();
-    this.handler = new ScientificAssesmentGradeItemHandler();
+    this.handler = new PersonalBehaviourGradeItemHandler();
   }
 
   register() {
-    // * get all scientific assesment grade items
+    // * get all personal behaviour grade items
     this.router.get(
       this.path,
       AuthorizationBearer.authorize([
@@ -24,21 +24,21 @@ export class ScientificAssesmentGradeItemRouter {
         constants.SUPERVISOR_ROLE,
         constants.DPK_ROLE,
       ]),
-      this.handler.getScientificAssesmentGradeItems
+      this.handler.getPersonalBehaviourGradeItems
     );
-    // * post  scientific assesment grade items
+    // * post  personal behaviour grade items
     this.router.post(
       this.path,
       AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
-      this.handler.postScientificAssesmentGradeItem
+      this.handler.postPersonalBehaviourGradeItem
     );
 
-    // * delete scientific assesment grade items
+    // * delete personal behaviour grade items
     this.router
       .route(this.path + "/:id")
       .delete(
         AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
-        this.handler.deleteScientificAssesmentGradeItem
+        this.handler.deletePersonalBehaviourGradeItem
       );
 
     return this.router;

@@ -171,6 +171,14 @@ export class StudentRouter {
         this.studentHandler.getScientificAssesments
       );
 
+    // * get student personal behaviours
+    this.router
+      .route(this.path + "/personal-behaviours")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getPersonalBehaviours
+      );
+
     return this.router;
   }
 }
