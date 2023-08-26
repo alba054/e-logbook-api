@@ -8,18 +8,21 @@ import {
   IListMiniCex,
   IListScientificAssesment,
   IMiniCexDetail,
+  IPersonalBehaviourDetail,
 } from "../../utils/dto/AssesmentDTO";
 import {
   IPostMiniCex,
   IPutGradeItemMiniCex,
   IPutGradeItemMiniCexScore,
   IPutGradeItemMiniCexScoreV2,
+  IPutGradeItemPersonalBehaviourVerificationStatus,
 } from "../../utils/interfaces/Assesment";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import {
   GradeItemMiniCexSchema,
   GradeItemMiniCexScoreSchema,
   GradeItemMiniCexScoreV2Schema,
+  GradeItemPersonalBehaviourVerificationStatusSchema,
   MiniCexPayloadSchema,
 } from "../../validator/assesment/AssesmentSchema";
 import { Validator } from "../../validator/Validator";
@@ -44,6 +47,125 @@ export class AssesmentHandler {
       this.putScientificAssesmentGradeItemScore.bind(this);
     this.putMiniCexGradeItemScoreV2 =
       this.putMiniCexGradeItemScoreV2.bind(this);
+    this.getPersonalBehaviours = this.getPersonalBehaviours.bind(this);
+    this.getPersonalBehaviourDetail =
+      this.getPersonalBehaviourDetail.bind(this);
+    this.putVerificationStatusPersonalBehaviourGradeItem =
+      this.putVerificationStatusPersonalBehaviourGradeItem.bind(this);
+  }
+
+  async putVerificationStatusPersonalBehaviourGradeItem(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { id } = req.params;
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const payload: IPutGradeItemPersonalBehaviourVerificationStatus = req.body;
+
+    try {
+      const validationResult = this.validator.validate(
+        GradeItemPersonalBehaviourVerificationStatusSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        throw new BadRequestError(validationResult.message);
+      }
+
+      const miniCex =
+        await this.assesmentService.verifyPersonalBehaviourGradeItem(
+          tokenPayload,
+          id,
+          payload
+        );
+
+      if (miniCex && "error" in miniCex) {
+        switch (miniCex.error) {
+          case 400:
+            throw new BadRequestError(miniCex.message);
+          case 404:
+            throw new NotFoundError(miniCex.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, miniCex));
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getPersonalBehaviourDetail(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { id } = req.params;
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    try {
+      const miniCex = await this.assesmentService.getPersonalBehaviourById(
+        tokenPayload,
+        id
+      );
+
+      if (miniCex && "error" in miniCex) {
+        switch (miniCex.error) {
+          case 400:
+            throw new BadRequestError(miniCex.message);
+          case 404:
+            throw new NotFoundError(miniCex.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          id: miniCex.miniCexId,
+          studentId: miniCex.Student?.studentId,
+          studentName: miniCex.Student?.fullName,
+          scores: miniCex.PersonalBehaviour?.PersonalBehaviourGrade.map((g) => {
+            return {
+              name: g.gradeItem.name,
+              verificationStatus: g.verificationStatus,
+              id: g.id,
+              type: g.gradeItem.personalBehaviourGradeType,
+            };
+          }),
+        } as IPersonalBehaviourDetail)
+      );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getPersonalBehaviours(req: Request, res: Response, next: NextFunction) {
+    const { studentId } = req.params;
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    const personalBehaviours =
+      await this.assesmentService.getPersonalBehavioursByStudentId(
+        tokenPayload,
+        studentId
+      );
+
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        personalBehaviours.map((p) => {
+          return {
+            id: p?.personalBehaviourId,
+            studentId: p?.Student?.studentId,
+            studentName: p?.Student?.fullName,
+          } as IListScientificAssesment;
+        })
+      )
+    );
   }
 
   async putMiniCexGradeItemScoreV2(
@@ -339,11 +461,16 @@ export class AssesmentHandler {
       );
 
     return res.status(200).json(
-      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-        id: scientificAssesment?.scientificAssesmentId,
-        studentId: scientificAssesment?.Student?.studentId,
-        studentName: scientificAssesment?.Student?.fullName,
-      } as IListScientificAssesment)
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        scientificAssesment.map((s) => {
+          return {
+            id: s?.scientificAssesmentId,
+            studentId: s?.Student?.studentId,
+            studentName: s?.Student?.fullName,
+          } as IListScientificAssesment;
+        })
+      )
     );
   }
 

@@ -539,10 +539,39 @@ model Assesment {
   type                  AssesmentType
   MiniCex               MiniCex?             @relation(fields: [miniCexId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ScientificAssesment   ScientificAssesment? @relation(fields: [scientificAssesmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  PersonalBehaviour     PersonalBehaviour?   @relation(fields: [personalBehaviourId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   miniCexId             String?              @unique @db.VarChar(100)
   scientificAssesmentId String?              @unique @db.VarChar(100)
+  personalBehaviourId   String?              @unique @db.VarChar(100)
 
   @@map("assesments")
+}
+
+model PersonalBehaviour {
+  id                     String                   @id @db.VarChar(100)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @default(now()) @updatedAt
+  assesmentId            String?                  @db.VarChar(100)
+  Assesment              Assesment?
+  PersonalBehaviourGrade PersonalBehaviourGrade[]
+
+  @@map("personal_behaviours")
+}
+
+model PersonalBehaviourGradeItem {
+  id                         Int                        @id @default(autoincrement())
+  name                       String                     @db.VarChar(255)
+  personalBehaviourGradeType PersonalBehaviourGradeType
+  PersonalBehaviourGrade     PersonalBehaviourGrade[]
+}
+
+model PersonalBehaviourGrade {
+  id                           Int                        @id @default(autoincrement())
+  verificationStatus           VerificationStatus         @default(INPROCESS)
+  gradeItem                    PersonalBehaviourGradeItem @relation(fields: [personalBehaviourGradeItemId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  PersonalBehaviour            PersonalBehaviour?         @relation(fields: [personalBehaviourId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  personalBehaviourId          String?                    @db.VarChar(100)
+  personalBehaviourGradeItemId Int
 }
 
 model MiniCex {
@@ -606,6 +635,17 @@ enum ScientificGradeType {
   SAJIAN
   CARA_PENYAJIAN
   DISKUSI
+}
+
+enum PersonalBehaviourGradeType {
+  ALTRUISM
+  HONOR_INTEGRITY
+  CARING_COMPASSION
+  RESPECT
+  RESPONSIBILITY
+  ACCOUNTABILITY
+  EXCELLENCE_SCHOLARSHIP
+  LEADERSHIP
 }
 
 enum AssesmentType {

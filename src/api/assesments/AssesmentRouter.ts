@@ -110,6 +110,41 @@ export class AssesmentRouter {
         this.handler.getScientificAssesments
       );
 
+    // * get personal behaviour detail
+    this.router
+      .route(this.path + "/personal-behaviours/:id")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.STUDENT_ROLE,
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.getPersonalBehaviourDetail
+      );
+
+    // * verify each personal behaviour grade item
+    this.router
+      .route(this.path + "/personal-behaviours/:id/items")
+      .put(
+        AuthorizationBearer.authorize([
+          constants.STUDENT_ROLE,
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.putVerificationStatusPersonalBehaviourGradeItem
+      );
+
+    // * get personal behavoiur of spesific student
+    this.router
+      .route(this.path + "/personal-behaviours/students/:studentId")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.getPersonalBehaviours
+      );
+
     return this.router;
   }
 }

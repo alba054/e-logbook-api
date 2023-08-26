@@ -109,6 +109,33 @@ export class StudentHandler {
     this.getDailyActivities = this.getDailyActivities.bind(this);
     this.getMiniCexs = this.getMiniCexs.bind(this);
     this.getScientificAssesments = this.getScientificAssesments.bind(this);
+    this.getPersonalBehaviours = this.getPersonalBehaviours.bind(this);
+  }
+
+  async getPersonalBehaviours(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    const result =
+      await this.assesmentService.getPersonalBehavioursByStudentIdAndUnitId(
+        tokenPayload
+      );
+
+    const student = await this.studentService.getStudentById(
+      tokenPayload.studentId
+    );
+
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        result.map((r) => {
+          return {
+            id: r.scientificAssesmentId,
+            studentId: student?.studentId,
+            studentName: student?.fullName,
+          } as IListScientificAssesment;
+        })
+      )
+    );
   }
 
   async getScientificAssesments(

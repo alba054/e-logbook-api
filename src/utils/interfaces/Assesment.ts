@@ -20,3 +20,7 @@ export interface IPutGradeItemMiniCexScoreV2 {
     name: string;
   }[];
 }
+export interface IPutGradeItemPersonalBehaviourVerificationStatus {
+  id: number;
+  verified: boolean;
+}

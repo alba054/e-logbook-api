@@ -30,3 +30,8 @@ export const GradeItemMiniCexScoreV2Schema = Joi.object({
     )
     .min(0),
 });
+
+export const GradeItemPersonalBehaviourVerificationStatusSchema = Joi.object({
+  id: Joi.number().required(),
+  verified: Joi.boolean().required(),
+});

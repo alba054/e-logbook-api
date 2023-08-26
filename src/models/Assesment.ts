@@ -1,7 +1,79 @@
 import db from "../database";
-import { IPutGradeItemMiniCex } from "../utils/interfaces/Assesment";
+import {
+  IPutGradeItemMiniCex,
+  IPutGradeItemPersonalBehaviourVerificationStatus,
+} from "../utils/interfaces/Assesment";
 
 export class Assesment {
+  async verifyPersonalBehaviourGradeItemVerificationStatus(
+    payload: IPutGradeItemPersonalBehaviourVerificationStatus
+  ) {
+    return db.personalBehaviourGrade.update({
+      where: {
+        id: payload.id,
+      },
+      data: {
+        verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
+      },
+    });
+  }
+
+  async getPersonalBehaviourById(id: string) {
+    return db.assesment.findUnique({
+      where: {
+        personalBehaviourId: id,
+      },
+      include: {
+        Student: true,
+        PersonalBehaviour: {
+          include: {
+            PersonalBehaviourGrade: {
+              include: {
+                gradeItem: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async getPersonalBehavioursByStudentIdAndSupervisorId(
+    studentId: string,
+    supervisorId: string | undefined
+  ) {
+    return db.assesment.findMany({
+      where: {
+        Student: {
+          studentId,
+          OR: [
+            { academicSupervisorId: supervisorId },
+            { examinerSupervisorId: supervisorId },
+            { supervisingSupervisorId: supervisorId },
+          ],
+        },
+        type: "PERSONAL_BEHAVIOUR",
+      },
+      include: {
+        PersonalBehaviour: true,
+        Student: true,
+      },
+    });
+  }
+
+  async getPersonalBehaviourByStudentIdAndUnitId(
+    studentId: string | null | undefined,
+    unitId: string | null | undefined
+  ) {
+    return db.assesment.findMany({
+      where: {
+        studentId,
+        unitId,
+        type: "PERSONAL_BEHAVIOUR",
+      },
+    });
+  }
+
   async getScientificAssesmentsByStudentIdAndUnitId(
     studentId: string | undefined | null,
     unitId: string | undefined | null
@@ -111,7 +183,7 @@ export class Assesment {
     studentId: string,
     supervisorId: string | undefined
   ) {
-    return db.assesment.findFirst({
+    return db.assesment.findMany({
       where: {
         Student: {
           studentId,

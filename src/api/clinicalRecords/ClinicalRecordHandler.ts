@@ -320,7 +320,7 @@ export class ClinicalRecordHandler {
   ) {
     try {
       if (!req.file?.buffer) {
-        throw new BadRequestError("upload file with fieldname attachment");
+        throw new BadRequestError("upload file with fieldname attachments");
       }
 
       const savedFile = UploadFileHelper.uploadFileBuffer(

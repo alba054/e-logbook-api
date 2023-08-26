@@ -9,6 +9,7 @@ import {
   IPutGradeItemMiniCex,
   IPutGradeItemMiniCexScore,
   IPutGradeItemMiniCexScoreV2,
+  IPutGradeItemPersonalBehaviourVerificationStatus,
 } from "../../utils/interfaces/Assesment";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
@@ -19,6 +20,86 @@ export class AssesmentService {
   constructor() {
     this.assesmentModel = new Assesment();
     this.studentService = new StudentService();
+  }
+
+  async getPersonalBehavioursByStudentIdAndUnitId(tokenPayload: ITokenPayload) {
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+
+    return this.assesmentModel.getPersonalBehaviourByStudentIdAndUnitId(
+      tokenPayload.studentId,
+      activeUnit?.activeUnit.activeUnit?.id
+    );
+  }
+
+  async verifyPersonalBehaviourGradeItem(
+    tokenPayload: ITokenPayload,
+    id: string,
+    payload: IPutGradeItemPersonalBehaviourVerificationStatus
+  ) {
+    const personalBehaviour =
+      await this.assesmentModel.getPersonalBehaviourById(id);
+
+    if (!personalBehaviour) {
+      return createErrorObject(404, "personal behaviour's not found");
+    }
+
+    if (
+      personalBehaviour?.studentId !== tokenPayload.studentId &&
+      personalBehaviour?.Student?.examinerSupervisorId !==
+        tokenPayload.supervisorId &&
+      personalBehaviour?.Student?.supervisingSupervisorId !==
+        tokenPayload.supervisorId &&
+      personalBehaviour?.Student?.academicSupervisorId !==
+        tokenPayload.supervisorId
+    ) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    if (
+      !personalBehaviour.PersonalBehaviour?.PersonalBehaviourGrade.filter(
+        (p) => p.id === payload.id
+      ).length
+    ) {
+      return createErrorObject(400, "item's not found");
+    }
+
+    return this.assesmentModel.verifyPersonalBehaviourGradeItemVerificationStatus(
+      payload
+    );
+  }
+
+  async getPersonalBehaviourById(tokenPayload: ITokenPayload, id: string) {
+    const miniCex = await this.assesmentModel.getPersonalBehaviourById(id);
+
+    if (!miniCex) {
+      return createErrorObject(404, "personal behaviour's not found");
+    }
+
+    if (
+      miniCex.studentId !== tokenPayload.studentId &&
+      miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.academicSupervisorId !== tokenPayload.supervisorId
+    ) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return miniCex;
+  }
+
+  async getPersonalBehavioursByStudentId(
+    tokenPayload: ITokenPayload,
+    studentId: string
+  ) {
+    const personalBehaviours =
+      await this.assesmentModel.getPersonalBehavioursByStudentIdAndSupervisorId(
+        studentId,
+        tokenPayload.supervisorId
+      );
+
+    return personalBehaviours;
   }
 
   async scoreScientificAssesment(
