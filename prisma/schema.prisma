@@ -64,6 +64,7 @@ model Student {
   CST                     CST[]
   DailyActivity           DailyActivity[]
   Assesment               Assesment[]
+  History                 History[]
 
   @@map("students")
 }
@@ -81,6 +82,7 @@ model Supervisor {
   SglTopic           SglTopic[]
   CstTopic           CstTopic[]
   Activity           Activity[]
+  History            History[]
 
   @@map("supervisors")
 }
@@ -667,6 +669,19 @@ model MiniCexGrade {
   miniCexGradeItemId Int?
 }
 
+model History {
+  id           Int         @id @default(autoincrement())
+  type         HistoryType // Bisa merujuk ke UUID pada jenis-jenis riwayat
+  timestamp    DateTime    @default(now())
+  student      Student     @relation(fields: [studentId], references: [id])
+  supervisor   Supervisor  @relation(fields: [supervisorId], references: [id])
+  attachment   String?     @db.VarChar(100)
+  studentId    String      @db.VarChar(100)
+  supervisorId String      @db.VarChar(100)
+
+  @@index([timestamp(sort: Desc)])
+}
+
 enum ScientificGradeType {
   SAJIAN
   CARA_PENYAJIAN
@@ -731,4 +746,17 @@ enum ActivityStatus {
   SICK
   ATTEND
   NOT_ATTEND
+}
+
+enum HistoryType {
+  SGL // "attachment" SGL
+  CST // "attachment" CST
+  CLINICAL_RECORD // "attachment" ClinicalRecord
+  SCIENTIFIC_SESSION // "attachment" ScientificSession
+  SELF_REFLECTION // "attachment" SelfReflection
+  COMPETENCY // "attachment" Competency
+  ASSESMENT // "attachment" Assesment
+  PROBLEM_CONSULTATION // "attachment" is null
+  CHECK_IN // "attachment" is CheckInCheckOut
+  CHECK_OUT // "attachment" is CheckInCheckOut
 }
