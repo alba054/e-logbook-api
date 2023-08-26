@@ -179,21 +179,4 @@ export class CheckInCheckOut {
       }
     })
   }
-
-  async getLastCheckOutByUnitIdAndStudentId(
-    studentId: string,
-    unitId: string
-  ) {
-    return db.checkInCheckOut.findFirst({
-      where: {
-        unitId,
-        studentId,
-        checkInStatus: "VERIFIED",
-        checkOut: true
-      },
-      orderBy: {
-        checkOutTime: "desc"
-      },
-    })
-  }
 }
