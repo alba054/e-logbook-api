@@ -15,6 +15,26 @@ export class AssesmentRouter {
   }
 
   register() {
+    // * get assesments of student by ceu
+    this.router
+      .route(this.path + "/students/:studentId")
+      .get(
+        AuthorizationBearer.authorize([constants.CEU_BADGE]),
+        this.handler.getStudentAssesments
+      );
+
+    // * get assesments of student by ceu each unit
+    this.router
+      .route(this.path + "/students/:studentId/units/:unitId")
+      .get(
+        AuthorizationBearer.authorize([constants.CEU_BADGE]),
+        this.handler.getStudentAssesmentsUnit
+      )
+      .put(
+        AuthorizationBearer.authorize([constants.CEU_BADGE]),
+        this.handler.putAssesmentScore
+      );
+
     // * post new mini cex by student
     this.router
       .route(this.path + "/mini-cexs")

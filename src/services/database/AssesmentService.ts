@@ -10,16 +10,53 @@ import {
   IPutGradeItemMiniCexScore,
   IPutGradeItemMiniCexScoreV2,
   IPutGradeItemPersonalBehaviourVerificationStatus,
+  IPutStudentAssesmentScore,
 } from "../../utils/interfaces/Assesment";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export class AssesmentService {
-  private studentService: StudentService;
   private assesmentModel: Assesment;
+  private studentService: StudentService;
 
   constructor() {
     this.assesmentModel = new Assesment();
     this.studentService = new StudentService();
+  }
+
+  async scoreOsceOrCBT(
+    studentId: string,
+    unitId: string,
+    payload: IPutStudentAssesmentScore
+  ) {
+    const assesment =
+      await this.assesmentModel.getAssesmentsByStudentIdAndUnitIdAndType(
+        studentId,
+        unitId,
+        payload.type
+      );
+
+    if (payload.type === "CBT") {
+      return this.assesmentModel.scoreCBT(
+        assesment?.cBTId ?? "",
+        payload.score
+      );
+    } else if (payload.type === "OSCE") {
+      return this.assesmentModel.scoreOSCE(
+        assesment?.oSCEId ?? "",
+        payload.score
+      );
+    }
+  }
+
+  async getAssesmentsByStudentIdAndUnitId(studentId: string, unitId: string) {
+    return this.assesmentModel.getAssesmentsByStudentIdAndUnitId(
+      studentId,
+      unitId
+    );
+  }
+
+  async getAssesmentsByStudentId(studentId: string) {
+    return this.assesmentModel.getAssesmentsByStudentId(studentId);
   }
 
   async getPersonalBehavioursByStudentIdAndUnitId(tokenPayload: ITokenPayload) {
