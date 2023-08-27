@@ -54,6 +54,15 @@ export class SglRouter {
         this.handler.getSglTopics
       );
 
+    // * add topic of sgl
+    this.router
+      .route(this.path + "/:id/topics")
+      .put(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        UnitCheckIn.restrictUncheckInActiveUnit(),
+        this.handler.putTopicSgl
+      );
+
     // * verify sgl topic
     this.router
       .route(this.path + "/topics/:topicId")

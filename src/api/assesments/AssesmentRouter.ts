@@ -96,6 +96,14 @@ export class AssesmentRouter {
         this.handler.getAssesmentMiniCexs
       );
 
+    // * post new scientific assesment by student
+    this.router
+      .route(this.path + "/scientific-assesments")
+      .post(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.handler.postAssesmentScientificAsessment
+      );
+
     // * get scientific assesment detail
     this.router
       .route(this.path + "/scientific-assesments/:id")

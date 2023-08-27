@@ -33,6 +33,56 @@ export class CstHandler {
     this.putVerificationStatusCstTopic =
       this.putVerificationStatusCstTopic.bind(this);
     this.putVerificationStatusCst = this.putVerificationStatusCst.bind(this);
+    this.putTopicCst = this.putTopicCst.bind(this);
+  }
+
+  async putTopicCst(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const payload: IPostCST = req.body;
+    const { id } = req.params;
+
+    try {
+      const result = this.validator.validate(CstPayloadSchema, payload);
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      const testError = await this.cstService.addTopicToCst(
+        id,
+        tokenPayload,
+        payload
+      );
+
+      if (testError && "error" in testError) {
+        switch (testError.error) {
+          case 400:
+            throw new BadRequestError(testError.message);
+          case 404:
+            throw new NotFoundError(testError.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully put topic cst"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async putVerificationStatusCst(
