@@ -79,8 +79,8 @@ export class HistoryService {
 
     return {
       type: History.getHistoryName(value.type),
-      studentName: value.student?.fullName ?? "",
-      supervisorName: value.supervisor?.fullname ?? "",
+      studentName: value.student?.fullName ?? null,
+      supervisorName: value.supervisor?.fullname ?? null,
       timestamp: Number(value.timestamp),
       patientName: patientName,
       rating: rating,
