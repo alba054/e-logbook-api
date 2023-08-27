@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentService } from "./StudentService";
 import { Assesment } from "../../models/Assesment";
-import { createErrorObject } from "../../utils";
+import { createErrorObject, getUnixTimestamp } from "../../utils";
 import {
   IPostMiniCex,
   IPutGradeItemMiniCex,
@@ -14,15 +14,18 @@ import {
 } from "../../utils/interfaces/Assesment";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ScientificAssesmentGradeItemService } from "./ScientificAssesmentGradeItemService";
+import { History } from "../../models/History";
 
 export class AssesmentService {
   private assesmentModel: Assesment;
   private studentService: StudentService;
   private scientificAssesmentGradeItemService: ScientificAssesmentGradeItemService;
+  private historyModel: History;
 
   constructor() {
     this.assesmentModel = new Assesment();
     this.studentService = new StudentService();
+    this.historyModel = new History();
     this.scientificAssesmentGradeItemService =
       new ScientificAssesmentGradeItemService();
   }
@@ -400,6 +403,7 @@ export class AssesmentService {
         tokenPayload.studentId ?? ""
       );
       const miniCexId = uuidv4();
+      const assesmentId = uuidv4();
 
       return db.$transaction([
         db.miniCex.create({
@@ -411,13 +415,20 @@ export class AssesmentService {
         }),
         db.assesment.create({
           data: {
-            id: uuidv4(),
+            id: assesmentId,
             type: "MINI_CEX",
             studentId: tokenPayload.studentId,
             unitId: activeUnit?.activeUnit.activeUnit?.id,
             miniCexId,
           },
         }),
+        this.historyModel.insertHistoryAsync(
+          "ASSESMENT",
+          getUnixTimestamp(),
+          tokenPayload.studentId,
+          undefined,
+          assesmentId
+        ),
       ]);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {

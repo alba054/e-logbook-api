@@ -1,6 +1,6 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ScientificSession } from "../../models/ScientificSession";
-import { createErrorObject } from "../../utils";
+import { createErrorObject, getUnixTimestamp } from "../../utils";
 import {
   IPostScientificSessionPayload,
   IPutFeedbackScientificSession,
@@ -12,18 +12,22 @@ import { v4 as uuidv4 } from "uuid";
 import db from "../../database";
 import { Assesment } from "../../models/Assesment";
 import { ScientificAssesmentGradeItemService } from "./ScientificAssesmentGradeItemService";
+import { History } from "../../models/History";
 
 export class ScientificSessionService {
   private studentService: StudentService;
   private scientificSessionModel: ScientificSession;
   private assesmentModel: Assesment;
   private scientificAssesmentGradeItemService: ScientificAssesmentGradeItemService;
+  private historyModel: History;
+
   constructor() {
     this.scientificSessionModel = new ScientificSession();
     this.assesmentModel = new Assesment();
     this.studentService = new StudentService();
     this.scientificAssesmentGradeItemService =
       new ScientificAssesmentGradeItemService();
+    this.historyModel = new History();
   }
 
   async giveFeedbackToScientificSession(
