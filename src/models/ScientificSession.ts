@@ -1,9 +1,16 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
-import { createErrorObject } from "../utils";
+import { createErrorObject, getUnixTimestamp } from "../utils";
 import { IPostScientificSessionPayload } from "../utils/interfaces/ScientificSession";
+import { History } from "./History";
 
 export class ScientificSession {
+  private historyModel: History
+
+  constructor() {
+    this.historyModel = new History();
+  }
+
   async insertSupervisorFeedback(id: string, feedback: string) {
     try {
       return db.scientificSession.update({
@@ -112,21 +119,30 @@ export class ScientificSession {
     unitId?: string
   ) {
     try {
-      return db.scientificSession.create({
-        data: {
-          id,
-          studentId: studentId ?? "",
-          unitId: unitId ?? "",
-          reference: payload.reference,
-          title: payload.title,
-          topic: payload.topic,
-          attachment: payload.attachment,
-          note: payload.notes,
-          supervisorId: payload.supervisorId,
-          sessionTypeId: payload.sessionType,
-          scientificRoleId: payload.role,
-        },
-      });
+      return (await db.$transaction([
+        db.scientificSession.create({
+          data: {
+            id,
+            studentId: studentId ?? "",
+            unitId: unitId ?? "",
+            reference: payload.reference,
+            title: payload.title,
+            topic: payload.topic,
+            attachment: payload.attachment,
+            note: payload.notes,
+            supervisorId: payload.supervisorId,
+            sessionTypeId: payload.sessionType,
+            scientificRoleId: payload.role,
+          },
+        }),
+        this.historyModel.insertHistoryAsync(
+          "SCIENTIFIC_SESSION",
+          getUnixTimestamp(),
+          studentId,
+          payload.supervisorId,
+          id
+        )
+      ]))[0]
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(

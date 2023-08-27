@@ -6,18 +6,21 @@ import {
 } from "../../utils/interfaces/ClinicalRecord";
 import { v4 as uuidv4 } from "uuid";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { createErrorObject } from "../../utils";
+import { createErrorObject, getUnixTimestamp } from "../../utils";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentService } from "./StudentService";
 import { ClinicalRecord } from "../../models/ClinicalRecord";
+import { History } from "../../models/History";
 
 export class ClinicalRecordService {
   private studentService: StudentService;
   private clinicalRecordModel: ClinicalRecord;
+  private historyModel: History
 
   constructor() {
     this.studentService = new StudentService();
     this.clinicalRecordModel = new ClinicalRecord();
+    this.historyModel = new History();
   }
 
   async giveFeedbackToClinicalRecord(
@@ -269,6 +272,13 @@ export class ClinicalRecordService {
         ...examinations,
         ...diagnosiss,
         ...managements,
+        this.historyModel.insertHistoryAsync(
+          "CLINICAL_RECORD",
+          getUnixTimestamp(),
+          tokenPayload.studentId,
+          payload.supervisorId,
+          clinicalRecordId
+        )
       ]);
     } catch (error) {
       console.log(error);
