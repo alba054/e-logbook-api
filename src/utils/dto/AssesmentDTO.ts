@@ -59,6 +59,7 @@ interface IMiniCexGradeItem {
   name: string;
   score: number;
   id: number;
+  type: "SAJIAN" | "CARA_PENYAJIAN" | "DISKUSI";
 }
 
 interface IPersonalBehaviourGradeItem {

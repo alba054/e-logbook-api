@@ -18,6 +18,17 @@ export class CstService {
     this.cstModel = new Cst();
   }
 
+  async getCstsByStudentIdAndUnitId(tokenPayload: ITokenPayload) {
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+
+    return this.cstModel.getCstByStudentIdAndUnitId(
+      tokenPayload.studentId,
+      activeUnit?.activeUnit.activeUnit?.id
+    );
+  }
+
   async addTopicToCst(
     id: string,
     tokenPayload: ITokenPayload,

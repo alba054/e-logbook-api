@@ -7,6 +7,26 @@ import {
 } from "../utils/interfaces/Sgl";
 
 export class Sgl {
+  async getSglsByStudentIdAndUnitId(
+    studentId: string | undefined,
+    unitId: string | undefined
+  ) {
+    return db.sGL.findMany({
+      where: {
+        studentId,
+        unitId,
+      },
+      include: {
+        topics: {
+          include: {
+            topic: true,
+          },
+        },
+        Student: true,
+      },
+    });
+  }
+
   async addTopicToSglById(sglId: string, topicId: string, payload: IPostSGL) {
     try {
       return db.sglTopic.create({

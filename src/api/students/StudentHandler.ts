@@ -47,6 +47,10 @@ import {
   IListScientificAssesment,
   IStudentAssesmentUnit,
 } from "../../utils/dto/AssesmentDTO";
+import { SglService } from "../../services/database/SglService";
+import { ISglDetail, IStudentSgl } from "../../utils/dto/SglDTO";
+import { ICstDetail, IStudentCst } from "../../utils/dto/CstDTO";
+import { CstService } from "../../services/database/CstService";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -65,6 +69,8 @@ export class StudentHandler {
   private dailyActivityService: DailyActivityService;
   private validator: Validator;
   private assesmentService: AssesmentService;
+  private sglService: SglService;
+  private cstService: CstService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -83,6 +89,8 @@ export class StudentHandler {
     this.competencyService = new CompetencyService();
     this.dailyActivityService = new DailyActivityService();
     this.assesmentService = new AssesmentService();
+    this.sglService = new SglService();
+    this.cstService = new CstService();
     this.validator = new Validator();
 
     this.postStudent = this.postStudent.bind(this);
@@ -112,6 +120,70 @@ export class StudentHandler {
     this.getScientificAssesments = this.getScientificAssesments.bind(this);
     this.getPersonalBehaviours = this.getPersonalBehaviours.bind(this);
     this.getAssesmentFinalScore = this.getAssesmentFinalScore.bind(this);
+    this.getSgls = this.getSgls.bind(this);
+    this.getCsts = this.getCsts.bind(this);
+  }
+
+  async getCsts(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    const result = await this.cstService.getCstsByStudentIdAndUnitId(
+      tokenPayload
+    );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentId: result[0]?.Student?.studentId,
+        studentName: result[0]?.Student?.fullName,
+        csts: result.map(
+          (r) =>
+            ({
+              createdAt: r.createdAt,
+              verificationStatus: r.verificationStatus,
+              cstId: r.id,
+              topic: r.topics.map((t) => ({
+                topicName: t.topic.map((n) => n.name),
+                verificationStatus: t.verificationStatus,
+                endTime: Number(t.endTime),
+                notes: t.notes,
+                startTime: Number(t.startTime),
+                id: t.id,
+              })),
+            } as ICstDetail)
+        ),
+      } as IStudentCst)
+    );
+  }
+
+  async getSgls(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    const result = await this.sglService.getSglsByStudentIdAndUnitId(
+      tokenPayload
+    );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentId: result[0]?.Student?.studentId,
+        studentName: result[0]?.Student?.fullName,
+        sgls: result.map(
+          (r) =>
+            ({
+              createdAt: r.createdAt,
+              verificationStatus: r.verificationStatus,
+              sglId: r.id,
+              topic: r.topics.map((t) => ({
+                topicName: t.topic.map((n) => n.name),
+                verificationStatus: t.verificationStatus,
+                endTime: Number(t.endTime),
+                notes: t.notes,
+                startTime: Number(t.startTime),
+                id: t.id,
+              })),
+            } as ISglDetail)
+        ),
+      } as IStudentSgl)
+    );
   }
 
   async getAssesmentFinalScore(

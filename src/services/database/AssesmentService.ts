@@ -13,14 +13,18 @@ import {
   IPutStudentAssesmentScore,
 } from "../../utils/interfaces/Assesment";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { ScientificAssesmentGradeItemService } from "./ScientificAssesmentGradeItemService";
 
 export class AssesmentService {
   private assesmentModel: Assesment;
   private studentService: StudentService;
+  private scientificAssesmentGradeItemService: ScientificAssesmentGradeItemService;
 
   constructor() {
     this.assesmentModel = new Assesment();
     this.studentService = new StudentService();
+    this.scientificAssesmentGradeItemService =
+      new ScientificAssesmentGradeItemService();
   }
 
   async addScientificAssesment(
@@ -31,6 +35,9 @@ export class AssesmentService {
       const activeUnit = await this.studentService.getActiveUnit(
         tokenPayload.studentId ?? ""
       );
+
+      const scientificAssesmentGradeItems =
+        await this.scientificAssesmentGradeItemService.getScientificAssesmentGradeItemByUnitId();
       const scientificAssesmentId = uuidv4();
 
       return db.$transaction([
@@ -39,6 +46,14 @@ export class AssesmentService {
             id: scientificAssesmentId,
             activityLocationId: payload.location,
             title: payload.case,
+            grades: {
+              create: scientificAssesmentGradeItems.map((s) => {
+                return {
+                  scientificAssesmentGradeItemId: s.id,
+                  score: 0,
+                };
+              }),
+            },
           },
         }),
         db.assesment.create({
