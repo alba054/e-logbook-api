@@ -109,15 +109,13 @@ export class History {
     attachment?: string
   ) {
     try {
-      return db.history.create({
-        data: {
-          type,
-          timestamp,
-          studentId,
-          supervisorId,
-          attachment
-        }
-      })
+      return await this.insertHistoryAsync(
+        type,
+        timestamp,
+        studentId,
+        supervisorId,
+        attachment
+      )
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(500, "failed to query history");
@@ -125,6 +123,24 @@ export class History {
         return createErrorObject(500);
       }
     }
+  }
+
+  insertHistoryAsync(
+    type: HistoryType,
+    timestamp: number,
+    studentId: string,
+    supervisorId: string,
+    attachment?: string
+  ) {
+    return db.history.create({
+      data: {
+        type,
+        timestamp,
+        studentId,
+        supervisorId,
+        attachment
+      }
+    })
   }
 
   private static remapStudent(value: string) {
