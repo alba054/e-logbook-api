@@ -5,8 +5,15 @@ import {
   IPostSGL,
   IPutSglTopicVerificationStatus,
 } from "../utils/interfaces/Sgl";
+import { History } from "./History";
 
 export class Sgl {
+  private historyModel: History
+
+  constructor() {
+    this.historyModel = new History();
+  }
+
   async getSglsByStudentIdAndUnitId(
     studentId: string | undefined,
     unitId: string | undefined
@@ -197,27 +204,36 @@ export class Sgl {
     unitId: string | undefined
   ) {
     try {
-      return db.sGL.create({
-        data: {
-          id,
-          studentId,
-          unitId,
-          topics: {
-            create: {
-              id: topicId,
-              endTime: payload.endTime,
-              startTime: payload.startTime,
-              notes: payload.notes,
-              supervisorId: payload.supervisorId,
-              topic: {
-                connect: payload.topicId.map((t) => {
-                  return { id: t };
-                }),
+      return (await db.$transaction([
+        db.sGL.create({
+          data: {
+            id,
+            studentId,
+            unitId,
+            topics: {
+              create: {
+                id: topicId,
+                endTime: payload.endTime,
+                startTime: payload.startTime,
+                notes: payload.notes,
+                supervisorId: payload.supervisorId,
+                topic: {
+                  connect: payload.topicId.map((t) => {
+                    return { id: t };
+                  }),
+                },
               },
             },
           },
-        },
-      });
+        }),
+        this.historyModel.insertHistoryAsync(
+          "SGL",
+          Math.floor(new Date().getTime() / 1000),
+          studentId,
+          payload.supervisorId,
+          id
+        )
+      ]))[0]
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to insert sgl");
