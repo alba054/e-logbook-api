@@ -18,6 +18,17 @@ export class SglService {
     this.sglModel = new Sgl();
   }
 
+  async getSglsByStudentIdAndUnitId(tokenPayload: ITokenPayload) {
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+
+    return this.sglModel.getSglsByStudentIdAndUnitId(
+      tokenPayload.studentId,
+      activeUnit?.activeUnit.activeUnit?.id
+    );
+  }
+
   async addTopicToSgl(
     id: string,
     tokenPayload: ITokenPayload,

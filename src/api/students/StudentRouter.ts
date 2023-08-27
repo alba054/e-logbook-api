@@ -187,6 +187,22 @@ export class StudentRouter {
         this.studentHandler.getPersonalBehaviours
       );
 
+    // * get sgls by student
+    this.router
+      .route(this.path + "/sgls")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getSgls
+      );
+
+    // * get csts by student
+    this.router
+      .route(this.path + "/csts")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getCsts
+      );
+
     return this.router;
   }
 }

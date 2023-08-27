@@ -7,6 +7,26 @@ import {
 } from "../utils/interfaces/Cst";
 
 export class Cst {
+  async getCstByStudentIdAndUnitId(
+    studentId: string | undefined,
+    unitId: string | undefined
+  ) {
+    return db.cST.findMany({
+      where: {
+        studentId,
+        unitId,
+      },
+      include: {
+        topics: {
+          include: {
+            topic: true,
+          },
+        },
+        Student: true,
+      },
+    });
+  }
+
   async addTopicToCstById(cstId: string, topicId: string, payload: IPostCST) {
     try {
       return db.cstTopic.create({

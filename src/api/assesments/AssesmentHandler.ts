@@ -506,6 +506,7 @@ export class AssesmentHandler {
               name: g.gradeItem.name,
               score: g.score,
               id: g.id,
+              type: g.gradeItem.scientificGradeType,
             };
           }),
           grade,
