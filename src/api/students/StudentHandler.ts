@@ -341,6 +341,8 @@ export class StudentHandler {
             id: r.scientificAssesmentId,
             studentId: student?.studentId,
             studentName: student?.fullName,
+            case: r.ScientificAssesment?.title,
+            location: r.ScientificAssesment?.location?.name,
           } as IListScientificAssesment;
         })
       )

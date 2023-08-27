@@ -187,7 +187,11 @@ export class Assesment {
         type: "SCIENTIFIC_ASSESMENT",
       },
       include: {
-        ScientificAssesment: true,
+        ScientificAssesment: {
+          include: {
+            location: true,
+          },
+        },
       },
     });
   }
