@@ -52,7 +52,10 @@ export class HistoryHandler {
 
       return res
         .status(200)
-        .json(result)
+        .json(createResponse(
+          constants.SUCCESS_RESPONSE_MESSAGE,
+          result
+        ))
     } catch (error) {
       next(error)
     }
