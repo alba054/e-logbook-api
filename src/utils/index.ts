@@ -33,6 +33,8 @@ export const generateRandomString = (length: number) => {
   return randomString;
 };
 
+export const getUnixTimestamp = () => Math.floor(new Date().getTime() / 1000);
+
 export const constants = {
   SUCCESS_RESPONSE_MESSAGE: "success",
   FAILED_RESPONSE_MESSAGE: "failed",

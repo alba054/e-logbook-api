@@ -1,6 +1,6 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
-import { createErrorObject } from "../utils";
+import { createErrorObject, getUnixTimestamp } from "../utils";
 import {
   IPostSGL,
   IPutSglTopicVerificationStatus,
@@ -228,7 +228,7 @@ export class Sgl {
         }),
         this.historyModel.insertHistoryAsync(
           "SGL",
-          Math.floor(new Date().getTime() / 1000),
+          getUnixTimestamp(),
           studentId,
           payload.supervisorId,
           id
