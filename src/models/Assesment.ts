@@ -201,6 +201,11 @@ export class Assesment {
         Student: true,
         ScientificAssesment: {
           include: {
+            location: {
+              include: {
+                Activity: true,
+              },
+            },
             grades: {
               include: {
                 gradeItem: true,
@@ -298,7 +303,11 @@ export class Assesment {
         type: "SCIENTIFIC_ASSESMENT",
       },
       include: {
-        ScientificAssesment: true,
+        ScientificAssesment: {
+          include: {
+            location: true,
+          },
+        },
         Student: true,
       },
     });

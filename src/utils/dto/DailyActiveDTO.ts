@@ -31,6 +31,9 @@ export interface ISubmittedActivities {
 }
 
 interface IDailyActivities {
+  attendNum?: number;
+  notAttendNum?: number;
+  sickNum?: number;
   dailyActivityId: string;
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
   weekName: number;
