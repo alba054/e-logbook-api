@@ -31,29 +31,29 @@ model User {
 }
 
 model Student {
-  id                      String              @id @db.VarChar(100)
-  studentId               String              @unique @db.VarChar(25)
-  clinicId                String?             @db.VarChar(25)
-  preClinicId             String?             @db.VarChar(25)
-  graduationDate          Int?                @db.UnsignedInt
-  phoneNumber             String?             @db.VarChar(50)
-  address                 String?             @db.VarChar(255)
-  fullName                String?             @db.VarChar(255)
-  createdAt               DateTime            @default(now())
-  updatedAt               DateTime            @updatedAt
-  activeUnit              Unit?               @relation(fields: [unitId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  academicAdvisor         Supervisor?         @relation(fields: [academicSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "academicSupervisor")
-  supervisingDPK          Supervisor?         @relation(fields: [supervisingSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "supervisingDPK")
-  examinerDPK             Supervisor?         @relation(fields: [examinerSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "examinerDPK")
+  id                      String                @id @db.VarChar(100)
+  studentId               String                @unique @db.VarChar(25)
+  clinicId                String?               @db.VarChar(25)
+  preClinicId             String?               @db.VarChar(25)
+  graduationDate          Int?                  @db.UnsignedInt
+  phoneNumber             String?               @db.VarChar(50)
+  address                 String?               @db.VarChar(255)
+  fullName                String?               @db.VarChar(255)
+  createdAt               DateTime              @default(now())
+  updatedAt               DateTime              @updatedAt
+  activeUnit              Unit?                 @relation(fields: [unitId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  academicAdvisor         Supervisor?           @relation(fields: [academicSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "academicSupervisor")
+  supervisingDPK          Supervisor?           @relation(fields: [supervisingSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "supervisingDPK")
+  examinerDPK             Supervisor?           @relation(fields: [examinerSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "examinerDPK")
   academicSupervisorId    String?
   supervisingSupervisorId String?
   examinerSupervisorId    String?
-  rsStation               String?             @db.VarChar(100)
-  pkmStation              String?             @db.VarChar(100)
-  periodLengthStation     BigInt              @default(0) @db.UnsignedBigInt
+  rsStation               String?               @db.VarChar(100)
+  pkmStation              String?               @db.VarChar(100)
+  periodLengthStation     BigInt                @default(0) @db.UnsignedBigInt
   clinicalRecords         ClinicalRecord[]
   CheckInCheckOut         CheckInCheckOut[]
-  unitId                  String?             @db.VarChar(100)
+  unitId                  String?               @db.VarChar(100)
   User                    User[]
   ScientificSession       ScientificSession[]
   SelfReflection          SelfReflection[]
@@ -64,6 +64,7 @@ model Student {
   CST                     CST[]
   DailyActivity           DailyActivity[]
   Assesment               Assesment[]
+  ProblemConsultation     ProblemConsultation[]
 
   @@map("students")
 }
@@ -107,26 +108,27 @@ model PasswordResetToken {
 }
 
 model Unit {
-  id                String              @id @db.VarChar(100)
-  name              String              @db.VarChar(100)
-  clinicalRecords   ClinicalRecord[]
-  affectedParts     AffectedPart[]
-  examinationTypes  ExaminationType[]
-  DiagnosisType     DiagnosisType[]
-  ManagementType    ManagementType[]
-  CheckInCheckOut   CheckInCheckOut[]
-  Student           Student[]
-  ScientificSession ScientificSession[]
-  SelfReflection    SelfReflection[]
-  Skill             Skill[]
-  Case              Case[]
-  Competency        Competency[]
-  SkillType         SkillType[]
-  CaseType          CaseType[]
-  SGL               SGL[]
-  CST               CST[]
-  DailyActivity     DailyActivity[]
-  Assesment         Assesment[]
+  id                  String                @id @db.VarChar(100)
+  name                String                @db.VarChar(100)
+  clinicalRecords     ClinicalRecord[]
+  affectedParts       AffectedPart[]
+  examinationTypes    ExaminationType[]
+  DiagnosisType       DiagnosisType[]
+  ManagementType      ManagementType[]
+  CheckInCheckOut     CheckInCheckOut[]
+  Student             Student[]
+  ScientificSession   ScientificSession[]
+  SelfReflection      SelfReflection[]
+  Skill               Skill[]
+  Case                Case[]
+  Competency          Competency[]
+  SkillType           SkillType[]
+  CaseType            CaseType[]
+  SGL                 SGL[]
+  CST                 CST[]
+  DailyActivity       DailyActivity[]
+  Assesment           Assesment[]
+  ProblemConsultation ProblemConsultation[]
 
   @@map("units")
 }
@@ -332,6 +334,21 @@ model SelfReflection {
   verificationStatus VerificationStatus @default(INPROCESS)
 
   @@map("self_reflections")
+}
+
+model ProblemConsultation {
+  id                 String             @id @db.VarChar(100)
+  Unit               Unit?              @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId             String?            @db.VarChar(100)
+  createdAt          DateTime           @default(now())
+  problem            String             @db.Text
+  Student            Student?           @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId          String?            @db.VarChar(100)
+  rating             Int?               @default(0) @db.UnsignedTinyInt
+  solution           String?            @db.Text
+  verificationStatus VerificationStatus @default(INPROCESS)
+
+  @@map("problem_consultations")
 }
 
 model Competency {
