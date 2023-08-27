@@ -501,6 +501,8 @@ export class AssesmentHandler {
           id: miniCex.miniCexId,
           studentId: miniCex.Student?.studentId,
           studentName: miniCex.Student?.fullName,
+          case: miniCex.ScientificAssesment?.title,
+          location: miniCex.ScientificAssesment?.location?.name,
           scores: miniCex.ScientificAssesment?.grades.map((g) => {
             return {
               name: g.gradeItem.name,
@@ -675,6 +677,8 @@ export class AssesmentHandler {
             id: s?.scientificAssesmentId,
             studentId: s?.Student?.studentId,
             studentName: s?.Student?.fullName,
+            case: s.ScientificAssesment?.title,
+            location: s.ScientificAssesment?.location?.name,
           } as IListScientificAssesment;
         })
       )

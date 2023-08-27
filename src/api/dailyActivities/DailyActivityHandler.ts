@@ -224,11 +224,20 @@ export class DailyActivityHandler {
       }
       return res.status(200).json(
         createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          unitName: activities[0]?.Unit?.name,
           dailyActivities: activities.map((r) => {
             return {
               verificationStatus: r.verificationStatus,
               weekName: r.weekNum,
               dailyActivityId: r.id,
+              attendNum: r.activities.filter(
+                (a) => a.activityStatus === "ATTEND"
+              ).length,
+              notAttendNum: r.activities.filter(
+                (a) => a.activityStatus === "NOT_ATTEND"
+              ).length,
+              sickNum: r.activities.filter((a) => a.activityStatus === "SICK")
+                .length,
               activitiesStatus: r.activities.map((a) => {
                 return {
                   activityStatus: a.activityStatus,
