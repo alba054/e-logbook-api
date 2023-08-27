@@ -36,6 +36,25 @@ export interface IPersonalBehaviourDetail {
   scores: IPersonalBehaviourGradeItem[];
 }
 
+export interface IListStudentAssesment {
+  studentName: string;
+  studentId: string;
+  unitName: string;
+  unitId: string;
+}
+
+export interface IStudentAssesmentUnit {
+  unitName: string;
+  type:
+    | "MINI_CEX"
+    | "SCIENTIFIC_ASSESMENT"
+    | "PERSONAL_BEHAVIOUR"
+    | "OSCE"
+    | "CBT";
+  score: number;
+  weight: number;
+}
+
 interface IMiniCexGradeItem {
   name: string;
   score: number;

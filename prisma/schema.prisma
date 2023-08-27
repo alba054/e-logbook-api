@@ -540,9 +540,13 @@ model Assesment {
   MiniCex               MiniCex?             @relation(fields: [miniCexId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ScientificAssesment   ScientificAssesment? @relation(fields: [scientificAssesmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   PersonalBehaviour     PersonalBehaviour?   @relation(fields: [personalBehaviourId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  osce                  OSCE?                @relation(fields: [oSCEId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cbt                   CBT?                 @relation(fields: [cBTId], references: [id])
   miniCexId             String?              @unique @db.VarChar(100)
   scientificAssesmentId String?              @unique @db.VarChar(100)
   personalBehaviourId   String?              @unique @db.VarChar(100)
+  oSCEId                String?              @unique @db.VarChar(100)
+  cBTId                 String?              @unique @db.VarChar(100)
 
   @@map("assesments")
 }
@@ -584,8 +588,35 @@ model MiniCex {
   Assesment          Assesment?
   MiniCexGrade       MiniCexGrade[]
   activityLocationId Int?
+  weight             Float             @default(0.25) @db.Float
 
   @@map("mini_cexs")
+}
+
+model OSCE {
+  id          String     @id @db.VarChar(100)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @default(now()) @updatedAt
+  case        String?
+  weight      Float      @default(0.3) @db.Float
+  Assesment   Assesment?
+  assesmentId String?    @db.VarChar(100)
+  score       Float?     @default(0)
+
+  @@map("osces")
+}
+
+model CBT {
+  id          String     @id @db.VarChar(100)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @default(now()) @updatedAt
+  case        String?
+  weight      Float      @default(0.3) @db.Float
+  Assesment   Assesment?
+  score       Float?     @default(0)
+  assesmentId String?    @db.VarChar(100)
+
+  @@map("cbts")
 }
 
 model ScientificAssesment {
@@ -595,6 +626,7 @@ model ScientificAssesment {
   assesmentId String?                    @db.VarChar(100)
   grades      ScientificAssesmentGrade[]
   Assesment   Assesment?
+  weight      Float                      @default(0.15) @db.Float
 
   @@map("scientific_assesments")
 }
@@ -608,7 +640,7 @@ model ScientificAssesmentGradeItem {
 
 model ScientificAssesmentGrade {
   id                             Int                          @id @default(autoincrement())
-  score                          Int                          @db.UnsignedInt
+  score                          Float?                       @db.Float
   gradeItem                      ScientificAssesmentGradeItem @relation(fields: [scientificAssesmentGradeItemId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ScientificAssesment            ScientificAssesment?         @relation(fields: [scientificAssesmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   scientificAssesmentId          String?                      @db.VarChar(100)
@@ -624,7 +656,7 @@ model MiniCexGradeItem {
 model MiniCexGrade {
   id                 Int               @id @default(autoincrement())
   name               String
-  score              Int               @default(0) @db.UnsignedInt
+  score              Float?            @default(0)
   gradeItem          MiniCexGradeItem? @relation(fields: [miniCexGradeItemId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   MiniCex            MiniCex?          @relation(fields: [miniCexId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   miniCexId          String?           @db.VarChar(100)
@@ -652,6 +684,8 @@ enum AssesmentType {
   MINI_CEX
   SCIENTIFIC_ASSESMENT
   PERSONAL_BEHAVIOUR
+  OSCE
+  CBT
 }
 
 enum CompetencyType {

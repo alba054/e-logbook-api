@@ -7,8 +7,10 @@ import { constants, createResponse } from "../../utils";
 import {
   IListMiniCex,
   IListScientificAssesment,
+  IListStudentAssesment,
   IMiniCexDetail,
   IPersonalBehaviourDetail,
+  IStudentAssesmentUnit,
 } from "../../utils/dto/AssesmentDTO";
 import {
   IPostMiniCex,
@@ -16,9 +18,11 @@ import {
   IPutGradeItemMiniCexScore,
   IPutGradeItemMiniCexScoreV2,
   IPutGradeItemPersonalBehaviourVerificationStatus,
+  IPutStudentAssesmentScore,
 } from "../../utils/interfaces/Assesment";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import {
+  AssesmentScoreSchema,
   GradeItemMiniCexSchema,
   GradeItemMiniCexScoreSchema,
   GradeItemMiniCexScoreV2Schema,
@@ -52,6 +56,159 @@ export class AssesmentHandler {
       this.getPersonalBehaviourDetail.bind(this);
     this.putVerificationStatusPersonalBehaviourGradeItem =
       this.putVerificationStatusPersonalBehaviourGradeItem.bind(this);
+    this.getStudentAssesments = this.getStudentAssesments.bind(this);
+    this.getStudentAssesmentsUnit = this.getStudentAssesmentsUnit.bind(this);
+    this.putAssesmentScore = this.putAssesmentScore.bind(this);
+  }
+
+  async putAssesmentScore(req: Request, res: Response, next: NextFunction) {
+    const { studentId, unitId } = req.params;
+    const payload: IPutStudentAssesmentScore = req.body;
+
+    try {
+      const validationResult = this.validator.validate(
+        AssesmentScoreSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        throw new BadRequestError(validationResult.message);
+      }
+
+      await this.assesmentService.scoreOsceOrCBT(studentId, unitId, payload);
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "succesfully score assesment"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getStudentAssesmentsUnit(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { studentId, unitId } = req.params;
+
+    const assesments =
+      await this.assesmentService.getAssesmentsByStudentIdAndUnitId(
+        studentId,
+        unitId
+      );
+
+    let finalScore = 0;
+
+    assesments.forEach((a) => {
+      let grade = 0;
+      if (a.MiniCex) {
+        if (a.MiniCex.MiniCexGrade) {
+          a.MiniCex.MiniCexGrade.forEach((g) => {
+            grade += g.score ?? 0;
+          });
+          grade = grade / a.MiniCex?.MiniCexGrade.length;
+        }
+      }
+
+      if (a.ScientificAssesment) {
+        if (a.ScientificAssesment?.grades) {
+          a.ScientificAssesment?.grades.forEach((g) => {
+            grade += g.score ?? 0;
+          });
+          grade = grade / a.ScientificAssesment?.grades.length;
+        }
+      }
+
+      if (a.osce) {
+        grade = a.osce.score ?? 0;
+      }
+
+      if (a.cbt) {
+        grade = a.cbt.score ?? 0;
+      }
+
+      finalScore =
+        finalScore +
+        grade *
+          (a.MiniCex?.weight ??
+            a.ScientificAssesment?.weight ??
+            a.osce?.weight ??
+            a.cbt?.weight ??
+            0);
+    });
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        finalScore,
+        assesments: assesments.map((a) => {
+          let grade = 0;
+          if (a.MiniCex) {
+            if (a.MiniCex.MiniCexGrade) {
+              a.MiniCex.MiniCexGrade.forEach((g) => {
+                grade += g.score ?? 0;
+              });
+              grade = grade / a.MiniCex?.MiniCexGrade.length;
+            }
+          }
+
+          if (a.ScientificAssesment) {
+            if (a.ScientificAssesment?.grades) {
+              a.ScientificAssesment?.grades.forEach((g) => {
+                grade += g.score ?? 0;
+              });
+              grade = grade / a.ScientificAssesment?.grades.length;
+            }
+          }
+
+          if (a.osce) {
+            grade = a.osce.score ?? 0;
+          }
+
+          if (a.cbt) {
+            grade = a.cbt.score ?? 0;
+          }
+
+          return {
+            type: a.type,
+            weight:
+              a.MiniCex?.weight ??
+              a.ScientificAssesment?.weight ??
+              a.osce?.weight ??
+              a.cbt?.weight ??
+              0,
+            score: grade,
+          } as IStudentAssesmentUnit;
+        }),
+      })
+    );
+  }
+
+  async getStudentAssesments(req: Request, res: Response, next: NextFunction) {
+    const { studentId } = req.params;
+
+    const assesments = await this.assesmentService.getAssesmentsByStudentId(
+      studentId
+    );
+
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        assesments.map((a) => {
+          return {
+            studentId: a.Student?.studentId,
+            studentName: a.Student?.fullName,
+            unitName: a.Unit?.name,
+            unitId: a.Unit?.id,
+          } as IListStudentAssesment;
+        })
+      )
+    );
   }
 
   async putVerificationStatusPersonalBehaviourGradeItem(
@@ -285,7 +442,7 @@ export class AssesmentHandler {
       let grade = 0;
       if (miniCex.ScientificAssesment?.grades) {
         miniCex.ScientificAssesment?.grades.forEach((g) => {
-          grade += g.score;
+          grade += g.score ?? 0;
         });
         grade = grade / miniCex.ScientificAssesment?.grades.length;
       }
@@ -419,7 +576,7 @@ export class AssesmentHandler {
       let grade = 0;
       if (miniCex.MiniCex?.MiniCexGrade) {
         miniCex.MiniCex?.MiniCexGrade.forEach((g) => {
-          grade += g.score;
+          grade += g.score ?? 0;
         });
         grade = grade / miniCex.MiniCex?.MiniCexGrade.length;
       }
