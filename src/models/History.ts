@@ -104,8 +104,8 @@ export class History {
   async insertHistory(
     type: HistoryType,
     timestamp: number,
-    studentId: string,
-    supervisorId: string,
+    studentId?: string,
+    supervisorId?: string,
     attachment?: string
   ) {
     try {
@@ -128,8 +128,8 @@ export class History {
   insertHistoryAsync(
     type: HistoryType,
     timestamp: number,
-    studentId: string,
-    supervisorId: string,
+    studentId?: string,
+    supervisorId?: string,
     attachment?: string
   ) {
     return db.history.create({
