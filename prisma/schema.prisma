@@ -520,10 +520,11 @@ model ActivityName {
 }
 
 model ActivityLocation {
-  id       Int        @id @default(autoincrement())
-  name     String
-  Activity Activity[]
-  MiniCex  MiniCex[]
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  Activity            Activity[]
+  MiniCex             MiniCex[]
+  ScientificAssesment ScientificAssesment[]
 
   @@map("activity_locations")
 }
@@ -620,13 +621,16 @@ model CBT {
 }
 
 model ScientificAssesment {
-  id          String                     @id @db.VarChar(100)
-  createdAt   DateTime                   @default(now())
-  updatedAt   DateTime                   @default(now()) @updatedAt
-  assesmentId String?                    @db.VarChar(100)
-  grades      ScientificAssesmentGrade[]
-  Assesment   Assesment?
-  weight      Float                      @default(0.15) @db.Float
+  id                 String                     @id @db.VarChar(100)
+  title              String?                    @db.VarChar(255)
+  location           ActivityLocation?          @relation(fields: [activityLocationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  activityLocationId Int?
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @default(now()) @updatedAt
+  assesmentId        String?                    @db.VarChar(100)
+  grades             ScientificAssesmentGrade[]
+  Assesment          Assesment?
+  weight             Float                      @default(0.15) @db.Float
 
   @@map("scientific_assesments")
 }

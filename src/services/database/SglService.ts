@@ -18,6 +18,24 @@ export class SglService {
     this.sglModel = new Sgl();
   }
 
+  async addTopicToSgl(
+    id: string,
+    tokenPayload: ITokenPayload,
+    payload: IPostSGL
+  ) {
+    const sgl = await this.sglModel.getSglById(id);
+
+    if (!sgl) {
+      return createErrorObject(404, "sgl's not found");
+    }
+
+    if (sgl.studentId !== tokenPayload.studentId) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return this.sglModel.addTopicToSglById(id, uuidv4(), payload);
+  }
+
   async verifySgl(
     id: string,
     tokenPayload: ITokenPayload,

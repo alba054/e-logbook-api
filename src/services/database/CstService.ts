@@ -18,6 +18,24 @@ export class CstService {
     this.cstModel = new Cst();
   }
 
+  async addTopicToCst(
+    id: string,
+    tokenPayload: ITokenPayload,
+    payload: IPostCST
+  ) {
+    const sgl = await this.cstModel.getCstById(id);
+
+    if (!sgl) {
+      return createErrorObject(404, "cst's not found");
+    }
+
+    if (sgl.studentId !== tokenPayload.studentId) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return this.cstModel.addTopicToCstById(id, uuidv4(), payload);
+  }
+
   async verifyCst(
     id: string,
     tokenPayload: ITokenPayload,

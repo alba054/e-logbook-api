@@ -23,6 +23,43 @@ export class AssesmentService {
     this.studentService = new StudentService();
   }
 
+  async addScientificAssesment(
+    tokenPayload: ITokenPayload,
+    payload: IPostMiniCex
+  ) {
+    try {
+      const activeUnit = await this.studentService.getActiveUnit(
+        tokenPayload.studentId ?? ""
+      );
+      const scientificAssesmentId = uuidv4();
+
+      return db.$transaction([
+        db.scientificAssesment.create({
+          data: {
+            id: scientificAssesmentId,
+            activityLocationId: payload.location,
+            title: payload.case,
+          },
+        }),
+        db.assesment.create({
+          data: {
+            id: uuidv4(),
+            type: "SCIENTIFIC_ASSESMENT",
+            studentId: tokenPayload.studentId,
+            unitId: activeUnit?.activeUnit.activeUnit?.id,
+            scientificAssesmentId,
+          },
+        }),
+      ]);
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to add mini cex assesment");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async scoreOsceOrCBT(
     studentId: string,
     unitId: string,

@@ -59,6 +59,55 @@ export class AssesmentHandler {
     this.getStudentAssesments = this.getStudentAssesments.bind(this);
     this.getStudentAssesmentsUnit = this.getStudentAssesmentsUnit.bind(this);
     this.putAssesmentScore = this.putAssesmentScore.bind(this);
+    this.postAssesmentScientificAsessment =
+      this.postAssesmentScientificAsessment.bind(this);
+  }
+
+  async postAssesmentScientificAsessment(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const payload: IPostMiniCex = req.body;
+
+    try {
+      const validationResult = this.validator.validate(
+        MiniCexPayloadSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        throw new BadRequestError(validationResult.message);
+      }
+
+      const result = await this.assesmentService.addScientificAssesment(
+        tokenPayload,
+        payload
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(201)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully post assesment scientific assesment"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async putAssesmentScore(req: Request, res: Response, next: NextFunction) {
