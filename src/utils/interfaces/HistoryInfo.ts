@@ -4,4 +4,5 @@ export interface IHistoryInfo {
   readonly supervisorName: string;
   readonly timestamp: number;
   readonly patientName: string|null;
+  readonly rating: number|null;
 }

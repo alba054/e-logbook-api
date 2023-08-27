@@ -59,17 +59,19 @@ export class HistoryService {
 
   async processHistoryResult(
     value: HistoryDBObject & {
-      student: Student,
-      supervisor: Supervisor
+      student: Student | null,
+      supervisor: Supervisor | null
     }
   ) {
     let patientName: string|null = null;
+    let rating: number|null = null;
     if (value.type == "CLINICAL_RECORD" && value.attachment) {
       // get patient name
       try {
         const clinicalRecord =
           await this.clinicalRecordModel.getClinicalRecordsById(value.attachment);
         patientName = clinicalRecord?.patientName ?? null;
+        rating = clinicalRecord?.rating ?? null;
       } catch (error) {
         // ignore error for now
       }
@@ -77,10 +79,11 @@ export class HistoryService {
 
     return {
       type: History.getHistoryName(value.type),
-      studentName: value.student.fullName,
-      supervisorName: value.supervisor.fullname,
+      studentName: value.student?.fullName ?? "",
+      supervisorName: value.supervisor?.fullname ?? "",
       timestamp: Number(value.timestamp),
       patientName: patientName,
+      rating: rating,
     } as IHistoryInfo;
   }
 }
