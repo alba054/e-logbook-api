@@ -6,14 +6,21 @@ export class UploadFileHelper {
   static uploadFileBuffer(
     originalName: string,
     filePath: string,
-    buffer: Buffer
+    buffer: Buffer,
+    isOriName?: boolean
   ) {
     if (!fs.existsSync(filePath)) {
       fs.mkdirSync(filePath, { recursive: true });
     }
 
-    const pathToSave = `${filePath}/${uuidv4()}${path.extname(originalName)}`;
-    fs.createWriteStream(pathToSave).write(buffer);
+    let pathToSave = "";
+    if (isOriName) {
+      pathToSave = `${filePath}/${originalName}`;
+      fs.createWriteStream(pathToSave).write(buffer);
+    } else {
+      pathToSave = `${filePath}/${uuidv4()}${path.extname(originalName)}`;
+      fs.createWriteStream(pathToSave).write(buffer);
+    }
 
     return pathToSave;
   }
