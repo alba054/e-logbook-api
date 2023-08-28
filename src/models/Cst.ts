@@ -7,6 +7,56 @@ import {
 } from "../utils/interfaces/Cst";
 
 export class Cst {
+  async getCstByStudentIdAndUnitId(
+    studentId: string | undefined,
+    unitId: string | undefined
+  ) {
+    return db.cST.findMany({
+      where: {
+        studentId,
+        unitId,
+      },
+      include: {
+        topics: {
+          include: {
+            topic: true,
+          },
+        },
+        Student: true,
+      },
+    });
+  }
+
+  async addTopicToCstById(cstId: string, topicId: string, payload: IPostCST) {
+    try {
+      return db.cstTopic.create({
+        data: {
+          id: topicId,
+          endTime: payload.endTime,
+          notes: payload.notes,
+          startTime: payload.startTime,
+          supervisorId: payload.supervisorId,
+          topic: {
+            connect: payload.topicId.map((t) => {
+              return { id: t };
+            }),
+          },
+          CST: {
+            connect: {
+              id: cstId,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to insert cst");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async getCstsByStudentId(studentId: string) {
     return db.cST.findMany({
       where: {

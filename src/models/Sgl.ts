@@ -7,6 +7,52 @@ import {
 } from "../utils/interfaces/Sgl";
 
 export class Sgl {
+  async getSglsByStudentIdAndUnitId(
+    studentId: string | undefined,
+    unitId: string | undefined
+  ) {
+    return db.sGL.findMany({
+      where: {
+        studentId,
+        unitId,
+      },
+      include: {
+        topics: {
+          include: {
+            topic: true,
+          },
+        },
+        Student: true,
+      },
+    });
+  }
+
+  async addTopicToSglById(sglId: string, topicId: string, payload: IPostSGL) {
+    try {
+      return db.sglTopic.create({
+        data: {
+          id: topicId,
+          endTime: payload.endTime,
+          notes: payload.notes,
+          startTime: payload.startTime,
+          supervisorId: payload.supervisorId,
+          topic: {
+            connect: payload.topicId.map((t) => {
+              return { id: t };
+            }),
+          },
+          sGLId: sglId,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to insert sgl");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async getSglsByStudentId(studentId: string) {
     return db.sGL.findMany({
       where: {

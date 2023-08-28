@@ -20,6 +20,8 @@ export interface IListScientificAssesment {
   studentId: string;
   id: string;
   studentName: string;
+  case: string;
+  location: string;
 }
 
 export interface IScientificAssesmentDetail {
@@ -29,9 +31,50 @@ export interface IScientificAssesmentDetail {
   grade: number;
   scores: IMiniCexGradeItem[];
 }
+export interface IPersonalBehaviourDetail {
+  studentId: string;
+  studentName: string;
+  id: string;
+  scores: IPersonalBehaviourGradeItem[];
+}
+
+export interface IListStudentAssesment {
+  studentName: string;
+  studentId: string;
+  unitName: string;
+  unitId: string;
+}
+
+export interface IStudentAssesmentUnit {
+  unitName: string;
+  type:
+    | "MINI_CEX"
+    | "SCIENTIFIC_ASSESMENT"
+    | "PERSONAL_BEHAVIOUR"
+    | "OSCE"
+    | "CBT";
+  score: number;
+  weight: number;
+}
 
 interface IMiniCexGradeItem {
   name: string;
   score: number;
   id: number;
+  type: "SAJIAN" | "CARA_PENYAJIAN" | "DISKUSI";
+}
+
+interface IPersonalBehaviourGradeItem {
+  name: string;
+  verificationStatus: "INPROCESS" | "UNVERIFIED" | "VERIFIED";
+  id: number;
+  type:
+    | "ALTRUISM"
+    | "HONOR_INTEGRITY"
+    | "CARING_COMPASSION"
+    | "RESPECT"
+    | "RESPONSIBILITY"
+    | "ACCOUNTABILITY"
+    | "EXCELLENCE_SCHOLARSHIP"
+    | "LEADERSHIP";
 }

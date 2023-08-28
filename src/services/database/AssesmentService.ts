@@ -8,16 +8,187 @@ import {
   IPostMiniCex,
   IPutGradeItemMiniCex,
   IPutGradeItemMiniCexScore,
+  IPutGradeItemMiniCexScoreV2,
+  IPutGradeItemPersonalBehaviourVerificationStatus,
+  IPutStudentAssesmentScore,
 } from "../../utils/interfaces/Assesment";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { ScientificAssesmentGradeItemService } from "./ScientificAssesmentGradeItemService";
 
 export class AssesmentService {
-  private studentService: StudentService;
   private assesmentModel: Assesment;
+  private studentService: StudentService;
+  private scientificAssesmentGradeItemService: ScientificAssesmentGradeItemService;
 
   constructor() {
     this.assesmentModel = new Assesment();
     this.studentService = new StudentService();
+    this.scientificAssesmentGradeItemService =
+      new ScientificAssesmentGradeItemService();
+  }
+
+  async addScientificAssesment(
+    tokenPayload: ITokenPayload,
+    payload: IPostMiniCex
+  ) {
+    try {
+      const activeUnit = await this.studentService.getActiveUnit(
+        tokenPayload.studentId ?? ""
+      );
+
+      const scientificAssesmentGradeItems =
+        await this.scientificAssesmentGradeItemService.getScientificAssesmentGradeItemByUnitId();
+      const scientificAssesmentId = uuidv4();
+
+      return db.$transaction([
+        db.scientificAssesment.create({
+          data: {
+            id: scientificAssesmentId,
+            activityLocationId: payload.location,
+            title: payload.case,
+            grades: {
+              create: scientificAssesmentGradeItems.map((s) => {
+                return {
+                  scientificAssesmentGradeItemId: s.id,
+                  score: 0,
+                };
+              }),
+            },
+          },
+        }),
+        db.assesment.create({
+          data: {
+            id: uuidv4(),
+            type: "SCIENTIFIC_ASSESMENT",
+            studentId: tokenPayload.studentId,
+            unitId: activeUnit?.activeUnit.activeUnit?.id,
+            scientificAssesmentId,
+          },
+        }),
+      ]);
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to add mini cex assesment");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
+  async scoreOsceOrCBT(
+    studentId: string,
+    unitId: string,
+    payload: IPutStudentAssesmentScore
+  ) {
+    const assesment =
+      await this.assesmentModel.getAssesmentsByStudentIdAndUnitIdAndType(
+        studentId,
+        unitId,
+        payload.type
+      );
+
+    if (payload.type === "CBT") {
+      return this.assesmentModel.scoreCBT(
+        assesment?.cBTId ?? "",
+        payload.score
+      );
+    } else if (payload.type === "OSCE") {
+      return this.assesmentModel.scoreOSCE(
+        assesment?.oSCEId ?? "",
+        payload.score
+      );
+    }
+  }
+
+  async getAssesmentsByStudentIdAndUnitId(studentId: string, unitId: string) {
+    return this.assesmentModel.getAssesmentsByStudentIdAndUnitId(
+      studentId,
+      unitId
+    );
+  }
+
+  async getAssesmentsByStudentId(studentId: string) {
+    return this.assesmentModel.getAssesmentsByStudentId(studentId);
+  }
+
+  async getPersonalBehavioursByStudentIdAndUnitId(tokenPayload: ITokenPayload) {
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+
+    return this.assesmentModel.getPersonalBehaviourByStudentIdAndUnitId(
+      tokenPayload.studentId,
+      activeUnit?.activeUnit.activeUnit?.id
+    );
+  }
+
+  async verifyPersonalBehaviourGradeItem(
+    tokenPayload: ITokenPayload,
+    id: string,
+    payload: IPutGradeItemPersonalBehaviourVerificationStatus
+  ) {
+    const personalBehaviour =
+      await this.assesmentModel.getPersonalBehaviourById(id);
+
+    if (!personalBehaviour) {
+      return createErrorObject(404, "personal behaviour's not found");
+    }
+
+    if (
+      personalBehaviour?.studentId !== tokenPayload.studentId &&
+      personalBehaviour?.Student?.examinerSupervisorId !==
+        tokenPayload.supervisorId &&
+      personalBehaviour?.Student?.supervisingSupervisorId !==
+        tokenPayload.supervisorId &&
+      personalBehaviour?.Student?.academicSupervisorId !==
+        tokenPayload.supervisorId
+    ) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    if (
+      !personalBehaviour.PersonalBehaviour?.PersonalBehaviourGrade.filter(
+        (p) => p.id === payload.id
+      ).length
+    ) {
+      return createErrorObject(400, "item's not found");
+    }
+
+    return this.assesmentModel.verifyPersonalBehaviourGradeItemVerificationStatus(
+      payload
+    );
+  }
+
+  async getPersonalBehaviourById(tokenPayload: ITokenPayload, id: string) {
+    const miniCex = await this.assesmentModel.getPersonalBehaviourById(id);
+
+    if (!miniCex) {
+      return createErrorObject(404, "personal behaviour's not found");
+    }
+
+    if (
+      miniCex.studentId !== tokenPayload.studentId &&
+      miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.academicSupervisorId !== tokenPayload.supervisorId
+    ) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return miniCex;
+  }
+
+  async getPersonalBehavioursByStudentId(
+    tokenPayload: ITokenPayload,
+    studentId: string
+  ) {
+    const personalBehaviours =
+      await this.assesmentModel.getPersonalBehavioursByStudentIdAndSupervisorId(
+        studentId,
+        tokenPayload.supervisorId
+      );
+
+    return personalBehaviours;
   }
 
   async scoreScientificAssesment(
@@ -116,6 +287,43 @@ export class AssesmentService {
         });
       })
     );
+  }
+
+  async scoreMiniCexV2(
+    tokenPayload: ITokenPayload,
+    id: string,
+    payload: IPutGradeItemMiniCexScoreV2
+  ) {
+    const miniCex = await this.assesmentModel.getMiniCexById(id);
+
+    if (!miniCex) {
+      return createErrorObject(404, "mini cex's not found");
+    }
+
+    if (
+      miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.academicSupervisorId !== tokenPayload.supervisorId
+    ) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return db.$transaction([
+      db.miniCexGrade.deleteMany({
+        where: {
+          miniCexId: id,
+        },
+      }),
+      db.miniCexGrade.createMany({
+        data: payload.scores.map((s) => {
+          return {
+            miniCexId: id,
+            score: s.score,
+            name: s.name,
+          };
+        }),
+      }),
+    ]);
   }
 
   async getMiniCexsByStudentIdAndUnitId(tokenPayload: ITokenPayload) {

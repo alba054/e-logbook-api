@@ -46,7 +46,15 @@ import { AssesmentService } from "../../services/database/AssesmentService";
 import {
   IListMiniCex,
   IListScientificAssesment,
+  IStudentAssesmentUnit,
 } from "../../utils/dto/AssesmentDTO";
+import { SglService } from "../../services/database/SglService";
+import { ISglDetail, IStudentSgl } from "../../utils/dto/SglDTO";
+import { ICstDetail, IStudentCst } from "../../utils/dto/CstDTO";
+import { CstService } from "../../services/database/CstService";
+import { ProblemConsultationService } from "../../services/database/ProblemConsultationService";
+import { IStudentProblemConsultations } from "../../utils/dto/ProblemConsultationDTO";
+import { IStudentProfileDTO } from "../../utils/dto/StudentProfileDTO";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -65,6 +73,9 @@ export class StudentHandler {
   private dailyActivityService: DailyActivityService;
   private validator: Validator;
   private assesmentService: AssesmentService;
+  private sglService: SglService;
+  private cstService: CstService;
+  private problemConsultationService: ProblemConsultationService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -83,6 +94,9 @@ export class StudentHandler {
     this.competencyService = new CompetencyService();
     this.dailyActivityService = new DailyActivityService();
     this.assesmentService = new AssesmentService();
+    this.sglService = new SglService();
+    this.cstService = new CstService();
+    this.problemConsultationService = new ProblemConsultationService();
     this.validator = new Validator();
 
     this.postStudent = this.postStudent.bind(this);
@@ -113,6 +127,274 @@ export class StudentHandler {
     this.getDailyActivities = this.getDailyActivities.bind(this);
     this.getMiniCexs = this.getMiniCexs.bind(this);
     this.getScientificAssesments = this.getScientificAssesments.bind(this);
+    this.getPersonalBehaviours = this.getPersonalBehaviours.bind(this);
+    this.getAssesmentFinalScore = this.getAssesmentFinalScore.bind(this);
+    this.getSgls = this.getSgls.bind(this);
+    this.getCsts = this.getCsts.bind(this);
+    this.getStudentProblemConsultations =
+      this.getStudentProblemConsultations.bind(this);
+    this.getStudentProfileByStudentId =
+      this.getStudentProfileByStudentId.bind(this);
+  }
+
+  async getStudentProfileByStudentId(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { studentId } = req.params;
+
+    try {
+      const student = await this.studentService.getStudentByStudentId(
+        studentId
+      );
+
+      if (student && "error" in student) {
+        switch (student.error) {
+          case 400:
+            throw new BadRequestError(student.message);
+          case 404:
+            throw new NotFoundError(student.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          studentId: student.studentId,
+          fullName: student.fullName,
+          address: student.address,
+          email: student.User[0]?.email,
+          phoneNumber: student.phoneNumber,
+        } as IStudentProfileDTO)
+      );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getStudentProblemConsultations(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const problemConsultations =
+      await this.problemConsultationService.getProblemConsultationsByStudentAndUnitId(
+        tokenPayload
+      );
+    const student = await this.userService.getUserByUsername(
+      tokenPayload.username
+    );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentId: student?.student?.studentId,
+        studentName: student?.student?.fullName,
+        listProblemConsultations: problemConsultations.map((c) => {
+          return {
+            content: c.problem,
+            problemConsultationId: c.id,
+            verificationStatus: c.verificationStatus,
+            solution: c.solution,
+          };
+        }),
+      } as IStudentProblemConsultations)
+    );
+  }
+
+  async getCsts(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    const result = await this.cstService.getCstsByStudentIdAndUnitId(
+      tokenPayload
+    );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentId: result[0]?.Student?.studentId,
+        studentName: result[0]?.Student?.fullName,
+        csts: result.map(
+          (r) =>
+            ({
+              createdAt: r.createdAt,
+              verificationStatus: r.verificationStatus,
+              cstId: r.id,
+              topic: r.topics.map((t) => ({
+                topicName: t.topic.map((n) => n.name),
+                verificationStatus: t.verificationStatus,
+                endTime: Number(t.endTime),
+                notes: t.notes,
+                startTime: Number(t.startTime),
+                id: t.id,
+              })),
+            } as ICstDetail)
+        ),
+      } as IStudentCst)
+    );
+  }
+
+  async getSgls(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    const result = await this.sglService.getSglsByStudentIdAndUnitId(
+      tokenPayload
+    );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentId: result[0]?.Student?.studentId,
+        studentName: result[0]?.Student?.fullName,
+        sgls: result.map(
+          (r) =>
+            ({
+              createdAt: r.createdAt,
+              verificationStatus: r.verificationStatus,
+              sglId: r.id,
+              topic: r.topics.map((t) => ({
+                topicName: t.topic.map((n) => n.name),
+                verificationStatus: t.verificationStatus,
+                endTime: Number(t.endTime),
+                notes: t.notes,
+                startTime: Number(t.startTime),
+                id: t.id,
+              })),
+            } as ISglDetail)
+        ),
+      } as IStudentSgl)
+    );
+  }
+
+  async getAssesmentFinalScore(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const student = await this.studentService.getStudentById(
+      tokenPayload.studentId
+    );
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+
+    const assesments =
+      await this.assesmentService.getAssesmentsByStudentIdAndUnitId(
+        student?.studentId ?? "",
+        activeUnit?.activeUnit.activeUnit?.id ?? ""
+      );
+
+    let finalScore = 0;
+
+    assesments.forEach((a) => {
+      let grade = 0;
+      if (a.MiniCex) {
+        if (a.MiniCex.MiniCexGrade) {
+          a.MiniCex.MiniCexGrade.forEach((g) => {
+            grade += g.score ?? 0;
+          });
+          grade = grade / a.MiniCex?.MiniCexGrade.length;
+        }
+      }
+
+      if (a.ScientificAssesment) {
+        if (a.ScientificAssesment?.grades) {
+          a.ScientificAssesment?.grades.forEach((g) => {
+            grade += g.score ?? 0;
+          });
+          grade = grade / a.ScientificAssesment?.grades.length;
+        }
+      }
+
+      if (a.osce) {
+        grade = a.osce.score ?? 0;
+      }
+
+      if (a.cbt) {
+        grade = a.cbt.score ?? 0;
+      }
+
+      finalScore =
+        finalScore +
+        grade *
+          (a.MiniCex?.weight ??
+            a.ScientificAssesment?.weight ??
+            a.osce?.weight ??
+            a.cbt?.weight ??
+            0);
+    });
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        finalScore,
+        assesments: assesments.map((a) => {
+          let grade = 0;
+          if (a.MiniCex) {
+            if (a.MiniCex.MiniCexGrade) {
+              a.MiniCex.MiniCexGrade.forEach((g) => {
+                grade += g.score ?? 0;
+              });
+              grade = grade / a.MiniCex?.MiniCexGrade.length;
+            }
+          }
+
+          if (a.ScientificAssesment) {
+            if (a.ScientificAssesment?.grades) {
+              a.ScientificAssesment?.grades.forEach((g) => {
+                grade += g.score ?? 0;
+              });
+              grade = grade / a.ScientificAssesment?.grades.length;
+            }
+          }
+
+          if (a.osce) {
+            grade = a.osce.score ?? 0;
+          }
+
+          if (a.cbt) {
+            grade = a.cbt.score ?? 0;
+          }
+
+          return {
+            type: a.type,
+            weight:
+              a.MiniCex?.weight ??
+              a.ScientificAssesment?.weight ??
+              a.osce?.weight ??
+              a.cbt?.weight ??
+              0,
+            score: grade,
+          } as IStudentAssesmentUnit;
+        }),
+      })
+    );
+  }
+
+  async getPersonalBehaviours(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    const result =
+      await this.assesmentService.getPersonalBehavioursByStudentIdAndUnitId(
+        tokenPayload
+      );
+
+    const student = await this.studentService.getStudentById(
+      tokenPayload.studentId
+    );
+
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        result.map((r) => {
+          return {
+            id: r.personalBehaviourId,
+            studentId: student?.studentId,
+            studentName: student?.fullName,
+          } as IListScientificAssesment;
+        })
+      )
+    );
   }
 
   async getScientificAssesments(
@@ -139,6 +421,8 @@ export class StudentHandler {
             id: r.scientificAssesmentId,
             studentId: student?.studentId,
             studentName: student?.fullName,
+            case: r.ScientificAssesment?.title,
+            location: r.ScientificAssesment?.location?.name,
           } as IListScientificAssesment;
         })
       )
@@ -157,18 +441,17 @@ export class StudentHandler {
     );
 
     return res.status(200).json(
-      createResponse(
-        constants.SUCCESS_RESPONSE_MESSAGE,
-        result.map((r) => {
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentId: student?.studentId,
+        studentName: student?.fullName,
+        data: result.map((r) => {
           return {
             case: r.MiniCex?.case,
             id: r.miniCexId,
             location: r.MiniCex?.location?.name,
-            studentId: student?.studentId,
-            studentName: student?.fullName,
           } as IListMiniCex;
-        })
-      )
+        }),
+      })
     );
   }
 

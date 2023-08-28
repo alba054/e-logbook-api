@@ -31,29 +31,29 @@ model User {
 }
 
 model Student {
-  id                      String              @id @db.VarChar(100)
-  studentId               String              @unique @db.VarChar(25)
-  clinicId                String?             @db.VarChar(25)
-  preClinicId             String?             @db.VarChar(25)
-  graduationDate          Int?                @db.UnsignedInt
-  phoneNumber             String?             @db.VarChar(50)
-  address                 String?             @db.VarChar(255)
-  fullName                String?             @db.VarChar(255)
-  createdAt               DateTime            @default(now())
-  updatedAt               DateTime            @updatedAt
-  activeUnit              Unit?               @relation(fields: [unitId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  academicAdvisor         Supervisor?         @relation(fields: [academicSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "academicSupervisor")
-  supervisingDPK          Supervisor?         @relation(fields: [supervisingSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "supervisingDPK")
-  examinerDPK             Supervisor?         @relation(fields: [examinerSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "examinerDPK")
+  id                      String                @id @db.VarChar(100)
+  studentId               String                @unique @db.VarChar(25)
+  clinicId                String?               @db.VarChar(25)
+  preClinicId             String?               @db.VarChar(25)
+  graduationDate          Int?                  @db.UnsignedInt
+  phoneNumber             String?               @db.VarChar(50)
+  address                 String?               @db.VarChar(255)
+  fullName                String?               @db.VarChar(255)
+  createdAt               DateTime              @default(now())
+  updatedAt               DateTime              @updatedAt
+  activeUnit              Unit?                 @relation(fields: [unitId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  academicAdvisor         Supervisor?           @relation(fields: [academicSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "academicSupervisor")
+  supervisingDPK          Supervisor?           @relation(fields: [supervisingSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "supervisingDPK")
+  examinerDPK             Supervisor?           @relation(fields: [examinerSupervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "examinerDPK")
   academicSupervisorId    String?
   supervisingSupervisorId String?
   examinerSupervisorId    String?
-  rsStation               String?             @db.VarChar(100)
-  pkmStation              String?             @db.VarChar(100)
-  periodLengthStation     BigInt              @default(0) @db.UnsignedBigInt
+  rsStation               String?               @db.VarChar(100)
+  pkmStation              String?               @db.VarChar(100)
+  periodLengthStation     BigInt                @default(0) @db.UnsignedBigInt
   clinicalRecords         ClinicalRecord[]
   CheckInCheckOut         CheckInCheckOut[]
-  unitId                  String?             @db.VarChar(100)
+  unitId                  String?               @db.VarChar(100)
   User                    User[]
   ScientificSession       ScientificSession[]
   SelfReflection          SelfReflection[]
@@ -64,6 +64,7 @@ model Student {
   CST                     CST[]
   DailyActivity           DailyActivity[]
   Assesment               Assesment[]
+  ProblemConsultation     ProblemConsultation[]
 
   @@map("students")
 }
@@ -107,26 +108,28 @@ model PasswordResetToken {
 }
 
 model Unit {
-  id                String              @id @db.VarChar(100)
-  name              String              @db.VarChar(100)
-  clinicalRecords   ClinicalRecord[]
-  affectedParts     AffectedPart[]
-  examinationTypes  ExaminationType[]
-  DiagnosisType     DiagnosisType[]
-  ManagementType    ManagementType[]
-  CheckInCheckOut   CheckInCheckOut[]
-  Student           Student[]
-  ScientificSession ScientificSession[]
-  SelfReflection    SelfReflection[]
-  Skill             Skill[]
-  Case              Case[]
-  Competency        Competency[]
-  SkillType         SkillType[]
-  CaseType          CaseType[]
-  SGL               SGL[]
-  CST               CST[]
-  DailyActivity     DailyActivity[]
-  Assesment         Assesment[]
+  id                  String                @id @db.VarChar(100)
+  name                String                @db.VarChar(100)
+  clinicalRecords     ClinicalRecord[]
+  affectedParts       AffectedPart[]
+  examinationTypes    ExaminationType[]
+  DiagnosisType       DiagnosisType[]
+  ManagementType      ManagementType[]
+  CheckInCheckOut     CheckInCheckOut[]
+  Student             Student[]
+  ScientificSession   ScientificSession[]
+  SelfReflection      SelfReflection[]
+  Skill               Skill[]
+  Case                Case[]
+  Competency          Competency[]
+  SkillType           SkillType[]
+  CaseType            CaseType[]
+  SGL                 SGL[]
+  CST                 CST[]
+  DailyActivity       DailyActivity[]
+  Assesment           Assesment[]
+  ProblemConsultation ProblemConsultation[]
+  Reference           Reference[]
 
   @@map("units")
 }
@@ -334,6 +337,21 @@ model SelfReflection {
   @@map("self_reflections")
 }
 
+model ProblemConsultation {
+  id                 String             @id @db.VarChar(100)
+  Unit               Unit?              @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId             String?            @db.VarChar(100)
+  createdAt          DateTime           @default(now())
+  problem            String             @db.Text
+  Student            Student?           @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId          String?            @db.VarChar(100)
+  rating             Int?               @default(0) @db.UnsignedTinyInt
+  solution           String?            @db.Text
+  verificationStatus VerificationStatus @default(INPROCESS)
+
+  @@map("problem_consultations")
+}
+
 model Competency {
   id                 String             @id @db.VarChar(100)
   name               String?            @db.VarChar(255)
@@ -520,10 +538,11 @@ model ActivityName {
 }
 
 model ActivityLocation {
-  id       Int        @id @default(autoincrement())
-  name     String
-  Activity Activity[]
-  MiniCex  MiniCex[]
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  Activity            Activity[]
+  MiniCex             MiniCex[]
+  ScientificAssesment ScientificAssesment[]
 
   @@map("activity_locations")
 }
@@ -539,10 +558,43 @@ model Assesment {
   type                  AssesmentType
   MiniCex               MiniCex?             @relation(fields: [miniCexId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ScientificAssesment   ScientificAssesment? @relation(fields: [scientificAssesmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  PersonalBehaviour     PersonalBehaviour?   @relation(fields: [personalBehaviourId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  osce                  OSCE?                @relation(fields: [oSCEId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cbt                   CBT?                 @relation(fields: [cBTId], references: [id])
   miniCexId             String?              @unique @db.VarChar(100)
   scientificAssesmentId String?              @unique @db.VarChar(100)
+  personalBehaviourId   String?              @unique @db.VarChar(100)
+  oSCEId                String?              @unique @db.VarChar(100)
+  cBTId                 String?              @unique @db.VarChar(100)
 
   @@map("assesments")
+}
+
+model PersonalBehaviour {
+  id                     String                   @id @db.VarChar(100)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @default(now()) @updatedAt
+  assesmentId            String?                  @db.VarChar(100)
+  Assesment              Assesment?
+  PersonalBehaviourGrade PersonalBehaviourGrade[]
+
+  @@map("personal_behaviours")
+}
+
+model PersonalBehaviourGradeItem {
+  id                         Int                        @id @default(autoincrement())
+  name                       String                     @db.VarChar(255)
+  personalBehaviourGradeType PersonalBehaviourGradeType
+  PersonalBehaviourGrade     PersonalBehaviourGrade[]
+}
+
+model PersonalBehaviourGrade {
+  id                           Int                        @id @default(autoincrement())
+  verificationStatus           VerificationStatus         @default(INPROCESS)
+  gradeItem                    PersonalBehaviourGradeItem @relation(fields: [personalBehaviourGradeItemId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  PersonalBehaviour            PersonalBehaviour?         @relation(fields: [personalBehaviourId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  personalBehaviourId          String?                    @db.VarChar(100)
+  personalBehaviourGradeItemId Int
 }
 
 model MiniCex {
@@ -555,17 +607,48 @@ model MiniCex {
   Assesment          Assesment?
   MiniCexGrade       MiniCexGrade[]
   activityLocationId Int?
+  weight             Float             @default(0.25) @db.Float
 
   @@map("mini_cexs")
 }
 
-model ScientificAssesment {
-  id          String                     @id @db.VarChar(100)
-  createdAt   DateTime                   @default(now())
-  updatedAt   DateTime                   @default(now()) @updatedAt
-  assesmentId String?                    @db.VarChar(100)
-  grades      ScientificAssesmentGrade[]
+model OSCE {
+  id          String     @id @db.VarChar(100)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @default(now()) @updatedAt
+  case        String?
+  weight      Float      @default(0.3) @db.Float
   Assesment   Assesment?
+  assesmentId String?    @db.VarChar(100)
+  score       Float?     @default(0)
+
+  @@map("osces")
+}
+
+model CBT {
+  id          String     @id @db.VarChar(100)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @default(now()) @updatedAt
+  case        String?
+  weight      Float      @default(0.3) @db.Float
+  Assesment   Assesment?
+  score       Float?     @default(0)
+  assesmentId String?    @db.VarChar(100)
+
+  @@map("cbts")
+}
+
+model ScientificAssesment {
+  id                 String                     @id @db.VarChar(100)
+  title              String?                    @db.VarChar(255)
+  location           ActivityLocation?          @relation(fields: [activityLocationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  activityLocationId Int?
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @default(now()) @updatedAt
+  assesmentId        String?                    @db.VarChar(100)
+  grades             ScientificAssesmentGrade[]
+  Assesment          Assesment?
+  weight             Float                      @default(0.15) @db.Float
 
   @@map("scientific_assesments")
 }
@@ -579,7 +662,7 @@ model ScientificAssesmentGradeItem {
 
 model ScientificAssesmentGrade {
   id                             Int                          @id @default(autoincrement())
-  score                          Int                          @db.UnsignedInt
+  score                          Float?                       @db.Float
   gradeItem                      ScientificAssesmentGradeItem @relation(fields: [scientificAssesmentGradeItemId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ScientificAssesment            ScientificAssesment?         @relation(fields: [scientificAssesmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   scientificAssesmentId          String?                      @db.VarChar(100)
@@ -595,11 +678,20 @@ model MiniCexGradeItem {
 model MiniCexGrade {
   id                 Int               @id @default(autoincrement())
   name               String
-  score              Int               @default(0) @db.UnsignedInt
+  score              Float?            @default(0)
   gradeItem          MiniCexGradeItem? @relation(fields: [miniCexGradeItemId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   MiniCex            MiniCex?          @relation(fields: [miniCexId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   miniCexId          String?           @db.VarChar(100)
   miniCexGradeItemId Int?
+}
+
+model Reference {
+  id     Int     @id @default(autoincrement())
+  file   String? @db.VarChar(255)
+  Unit   Unit?   @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId String? @db.VarChar(100)
+
+  @@map("references")
 }
 
 enum ScientificGradeType {
@@ -608,10 +700,23 @@ enum ScientificGradeType {
   DISKUSI
 }
 
+enum PersonalBehaviourGradeType {
+  ALTRUISM
+  HONOR_INTEGRITY
+  CARING_COMPASSION
+  RESPECT
+  RESPONSIBILITY
+  ACCOUNTABILITY
+  EXCELLENCE_SCHOLARSHIP
+  LEADERSHIP
+}
+
 enum AssesmentType {
   MINI_CEX
   SCIENTIFIC_ASSESMENT
   PERSONAL_BEHAVIOUR
+  OSCE
+  CBT
 }
 
 enum CompetencyType {

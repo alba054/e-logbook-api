@@ -18,6 +18,35 @@ export class CstService {
     this.cstModel = new Cst();
   }
 
+  async getCstsByStudentIdAndUnitId(tokenPayload: ITokenPayload) {
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+
+    return this.cstModel.getCstByStudentIdAndUnitId(
+      tokenPayload.studentId,
+      activeUnit?.activeUnit.activeUnit?.id
+    );
+  }
+
+  async addTopicToCst(
+    id: string,
+    tokenPayload: ITokenPayload,
+    payload: IPostCST
+  ) {
+    const sgl = await this.cstModel.getCstById(id);
+
+    if (!sgl) {
+      return createErrorObject(404, "cst's not found");
+    }
+
+    if (sgl.studentId !== tokenPayload.studentId) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return this.cstModel.addTopicToCstById(id, uuidv4(), payload);
+  }
+
   async verifyCst(
     id: string,
     tokenPayload: ITokenPayload,

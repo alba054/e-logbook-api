@@ -29,6 +29,7 @@ export class StudentRouter {
         AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
         this.studentHandler.putStudentProfile
       );
+
     // * send otp and token for reset password
     this.router.post(
       this.path + "/reset-password",
@@ -146,6 +147,14 @@ export class StudentRouter {
         this.studentHandler.getStudentSelfReflections
       );
 
+    // * get list of self reflections submitted
+    this.router
+      .route(this.path + "/problem-consultations")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getStudentProblemConsultations
+      );
+
     // * get list of cases submitted
     this.router
       .route(this.path + "/cases")
@@ -192,6 +201,46 @@ export class StudentRouter {
       .get(
         AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
         this.studentHandler.getScientificAssesments
+      );
+
+    // * get student assesments final score
+    this.router
+      .route(this.path + "/assesments")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getAssesmentFinalScore
+      );
+
+    // * get student personal behaviours
+    this.router
+      .route(this.path + "/personal-behaviours")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getPersonalBehaviours
+      );
+
+    // * get sgls by student
+    this.router
+      .route(this.path + "/sgls")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getSgls
+      );
+
+    // * get csts by student
+    this.router
+      .route(this.path + "/csts")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getCsts
+      );
+
+    // * get student detail by studentId
+    this.router
+      .route(this.path + "/:studentId")
+      .get(
+        AuthorizationBearer.authorize([constants.SUPERVISOR_ROLE]),
+        this.studentHandler.getStudentProfileByStudentId
       );
 
     return this.router;

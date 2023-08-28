@@ -54,6 +54,15 @@ export class CstRouter {
         this.handler.getCstTopics
       );
 
+    // * add topic of cst
+    this.router
+      .route(this.path + "/:id/topics")
+      .put(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        UnitCheckIn.restrictUncheckInActiveUnit(),
+        this.handler.putTopicCst
+      );
+
     // * verify cst topic
     this.router
       .route(this.path + "/topics/:topicId")

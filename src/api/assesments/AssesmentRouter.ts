@@ -15,6 +15,26 @@ export class AssesmentRouter {
   }
 
   register() {
+    // * get assesments of student by ceu
+    this.router
+      .route(this.path + "/students/:studentId")
+      .get(
+        AuthorizationBearer.authorize([constants.CEU_BADGE]),
+        this.handler.getStudentAssesments
+      );
+
+    // * get assesments of student by ceu each unit
+    this.router
+      .route(this.path + "/students/:studentId/units/:unitId")
+      .get(
+        AuthorizationBearer.authorize([constants.CEU_BADGE]),
+        this.handler.getStudentAssesmentsUnit
+      )
+      .put(
+        AuthorizationBearer.authorize([constants.CEU_BADGE]),
+        this.handler.putAssesmentScore
+      );
+
     // * post new mini cex by student
     this.router
       .route(this.path + "/mini-cexs")
@@ -54,6 +74,17 @@ export class AssesmentRouter {
         this.handler.putMiniCexGradeItemScore
       );
 
+    // * give a score to each mini cex grade item v2
+    this.router
+      .route(this.path + "/mini-cexs/:id/score/v2")
+      .put(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.putMiniCexGradeItemScoreV2
+      );
+
     // * get mini cex of spesific student
     this.router
       .route(this.path + "/mini-cexs/students/:studentId")
@@ -63,6 +94,14 @@ export class AssesmentRouter {
           constants.DPK_ROLE,
         ]),
         this.handler.getAssesmentMiniCexs
+      );
+
+    // * post new scientific assesment by student
+    this.router
+      .route(this.path + "/scientific-assesments")
+      .post(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.handler.postAssesmentScientificAsessment
       );
 
     // * get scientific assesment detail
@@ -97,6 +136,41 @@ export class AssesmentRouter {
           constants.DPK_ROLE,
         ]),
         this.handler.getScientificAssesments
+      );
+
+    // * get personal behaviour detail
+    this.router
+      .route(this.path + "/personal-behaviours/:id")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.STUDENT_ROLE,
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.getPersonalBehaviourDetail
+      );
+
+    // * verify each personal behaviour grade item
+    this.router
+      .route(this.path + "/personal-behaviours/:id/items")
+      .put(
+        AuthorizationBearer.authorize([
+          constants.STUDENT_ROLE,
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.putVerificationStatusPersonalBehaviourGradeItem
+      );
+
+    // * get personal behavoiur of spesific student
+    this.router
+      .route(this.path + "/personal-behaviours/students/:studentId")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.getPersonalBehaviours
       );
 
     return this.router;

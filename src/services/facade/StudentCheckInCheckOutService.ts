@@ -3,15 +3,24 @@ import { Student } from "../../models/Student";
 import { v4 as uuidv4 } from "uuid";
 import { StudentDailyActivityService } from "./StudentDailyActivityService";
 import { createErrorObject } from "../../utils";
+import { studentPersonalBehaviourService } from "./StudentPersonalBehaviourService";
+import { StudentOsceAndCBTService } from "./StudentOsceAndCBTService";
+
 
 export class StudentCheckInCheckOutService {
   private studentModel: Student;
   private checkInCheckOutModel: CheckInCheckOut;
   private studentDailyActivityService: StudentDailyActivityService;
+  private studentPersonalBehaviourService: studentPersonalBehaviourService;
+  studentOsceAndCBTService: StudentOsceAndCBTService;
+
   constructor() {
     this.studentModel = new Student();
     this.checkInCheckOutModel = new CheckInCheckOut();
     this.studentDailyActivityService = new StudentDailyActivityService();
+    this.studentPersonalBehaviourService =
+      new studentPersonalBehaviourService();
+    this.studentOsceAndCBTService = new StudentOsceAndCBTService();
   }
 
   async studentCheckInActiveUnit(studentId: string) {
@@ -56,6 +65,17 @@ export class StudentCheckInCheckOutService {
     );
 
     this.studentDailyActivityService.generateDailyActivity(
+      student?.id,
+      studentActiveUnit?.activeUnit?.id
+    );
+
+    this.studentPersonalBehaviourService.generatePersonalBehaviourAssesment(
+      student?.id,
+      studentActiveUnit?.activeUnit?.id
+    );
+
+    this.studentOsceAndCBTService.generateOsceAndCBTAssesment(
+      studentId,
       student?.id,
       studentActiveUnit?.activeUnit?.id
     );

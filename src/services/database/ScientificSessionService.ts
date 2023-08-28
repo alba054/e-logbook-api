@@ -137,43 +137,43 @@ export class ScientificSessionService {
       return createErrorObject(400, "scientific session's not for you");
     }
 
-    const scientificAssesment =
-      await this.assesmentModel.getScientificAssesmentByStudentIdAndUnitId(
-        scientificSession.studentId,
-        scientificSession.unitId
-      );
+    // const scientificAssesment =
+    //   await this.assesmentModel.getScientificAssesmentByStudentIdAndUnitId(
+    //     scientificSession.studentId,
+    //     scientificSession.unitId
+    //   );
 
-    const scientificAssesmentId = uuidv4();
-    let scientificAssesmentQuery: any[] = [];
+    // const scientificAssesmentId = uuidv4();
+    // let scientificAssesmentQuery: any[] = [];
 
-    const scientificAssesmentGradeItems =
-      await this.scientificAssesmentGradeItemService.getScientificAssesmentGradeItemByUnitId();
-    if (!scientificAssesment.length) {
-      scientificAssesmentQuery = [
-        db.scientificAssesment.create({
-          data: {
-            id: scientificAssesmentId,
-            grades: {
-              create: scientificAssesmentGradeItems.map((s) => {
-                return {
-                  scientificAssesmentGradeItemId: s.id,
-                  score: 0,
-                };
-              }),
-            },
-          },
-        }),
-        db.assesment.create({
-          data: {
-            id: uuidv4(),
-            type: "SCIENTIFIC_ASSESMENT",
-            scientificAssesmentId,
-            studentId: scientificSession.studentId,
-            unitId: scientificSession.unitId,
-          },
-        }),
-      ];
-    }
+    // const scientificAssesmentGradeItems =
+    //   await this.scientificAssesmentGradeItemService.getScientificAssesmentGradeItemByUnitId();
+    // if (!scientificAssesment.length) {
+    //   scientificAssesmentQuery = [
+    //     db.scientificAssesment.create({
+    //       data: {
+    //         id: scientificAssesmentId,
+    //         grades: {
+    //           create: scientificAssesmentGradeItems.map((s) => {
+    //             return {
+    //               scientificAssesmentGradeItemId: s.id,
+    //               score: 0,
+    //             };
+    //           }),
+    //         },
+    //       },
+    //     }),
+    //     db.assesment.create({
+    //       data: {
+    //         id: uuidv4(),
+    //         type: "SCIENTIFIC_ASSESMENT",
+    //         scientificAssesmentId,
+    //         studentId: scientificSession.studentId,
+    //         unitId: scientificSession.unitId,
+    //       },
+    //     }),
+    //   ];
+    // }
 
     return db.$transaction([
       db.scientificSession.update({
@@ -194,7 +194,7 @@ export class ScientificSessionService {
           scientificSessionDone: payload.verified,
         },
       }),
-      ...scientificAssesmentQuery,
+      // ...scientificAssesmentQuery,
     ]);
   }
 
