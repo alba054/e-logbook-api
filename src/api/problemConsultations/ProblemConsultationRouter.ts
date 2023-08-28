@@ -16,8 +16,8 @@ export class ProblemConsultationRouter {
   }
 
   register() {
-    // * add new self reflection
-    // * get student self reflections
+    // * add new problem consultation
+    // * get student problem consultations
     this.router
       .route(this.path)
       .post(
@@ -33,7 +33,7 @@ export class ProblemConsultationRouter {
         this.handler.getSubmittedProblemConsultations
       );
 
-    // * get student self reflections by supervisor
+    // * get student problem consultations by supervisor
     this.router
       .route(this.path + "/students/:studentId")
       .get(
@@ -44,8 +44,8 @@ export class ProblemConsultationRouter {
         this.handler.getStudentProblemConsultations
       );
 
-    // * verify self reflection
-    // * self reflection detail
+    // * verify problem consultation
+    // * problem consultation detail
     this.router
       .route(this.path + "/:id")
       .put(
@@ -64,7 +64,7 @@ export class ProblemConsultationRouter {
         this.handler.getProblemConsultationDetail
       );
 
-    // * update self reflection
+    // * update problem consultation
     this.router
       .route(this.path + "/:id/update")
       .put(

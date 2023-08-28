@@ -256,16 +256,18 @@ export class ProblemConsultationHandler {
       );
 
     return res.status(200).json(
-      createResponse(
-        constants.SUCCESS_RESPONSE_MESSAGE,
-        ProblemConsultations.map((s) => {
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        listProblemConsultations: ProblemConsultations.map((p) => {
           return {
-            latest: s.createdAt,
-            studentId: s.Student?.studentId,
-            studentName: s.Student?.fullName,
-          } as ISubmittedProblemConsultations;
-        })
-      )
+            content: p.problem,
+            problemConsultationId: p.id,
+            solution: p.solution,
+            verificationStatus: p.verificationStatus,
+            studentName: p.Student?.fullName,
+            studentId: p.Student?.studentId,
+          };
+        }),
+      } as IStudentProblemConsultations)
     );
   }
 

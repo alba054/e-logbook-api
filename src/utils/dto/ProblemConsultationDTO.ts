@@ -24,4 +24,6 @@ interface IListProblemConsultationDTO {
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
   solution: string;
   content: string;
+  studentName?: string;
+  studentId?: string;
 }

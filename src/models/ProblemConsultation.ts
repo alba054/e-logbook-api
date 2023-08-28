@@ -77,7 +77,6 @@ export class ProblemConsultation {
       orderBy: {
         createdAt: "desc",
       },
-      distinct: ["studentId"],
       include: {
         Student: true,
       },
