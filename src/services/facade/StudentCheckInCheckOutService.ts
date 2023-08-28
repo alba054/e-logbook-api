@@ -2,8 +2,10 @@ import { CheckInCheckOut } from "../../models/CheckInCheckOut";
 import { Student } from "../../models/Student";
 import { v4 as uuidv4 } from "uuid";
 import { StudentDailyActivityService } from "./StudentDailyActivityService";
+import { createErrorObject } from "../../utils";
 import { studentPersonalBehaviourService } from "./StudentPersonalBehaviourService";
 import { StudentOsceAndCBTService } from "./StudentOsceAndCBTService";
+
 
 export class StudentCheckInCheckOutService {
   private studentModel: Student;
@@ -28,6 +30,20 @@ export class StudentCheckInCheckOutService {
       uuidv4(),
       studentId,
       studentActiveUnit?.activeUnit?.id
+    );
+  }
+
+  async studentCheckOutActiveUnit(studentId: string) {
+    const studentActiveUnit = await this.studentModel.getActiveUnit(studentId);
+    const id = studentActiveUnit?.activeUnit?.id
+
+    if (!id) {
+      return createErrorObject(400, "cannot checkout empty unit")
+    }
+
+    return await this.checkInCheckOutModel.updateCheckOutCheckInCheckOutUnit(
+      studentId,
+      id
     );
   }
 
@@ -60,6 +76,31 @@ export class StudentCheckInCheckOutService {
 
     this.studentOsceAndCBTService.generateOsceAndCBTAssesment(
       studentId,
+      student?.id,
+      studentActiveUnit?.activeUnit?.id
+    );
+
+    return checkIn;
+  }
+
+  async verifyStudentCheckOut(
+    studentId: string,
+    userId: string,
+    payload: { verified: boolean }
+  ) {
+    const studentActiveUnit = await this.studentModel.getActiveUnitByStudentId(
+      studentId
+    );
+    const student = await this.studentModel.getStudentByStudentId(studentId);
+
+    const checkIn = this.checkInCheckOutModel.verifyInProcessCheckOut(
+      payload.verified,
+      userId,
+      studentActiveUnit?.id,
+      studentActiveUnit?.activeUnit?.id
+    );
+
+    this.studentDailyActivityService.generateDailyActivity(
       student?.id,
       studentActiveUnit?.activeUnit?.id
     );

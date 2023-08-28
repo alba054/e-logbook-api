@@ -71,6 +71,14 @@ export class StudentRouter {
       this.studentHandler.postCheckInActiveUnit
     );
 
+    // * check out current active unit
+    this.router.post(
+      this.path + "/units/check-out",
+      AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+      UnitCheckIn.restrictUnitActiveChanges(true),
+      this.studentHandler.postCheckOutActiveUnit
+    );
+
     // * test authorization for student
     this.router.get(
       this.path + "/test-authorization-student",
@@ -85,11 +93,26 @@ export class StudentRouter {
       this.studentHandler.getAllCheckInsStudent
     );
 
+    // * get all inprocess check outs student
+    // FIXME: ideally checkins and checkouts data should be done in 1 single API response.
+    this.router.get(
+      this.path + "/checkouts",
+      AuthorizationBearer.authorize([constants.HEAD_DIV_BADGE]),
+      this.studentHandler.getAllCheckOutsStudent
+    );
+
     // * verify student inprocess checkin
     this.router.put(
       this.path + "/checkins/:studentId",
       AuthorizationBearer.authorize([constants.HEAD_DIV_BADGE]),
       this.studentHandler.putVerificationCheckIn
+    );
+
+    // * verify student inprocess checkout
+    this.router.put(
+      this.path + "/checkouts/:studentId",
+      AuthorizationBearer.authorize([constants.HEAD_DIV_BADGE]),
+      this.studentHandler.putVerificationCheckOut
     );
 
     // * assign supervisors to student

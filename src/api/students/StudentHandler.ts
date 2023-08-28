@@ -19,6 +19,7 @@ import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentCheckInCheckOutService } from "../../services/facade/StudentCheckInCheckOutService";
 import { IActiveUnitDTO } from "../../utils/dto/ActiveUnitDTO";
 import { IListInProcessCheckInDTO } from "../../utils/dto/StudentCheckInDTO";
+import { IListInProcessCheckOutDTO } from "../../utils/dto/StudentCheckOutDTO";
 import { CheckInCheckOutValidator } from "../../validator/checkInCheckOut/CheckInCheckOutValidator";
 import { CheckInCheckOutService } from "../../services/database/CheckInCheckOutService";
 import { ClinicalRecordService } from "../../services/database/ClinicalRecordService";
@@ -106,8 +107,11 @@ export class StudentHandler {
     this.putActiveUnit = this.putActiveUnit.bind(this);
     this.getActiveUnit = this.getActiveUnit.bind(this);
     this.postCheckInActiveUnit = this.postCheckInActiveUnit.bind(this);
+    this.postCheckOutActiveUnit = this.postCheckOutActiveUnit.bind(this);
     this.getAllCheckInsStudent = this.getAllCheckInsStudent.bind(this);
+    this.getAllCheckOutsStudent = this.getAllCheckOutsStudent.bind(this);
     this.putVerificationCheckIn = this.putVerificationCheckIn.bind(this);
+    this.putVerificationCheckOut = this.putVerificationCheckOut.bind(this);
     this.putStudentProfile = this.putStudentProfile.bind(this);
     this.putStudentSupervisors = this.putStudentSupervisors.bind(this);
     this.getStudentClinicalRecords = this.getStudentClinicalRecords.bind(this);
@@ -862,6 +866,56 @@ export class StudentHandler {
     }
   }
 
+  async putVerificationCheckOut(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const { studentId } = req.params;
+    const payload: { verified: boolean } = req.body;
+
+    try {
+      const validationResult =
+        this.checkInCheckOutValidator.validateCheckInVerificationPayload(
+          payload
+        );
+
+      if (validationResult && "error" in validationResult) {
+        throw new BadRequestError(validationResult.message);
+      }
+
+      const result =
+        await this.studentCheckInCheckOutService.verifyStudentCheckOut(
+          studentId,
+          tokenPayload.userId,
+          payload
+        );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully verify checkout"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
   async getAllCheckInsStudent(req: Request, res: Response, next: NextFunction) {
     const studentCheckIns =
       await this.checkInCheckOutService.getAllCheckInStudents();
@@ -878,6 +932,28 @@ export class StudentHandler {
             unitId: s.unit.id,
             unitName: s.unit.name,
           } as IListInProcessCheckInDTO;
+        })
+      )
+    );
+  }
+
+  async getAllCheckOutsStudent(req: Request, res: Response, next: NextFunction) {
+    const { userId } = res.locals.user as ITokenPayload;
+    const studentCheckIns =
+      await this.checkInCheckOutService.getAllCheckOutStudents(userId);
+
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        studentCheckIns.map((s) => {
+          return {
+            checkOutStatus: s.checkOutStatus,
+            checkOutTime: Number(s.checkOutTime),
+            fullname: s.student.fullName,
+            studentId: s.student.studentId,
+            unitId: s.unit.id,
+            unitName: s.unit.name,
+          } as IListInProcessCheckOutDTO;
         })
       )
     );
@@ -913,6 +989,43 @@ export class StudentHandler {
           createResponse(
             constants.SUCCESS_RESPONSE_MESSAGE,
             "successfully check in"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async postCheckOutActiveUnit(req: Request, res: Response, next: NextFunction) {
+    const { studentId } = res.locals.user as ITokenPayload;
+
+    try {
+      if (!studentId) {
+        throw new InternalServerError();
+      }
+
+      const result =
+        await this.studentCheckInCheckOutService.studentCheckOutActiveUnit(
+          studentId
+        );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(201)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully check out"
           )
         );
     } catch (error) {
