@@ -30,13 +30,6 @@ export class StudentRouter {
         this.studentHandler.putStudentProfile
       );
 
-    // * get student detail by studentId
-    this.router
-      .route(this.path + "/:studentId")
-      .get(
-        AuthorizationBearer.authorize([constants.SUPERVISOR_ROLE]),
-        this.studentHandler.getStudentProfileByStudentId
-      );
     // * send otp and token for reset password
     this.router.post(
       this.path + "/reset-password",
@@ -217,6 +210,14 @@ export class StudentRouter {
       .get(
         AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
         this.studentHandler.getCsts
+      );
+
+    // * get student detail by studentId
+    this.router
+      .route(this.path + "/:studentId")
+      .get(
+        AuthorizationBearer.authorize([constants.SUPERVISOR_ROLE]),
+        this.studentHandler.getStudentProfileByStudentId
       );
 
     return this.router;
