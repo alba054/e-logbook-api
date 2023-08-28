@@ -17,7 +17,11 @@ export class StudentService {
     this.checkInCheckoutModel = new CheckInCheckOut();
   }
 
-  async getStudentBySupervisorId(tokenPayload: ITokenPayload) {
+  async getStudentBySupervisorId(tokenPayload: ITokenPayload, ceu: any) {
+    if (ceu) {
+      return this.studentModel.getAllStudents();
+    }
+
     return this.studentModel.getStudentBySupervisorId(
       tokenPayload.supervisorId
     );

@@ -29,6 +29,14 @@ export class StudentRouter {
         AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
         this.studentHandler.putStudentProfile
       );
+
+    // * get student detail by studentId
+    this.router
+      .route(this.path + "/:studentId")
+      .get(
+        AuthorizationBearer.authorize([constants.SUPERVISOR_ROLE]),
+        this.studentHandler.getStudentProfileByStudentId
+      );
     // * send otp and token for reset password
     this.router.post(
       this.path + "/reset-password",
@@ -121,6 +129,14 @@ export class StudentRouter {
       .get(
         AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
         this.studentHandler.getStudentSelfReflections
+      );
+
+    // * get list of self reflections submitted
+    this.router
+      .route(this.path + "/problem-consultations")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getStudentProblemConsultations
       );
 
     // * get list of cases submitted

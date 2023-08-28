@@ -51,6 +51,9 @@ import { SglService } from "../../services/database/SglService";
 import { ISglDetail, IStudentSgl } from "../../utils/dto/SglDTO";
 import { ICstDetail, IStudentCst } from "../../utils/dto/CstDTO";
 import { CstService } from "../../services/database/CstService";
+import { ProblemConsultationService } from "../../services/database/ProblemConsultationService";
+import { IStudentProblemConsultations } from "../../utils/dto/ProblemConsultationDTO";
+import { IStudentProfileDTO } from "../../utils/dto/StudentProfileDTO";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -71,6 +74,7 @@ export class StudentHandler {
   private assesmentService: AssesmentService;
   private sglService: SglService;
   private cstService: CstService;
+  private problemConsultationService: ProblemConsultationService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -91,6 +95,7 @@ export class StudentHandler {
     this.assesmentService = new AssesmentService();
     this.sglService = new SglService();
     this.cstService = new CstService();
+    this.problemConsultationService = new ProblemConsultationService();
     this.validator = new Validator();
 
     this.postStudent = this.postStudent.bind(this);
@@ -122,6 +127,77 @@ export class StudentHandler {
     this.getAssesmentFinalScore = this.getAssesmentFinalScore.bind(this);
     this.getSgls = this.getSgls.bind(this);
     this.getCsts = this.getCsts.bind(this);
+    this.getStudentProblemConsultations =
+      this.getStudentProblemConsultations.bind(this);
+    this.getStudentProfileByStudentId =
+      this.getStudentProfileByStudentId.bind(this);
+  }
+
+  async getStudentProfileByStudentId(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { studentId } = req.params;
+
+    try {
+      const student = await this.studentService.getStudentByStudentId(
+        studentId
+      );
+
+      if (student && "error" in student) {
+        switch (student.error) {
+          case 400:
+            throw new BadRequestError(student.message);
+          case 404:
+            throw new NotFoundError(student.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          studentId: student.studentId,
+          fullName: student.fullName,
+          address: student.address,
+          email: student.User[0]?.email,
+          phoneNumber: student.phoneNumber
+        } as IStudentProfileDTO)
+      );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getStudentProblemConsultations(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const problemConsultations =
+      await this.problemConsultationService.getProblemConsultationsByStudentAndUnitId(
+        tokenPayload
+      );
+    const student = await this.userService.getUserByUsername(
+      tokenPayload.username
+    );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentId: student?.student?.studentId,
+        studentName: student?.student?.fullName,
+        listProblemConsultations: problemConsultations.map((c) => {
+          return {
+            content: c.problem,
+            problemConsultationId: c.id,
+            verificationStatus: c.verificationStatus,
+            solution: c.solution,
+          };
+        }),
+      } as IStudentProblemConsultations)
+    );
   }
 
   async getCsts(req: Request, res: Response, next: NextFunction) {
