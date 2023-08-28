@@ -162,7 +162,7 @@ export class StudentHandler {
           fullName: student.fullName,
           address: student.address,
           email: student.User[0]?.email,
-          phoneNumber: student.phoneNumber
+          phoneNumber: student.phoneNumber,
         } as IStudentProfileDTO)
       );
     } catch (error) {
@@ -437,18 +437,17 @@ export class StudentHandler {
     );
 
     return res.status(200).json(
-      createResponse(
-        constants.SUCCESS_RESPONSE_MESSAGE,
-        result.map((r) => {
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentId: student?.studentId,
+        studentName: student?.fullName,
+        data: result.map((r) => {
           return {
             case: r.MiniCex?.case,
             id: r.miniCexId,
             location: r.MiniCex?.location?.name,
-            studentId: student?.studentId,
-            studentName: student?.fullName,
           } as IListMiniCex;
-        })
-      )
+        }),
+      })
     );
   }
 
