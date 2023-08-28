@@ -76,7 +76,8 @@ export class ReferenceHandler {
       const savedFile = UploadFileHelper.uploadFileBuffer(
         req.file.originalname,
         constants.REFERENCE_PATH,
-        req.file.buffer
+        req.file.buffer,
+        true
       );
 
       await this.referenceService.uploadReferenceByUnitId(savedFile, unitId);
