@@ -13,12 +13,12 @@ export class CheckInCheckOut {
     try {
       return db.checkInCheckOut.updateMany({
         where: {
-          studentId,
+          student: { studentId },
           unitId,
         },
         data: {
           countCheckIn: {
-            increment: 1,
+            increment: count,
           },
         },
       });

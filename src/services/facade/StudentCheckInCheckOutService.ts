@@ -100,7 +100,7 @@ export class StudentCheckInCheckOutService {
     );
 
     if (checkIn) {
-      this.checkInCheckOutModel.updateCheckInCounterByUnitIdAndStudentId(
+      await this.checkInCheckOutModel.updateCheckInCounterByUnitIdAndStudentId(
         studentId,
         studentActiveUnit?.activeUnit?.id ?? "",
         1
