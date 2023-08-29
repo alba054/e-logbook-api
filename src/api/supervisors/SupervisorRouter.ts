@@ -44,6 +44,7 @@ export class SupervisorRouter {
         AuthorizationBearer.authorize([
           constants.SUPERVISOR_ROLE,
           constants.DPK_ROLE,
+          constants.ER_ROLE,
         ]),
         this.supervisorHandler.getSupervisorStudents
       );
