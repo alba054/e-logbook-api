@@ -290,7 +290,7 @@ export class StudentHandler {
     assesments.forEach((a) => {
       let grade = 0;
       if (a.MiniCex) {
-        if (a.MiniCex.MiniCexGrade) {
+        if (a.MiniCex.MiniCexGrade.length) {
           a.MiniCex.MiniCexGrade.forEach((g) => {
             grade += g.score ?? 0;
           });
