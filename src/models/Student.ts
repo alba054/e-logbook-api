@@ -10,7 +10,11 @@ export class Student {
   constructor() {}
 
   async getAllStudents() {
-    return db.student.findMany();
+    return db.student.findMany({
+      include: {
+        activeUnit: true,
+      },
+    });
   }
 
   async getStudentBySupervisorId(supervisorId: string | undefined) {
@@ -21,6 +25,9 @@ export class Student {
           { academicSupervisorId: supervisorId },
           { examinerSupervisorId: supervisorId },
         ],
+      },
+      include: {
+        activeUnit: true,
       },
     });
   }

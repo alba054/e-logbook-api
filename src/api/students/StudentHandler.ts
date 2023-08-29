@@ -937,7 +937,11 @@ export class StudentHandler {
     );
   }
 
-  async getAllCheckOutsStudent(req: Request, res: Response, next: NextFunction) {
+  async getAllCheckOutsStudent(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     const { userId } = res.locals.user as ITokenPayload;
     const studentCheckIns =
       await this.checkInCheckOutService.getAllCheckOutStudents(userId);
@@ -996,7 +1000,11 @@ export class StudentHandler {
     }
   }
 
-  async postCheckOutActiveUnit(req: Request, res: Response, next: NextFunction) {
+  async postCheckOutActiveUnit(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     const { studentId } = res.locals.user as ITokenPayload;
 
     try {
@@ -1050,6 +1058,7 @@ export class StudentHandler {
           unitName: result?.activeUnit.activeUnit?.name,
           checkInTime: Number(result?.checkInCheckOutUnit?.checkInTime),
           checkOutTime: Number(result?.checkInCheckOutUnit?.checkOutTime),
+          countCheckIn: result?.checkInCheckOutUnit?.countCheckIn,
         } as IActiveUnitDTO)
       );
     } catch (error) {
