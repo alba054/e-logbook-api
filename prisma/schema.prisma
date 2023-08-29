@@ -65,6 +65,7 @@ model Student {
   DailyActivity           DailyActivity[]
   Assesment               Assesment[]
   ProblemConsultation     ProblemConsultation[]
+  WeekAssesment           WeekAssesment[]
 
   @@map("students")
 }
@@ -130,6 +131,7 @@ model Unit {
   Assesment           Assesment[]
   ProblemConsultation ProblemConsultation[]
   Reference           Reference[]
+  WeekAssesment       WeekAssesment[]
 
   @@map("units")
 }
@@ -693,6 +695,19 @@ model Reference {
   unitId String? @db.VarChar(100)
 
   @@map("references")
+}
+
+model WeekAssesment {
+  id                 String             @id @db.VarChar(100)
+  Student            Student?           @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId          String?            @db.VarChar(100)
+  Unit               Unit?              @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId             String?            @db.VarChar(100)
+  verificationStatus VerificationStatus @default(INPROCESS)
+  weekNum            Int                @db.UnsignedInt
+  score              Float              @db.Float
+
+  @@map("weekly_assesments")
 }
 
 enum ScientificGradeType {
