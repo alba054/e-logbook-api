@@ -38,18 +38,21 @@ export class CheckInCheckOut {
     unitId?: string
   ) {
     try {
-      const lastCheckin = await this.getLastCheckInByUnitIdAndStudentId(
-        studentId ?? "",
-        unitId ?? "",
-        "INPROCESS"
-      );
-      if (lastCheckin === null) {
-        return createErrorObject(404, "cannot find last check-in");
-      }
+      // const lastCheckin = await this.getLastCheckInByUnitIdAndStudentId(
+      //   studentId ?? "",
+      //   unitId ?? "",
+      //   "INPROCESS"
+      // );
+      // if (lastCheckin === null) {
+      //   return createErrorObject(404, "cannot find last check-in");
+      // }
 
       return db.checkInCheckOut.updateMany({
         where: {
-          id: lastCheckin.id,
+          student: {
+            studentId,
+          },
+          unitId,
         },
         data: {
           checkInStatus: verified ? "VERIFIED" : "UNVERIFIED",

@@ -55,6 +55,8 @@ import { CstService } from "../../services/database/CstService";
 import { ProblemConsultationService } from "../../services/database/ProblemConsultationService";
 import { IStudentProblemConsultations } from "../../utils/dto/ProblemConsultationDTO";
 import { IStudentProfileDTO } from "../../utils/dto/StudentProfileDTO";
+import { WeeklyAssesmentService } from "../../services/database/WeeklyAssesmentService";
+import { IStudentWeeklyAssesment } from "../../utils/dto/WeeklyAssesmentDTO";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -76,6 +78,7 @@ export class StudentHandler {
   private sglService: SglService;
   private cstService: CstService;
   private problemConsultationService: ProblemConsultationService;
+  private weeklyAssesmentService: WeeklyAssesmentService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -97,6 +100,7 @@ export class StudentHandler {
     this.sglService = new SglService();
     this.cstService = new CstService();
     this.problemConsultationService = new ProblemConsultationService();
+    this.weeklyAssesmentService = new WeeklyAssesmentService();
     this.validator = new Validator();
 
     this.postStudent = this.postStudent.bind(this);
@@ -135,6 +139,59 @@ export class StudentHandler {
       this.getStudentProblemConsultations.bind(this);
     this.getStudentProfileByStudentId =
       this.getStudentProfileByStudentId.bind(this);
+    this.getStudentWeeklyAssesments =
+      this.getStudentWeeklyAssesments.bind(this);
+  }
+
+  async getStudentWeeklyAssesments(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+    const student = await this.studentService.getStudentById(
+      tokenPayload.studentId
+    );
+
+    const weeklyAssesment =
+      await this.weeklyAssesmentService.getWeeklyAssesmentByStudentIdAndUnitId(
+        student?.studentId ?? "",
+        activeUnit?.activeUnit.activeUnit?.id ?? ""
+      );
+
+    const dailyActivities =
+      await this.dailyActivityService.getDailyActivitiesByStudentNimAndUnitId(
+        student?.studentId ?? "",
+        activeUnit?.activeUnit.activeUnit?.id ?? ""
+      );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentName: weeklyAssesment[0]?.Student?.fullName,
+        studentId: weeklyAssesment[0]?.Student?.studentId,
+        assesments: weeklyAssesment.map((w) => {
+          return {
+            attendNum: dailyActivities
+              .find((a) => a.weekNum === w.weekNum)
+              ?.activities.filter((a) => a.activityStatus === "ATTEND").length,
+            notAttendNum: dailyActivities
+              .find((a) => a.weekNum === w.weekNum)
+              ?.activities.filter(
+                (a) =>
+                  a.activityStatus === "NOT_ATTEND" ||
+                  a.activityStatus === "SICK"
+              ).length,
+            score: w.score,
+            verificationStatus: w.verificationStatus,
+            weekNum: w.weekNum,
+            id: w.id,
+          };
+        }),
+      } as IStudentWeeklyAssesment)
+    );
   }
 
   async getStudentProfileByStudentId(

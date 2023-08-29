@@ -18,6 +18,19 @@ export class DailyActivityService {
     this.studentService = new StudentService();
   }
 
+  async getDailyActivitiesByStudentNimAndUnitId(
+    studentId: string,
+    unitId: string
+  ) {
+    const dailyActivities =
+      await this.dailyActivityModel.getDailyActivitiesByStudentIdAndUnitId(
+        studentId,
+        unitId
+      );
+
+    return dailyActivities;
+  }
+
   async verifyDailyActivities(
     studentId: string,
     tokenPayload: ITokenPayload,
