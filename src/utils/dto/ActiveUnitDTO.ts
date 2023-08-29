@@ -5,4 +5,5 @@ export interface IActiveUnitDTO {
   checkOutStatus: "VERIFIED" | "INPROCESS" | "UNVERIFIED";
   checkInTime: number;
   checkOutTime: number;
+  countCheckIn?: number;
 }

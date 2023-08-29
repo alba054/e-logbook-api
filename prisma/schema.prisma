@@ -140,6 +140,7 @@ model CheckInCheckOut {
   checkOut              Boolean?
   checkInTime           BigInt?             @db.UnsignedBigInt
   checkOutTime          BigInt?             @db.UnsignedBigInt
+  countCheckIn          Int                 @default(0) @db.UnsignedInt
   checkInStatus         VerificationStatus  @default(INPROCESS)
   checkOutStatus        VerificationStatus?
   createdAt             DateTime            @default(now())

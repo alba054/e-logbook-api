@@ -6,7 +6,6 @@ import { createErrorObject } from "../../utils";
 import { studentPersonalBehaviourService } from "./StudentPersonalBehaviourService";
 import { StudentOsceAndCBTService } from "./StudentOsceAndCBTService";
 
-
 export class StudentCheckInCheckOutService {
   private studentModel: Student;
   private checkInCheckOutModel: CheckInCheckOut;
@@ -35,10 +34,10 @@ export class StudentCheckInCheckOutService {
 
   async studentCheckOutActiveUnit(studentId: string) {
     const studentActiveUnit = await this.studentModel.getActiveUnit(studentId);
-    const id = studentActiveUnit?.activeUnit?.id
+    const id = studentActiveUnit?.activeUnit?.id;
 
     if (!id) {
-      return createErrorObject(400, "cannot checkout empty unit")
+      return createErrorObject(400, "cannot checkout empty unit");
     }
 
     return await this.checkInCheckOutModel.updateCheckOutCheckInCheckOutUnit(
@@ -97,11 +96,6 @@ export class StudentCheckInCheckOutService {
       payload.verified,
       userId,
       studentActiveUnit?.id,
-      studentActiveUnit?.activeUnit?.id
-    );
-
-    this.studentDailyActivityService.generateDailyActivity(
-      student?.id,
       studentActiveUnit?.activeUnit?.id
     );
 

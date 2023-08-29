@@ -71,6 +71,20 @@ export class StudentService {
   }
 
   async setActiveUnit(studentId: string, payload: IPutStudentActiveUnit) {
+    const checkIn =
+      await this.checkInCheckoutModel.getCheckInCheckOutByUnitIdAndStudentId(
+        studentId,
+        payload.unitId
+      );
+
+    if (checkIn) {
+      this.checkInCheckoutModel.updateCheckInCounterByUnitIdAndStudentId(
+        studentId,
+        payload.unitId,
+        1
+      );
+    }
+
     return this.studentModel.updateStudentActiveUnitByStudentId(
       studentId,
       payload
