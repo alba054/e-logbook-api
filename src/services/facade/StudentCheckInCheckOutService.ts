@@ -92,12 +92,20 @@ export class StudentCheckInCheckOutService {
     );
     const student = await this.studentModel.getStudentByStudentId(studentId);
 
-    const checkIn = this.checkInCheckOutModel.verifyInProcessCheckOut(
+    const checkIn = await this.checkInCheckOutModel.verifyInProcessCheckOut(
       payload.verified,
       userId,
       studentActiveUnit?.id,
       studentActiveUnit?.activeUnit?.id
     );
+
+    if (checkIn) {
+      this.checkInCheckOutModel.updateCheckInCounterByUnitIdAndStudentId(
+        studentId,
+        studentActiveUnit?.activeUnit?.id ?? "",
+        1
+      );
+    }
 
     return checkIn;
   }
