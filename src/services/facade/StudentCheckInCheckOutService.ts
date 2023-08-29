@@ -59,7 +59,7 @@ export class StudentCheckInCheckOutService {
     const checkIn = this.checkInCheckOutModel.verifyInProcessCheckIn(
       payload.verified,
       userId,
-      studentActiveUnit?.id,
+      studentId,
       studentActiveUnit?.activeUnit?.id
     );
 
