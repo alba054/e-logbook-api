@@ -10,6 +10,7 @@ import { IStudentWeeklyAssesment } from "../../utils/dto/WeeklyAssesmentDTO";
 import { IPutWeeklyAssesmentScore } from "../../utils/interfaces/WeeklyAssesment";
 import { AssesmentScoreSchema } from "../../validator/assesment/AssesmentSchema";
 import { Validator } from "../../validator/Validator";
+import { WeeklyAssesmentScorePayloadSchema } from "../../validator/weeklyAssesment/WeeklyAssesmentSchema";
 
 export class WeeklyAssesmentHandler {
   private weeklyAssesmentService: WeeklyAssesmentService;
@@ -57,7 +58,7 @@ export class WeeklyAssesmentHandler {
 
     try {
       const validationResult = this.validator.validate(
-        AssesmentScoreSchema,
+        WeeklyAssesmentScorePayloadSchema,
         payload
       );
 
