@@ -2,15 +2,19 @@ import { Assesment } from "../../models/Assesment";
 import { v4 as uuidv4 } from "uuid";
 import { PersonalBehaviourGradeItemService } from "../database/PersonalBehaviourGradeItemService";
 import db from "../../database";
+import { History } from "../../models/History";
+import { getUnixTimestamp } from "../../utils";
 
 export class studentPersonalBehaviourService {
   private assesmentModel: Assesment;
   private personalBehaviourGradeItemService: PersonalBehaviourGradeItemService;
+  private historyModel: History;
 
   constructor() {
     this.assesmentModel = new Assesment();
     this.personalBehaviourGradeItemService =
       new PersonalBehaviourGradeItemService();
+    this.historyModel = new History();
   }
 
   async generatePersonalBehaviourAssesment(
@@ -29,6 +33,7 @@ export class studentPersonalBehaviourService {
     const personalBehaviourGradeItems =
       await this.personalBehaviourGradeItemService.getPersonalBehaviourGradeItemByUnitId();
     if (!personalBehaviour.length) {
+      const assesmentId = uuidv4();
       personalBehaviourQuery = [
         db.personalBehaviour.create({
           data: {
@@ -44,13 +49,20 @@ export class studentPersonalBehaviourService {
         }),
         db.assesment.create({
           data: {
-            id: uuidv4(),
+            id: assesmentId,
             type: "PERSONAL_BEHAVIOUR",
             personalBehaviourId,
             studentId: studentId,
             unitId: unitId,
           },
         }),
+        this.historyModel.insertHistoryAsync(
+          "ASSESMENT",
+          getUnixTimestamp(),
+          studentId,
+          undefined,
+          assesmentId
+        )
       ];
     }
 

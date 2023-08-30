@@ -1,9 +1,14 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
-import { createErrorObject } from "../utils";
+import { createErrorObject, getUnixTimestamp } from "../utils";
+import { History } from "./History";
 
 export class CheckInCheckOut {
-  constructor() {}
+  private historyModel: History;
+
+  constructor() {
+    this.historyModel = new History();
+  }
 
   async updateCheckInCounterByUnitIdAndStudentId(
     studentId: string,
@@ -38,16 +43,7 @@ export class CheckInCheckOut {
     unitId?: string
   ) {
     try {
-      // const lastCheckin = await this.getLastCheckInByUnitIdAndStudentId(
-      //   studentId ?? "",
-      //   unitId ?? "",
-      //   "INPROCESS"
-      // );
-      // if (lastCheckin === null) {
-      //   return createErrorObject(404, "cannot find last check-in");
-      // }
-
-      return db.checkInCheckOut.updateMany({
+      const result = await db.checkInCheckOut.updateMany({
         where: {
           student: {
             studentId,
@@ -58,7 +54,21 @@ export class CheckInCheckOut {
           checkInStatus: verified ? "VERIFIED" : "UNVERIFIED",
           userId,
         },
-      });
+      })
+
+      if (verified) {
+        try {
+          await this.historyModel.insertHistory(
+            "CHECK_IN",
+            getUnixTimestamp(),
+            studentId,
+            undefined,
+            undefined
+          );
+        } catch (error) {}
+      }
+
+      return result
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to update in process checkin");

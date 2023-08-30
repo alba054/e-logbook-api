@@ -1,13 +1,20 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
-import { createErrorObject } from "../utils";
+import { createErrorObject, getUnixTimestamp } from "../utils";
 import {
   IPostSelfReflection,
   IPutSelfReflection,
   IPutSelfReflectionVerificationStatus,
 } from "../utils/interfaces/SelfReflection";
+import { History } from "./History";
 
 export class SelfReflection {
+  private historyModel: History;
+
+  constructor() {
+    this.historyModel = new History();
+  }
+
   async updateSelfReflectionById(id: string, payload: IPutSelfReflection) {
     return db.selfReflection.update({
       where: {
@@ -104,14 +111,23 @@ export class SelfReflection {
     unitId?: string
   ) {
     try {
-      return db.selfReflection.create({
-        data: {
-          content: payload.content,
-          id,
+      return (await db.$transaction([
+        db.selfReflection.create({
+          data: {
+            content: payload.content,
+            id,
+            studentId,
+            unitId,
+          },
+        }),
+        this.historyModel.insertHistoryAsync(
+          "SELF_REFLECTION",
+          getUnixTimestamp(),
           studentId,
-          unitId,
-        },
-      });
+          undefined,
+          id
+        )
+      ]))[0]
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to insert self reflection");

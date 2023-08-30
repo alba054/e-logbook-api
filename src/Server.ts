@@ -29,6 +29,7 @@ import { DailyActivityRouter } from "./api/dailyActivities/DailyActivityRouter";
 import { AssesmentRouter } from "./api/assesments/AssesmentRouter";
 import { ScientificAssesmentGradeItemRouter } from "./api/scientificAssesmentGradeItems/ScientificAssesmentGradeItemRouter";
 import { PersonalBehaviourGradeItemRouter } from "./api/personalBehaviourGradeItems/PersonalBehaviourGradeItemRouter";
+import { HistoryRouter } from "./api/history/HistoryRouter";
 import { ProblemConsultationRouter } from "./api/problemConsultations/ProblemConsultationRouter";
 import { ReferenceRouter } from "./api/reference/ReferenceRouter";
 import { WeeklyAssesmentRouter } from "./api/weeklyAssesment/WeeklyAssesmentRouter";
@@ -85,6 +86,7 @@ class Server {
     this.app.use("/api", new AssesmentRouter().register());
     this.app.use("/api", new ScientificAssesmentGradeItemRouter().register());
     this.app.use("/api", new PersonalBehaviourGradeItemRouter().register());
+    this.app.use("/api", new HistoryRouter().register());
     this.app.use("/api", new ProblemConsultationRouter().register());
     this.app.use("/api", new ReferenceRouter().register());
     this.app.use("/api", new WeeklyAssesmentRouter().register());

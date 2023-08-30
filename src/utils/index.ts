@@ -33,6 +33,8 @@ export const generateRandomString = (length: number) => {
   return randomString;
 };
 
+export const getUnixTimestamp = () => Math.floor(new Date().getTime() / 1000);
+
 export const constants = {
   SUCCESS_RESPONSE_MESSAGE: "success",
   FAILED_RESPONSE_MESSAGE: "failed",
@@ -56,5 +58,6 @@ export const constants = {
   ABS_PATH: process.env.ABS_PATH,
   PROFILE_PIC_PATH: "storage/user-pic/",
   ASSESMENT_DOC_PATH: "storage/assesment/",
+  HISTORY_ELEMENTS_PER_PAGE: 25
   REFERENCE_PATH: "storage/reference/",
 };
