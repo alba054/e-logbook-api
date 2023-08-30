@@ -34,6 +34,34 @@ export class UserHandler {
     this.deleteUserProfilePic = this.deleteUserProfilePic.bind(this);
     this.getUserProfilePicByUserId = this.getUserProfilePicByUserId.bind(this);
     this.getAllUsers = this.getAllUsers.bind(this);
+    this.deleteUserById = this.deleteUserById.bind(this);
+  }
+
+  async deleteUserById(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+
+    try {
+      const result = await this.userService.deleteUserById(id);
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "deleted user")
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getAllUsers(req: Request, res: Response, next: NextFunction) {

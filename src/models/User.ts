@@ -6,6 +6,14 @@ import { IPutUserProfile } from "../utils/interfaces/User";
 export class User {
   constructor() {}
 
+  async deleteUserById(id: string) {
+    return db.user.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
   async getAllUsers() {
     return db.user.findMany({
       select: {

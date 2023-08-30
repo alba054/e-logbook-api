@@ -109,6 +109,13 @@ export class UserRouter {
         this.userHandler.getAllUsers
       );
 
+    this.router
+      .route(this.path + "/:id/master")
+      .delete(
+        AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+        this.userHandler.deleteUserById
+      );
+
     return this.router;
   }
 }
