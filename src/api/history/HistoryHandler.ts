@@ -6,9 +6,9 @@ import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 
 export class HistoryHandler {
-  private historyService: HistoryService
+  private historyService: HistoryService;
   constructor() {
-    this.historyService = new HistoryService()
+    this.historyService = new HistoryService();
     this.getHistory = this.getHistory.bind(this);
   }
 
@@ -16,31 +16,43 @@ export class HistoryHandler {
     try {
       const tokenPayload: ITokenPayload = res.locals.user;
       let page = parseInt(req.params.page ?? "1");
+      const { checkIn } = req.query;
       let result = undefined;
 
       if (page != page || page < 1) {
         throw new BadRequestError("bad page");
       }
-      
+
       if (tokenPayload.role == "ER" || tokenPayload.role == "ADMIN") {
         // can see all history
-        result = await this.historyService.retrieveHistory(page - 1);
-      } else if (tokenPayload.role == "SUPERVISOR" && tokenPayload.supervisorId) {
+        result = await this.historyService.retrieveHistory(
+          page - 1,
+          constants.HISTORY_ELEMENTS_PER_PAGE,
+          checkIn
+        );
+      } else if (
+        tokenPayload.role == "SUPERVISOR" &&
+        tokenPayload.supervisorId
+      ) {
         // can see own supervisor history
         result = await this.historyService.retrieveHistoryBySupervisors(
           [tokenPayload.supervisorId],
-          page - 1
-        )
+          page - 1,
+          constants.HISTORY_ELEMENTS_PER_PAGE,
+          checkIn
+        );
       } else if (tokenPayload.role == "STUDENT" && tokenPayload.studentId) {
         // can see student history
         result = await this.historyService.retrieveHistoryByStudents(
           [tokenPayload.studentId],
-          page - 1
-        )
+          page - 1,
+          constants.HISTORY_ELEMENTS_PER_PAGE,
+          checkIn
+        );
       }
 
       if (!result) {
-        throw new InternalServerError()
+        throw new InternalServerError();
       } else if (result && "error" in result) {
         switch (result.error) {
           case 400:
@@ -52,12 +64,9 @@ export class HistoryHandler {
 
       return res
         .status(200)
-        .json(createResponse(
-          constants.SUCCESS_RESPONSE_MESSAGE,
-          result
-        ))
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, result));
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 }

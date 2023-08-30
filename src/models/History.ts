@@ -3,26 +3,43 @@ import db from "../database";
 import { constants, createErrorObject } from "../utils";
 import { HistoryType } from "@prisma/client";
 
-const HISTORY_NAME_MAP = new Map<HistoryType, string>()
-HISTORY_NAME_MAP.set("CLINICAL_RECORD", "Clinical Record")
-HISTORY_NAME_MAP.set("SCIENTIFIC_SESSION", "Scientific Session")
-HISTORY_NAME_MAP.set("SELF_REFLECTION", "Self-Reflection")
-HISTORY_NAME_MAP.set("COMPETENCY", "Competency")
-HISTORY_NAME_MAP.set("ASSESMENT", "Assesment")
-HISTORY_NAME_MAP.set("PROBLEM_CONSULTATION", "Problem Consultation")
-HISTORY_NAME_MAP.set("CHECK_IN", "Check-in")
-HISTORY_NAME_MAP.set("CHECK_OUT", "Check-out")
+const HISTORY_NAME_MAP = new Map<HistoryType, string>();
+HISTORY_NAME_MAP.set("CLINICAL_RECORD", "Clinical Record");
+HISTORY_NAME_MAP.set("SCIENTIFIC_SESSION", "Scientific Session");
+HISTORY_NAME_MAP.set("SELF_REFLECTION", "Self-Reflection");
+HISTORY_NAME_MAP.set("COMPETENCY", "Competency");
+HISTORY_NAME_MAP.set("ASSESMENT", "Assesment");
+HISTORY_NAME_MAP.set("PROBLEM_CONSULTATION", "Problem Consultation");
+HISTORY_NAME_MAP.set("CHECK_IN", "Check-in");
+HISTORY_NAME_MAP.set("CHECK_OUT", "Check-out");
 
 export class History {
   static getHistoryName(type: HistoryType) {
-    return HISTORY_NAME_MAP.get(type) ?? type
+    return HISTORY_NAME_MAP.get(type) ?? type;
   }
 
   async getHistory(
     page: number = 0,
-    elemPerPage: number = constants.HISTORY_ELEMENTS_PER_PAGE
+    elemPerPage: number = constants.HISTORY_ELEMENTS_PER_PAGE,
+    checkin?: boolean
   ) {
     try {
+      if (checkin) {
+        return db.history.findMany({
+          where: {
+            OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }],
+          },
+          skip: page * elemPerPage,
+          take: elemPerPage,
+          orderBy: {
+            timestamp: "desc",
+          },
+          include: {
+            student: true,
+            supervisor: true,
+          },
+        });
+      }
       return db.history.findMany({
         skip: page * elemPerPage,
         take: elemPerPage,
@@ -31,9 +48,9 @@ export class History {
         },
         include: {
           student: true,
-          supervisor: true
-        }
-      })
+          supervisor: true,
+        },
+      });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(500, "failed to query history");
@@ -46,23 +63,43 @@ export class History {
   async getHistoryBySupervisors(
     supervisorId: string[],
     page: number = 0,
-    elemPerPage: number = constants.HISTORY_ELEMENTS_PER_PAGE
+    elemPerPage: number = constants.HISTORY_ELEMENTS_PER_PAGE,
+    checkin?: boolean
   ) {
     try {
+      if (checkin) {
+        return db.history.findMany({
+          where: {
+            AND: [
+              { OR: supervisorId.map(History.remapSupervisor) },
+              { OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }] },
+            ],
+          },
+          skip: page * elemPerPage,
+          take: elemPerPage,
+          orderBy: {
+            timestamp: "desc",
+          },
+          include: {
+            student: true,
+            supervisor: true,
+          },
+        });
+      }
       return db.history.findMany({
         skip: page * elemPerPage,
         take: elemPerPage,
         where: {
-          OR: supervisorId.map(History.remapSupervisor)
+          OR: supervisorId.map(History.remapSupervisor),
         },
         orderBy: {
           timestamp: "desc",
         },
         include: {
           student: true,
-          supervisor: true
-        }
-      })
+          supervisor: true,
+        },
+      });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(500, "failed to query history");
@@ -75,23 +112,43 @@ export class History {
   async getHistoryByStudents(
     studentId: string[],
     page: number = 0,
-    elemPerPage: number = constants.HISTORY_ELEMENTS_PER_PAGE
+    elemPerPage: number = constants.HISTORY_ELEMENTS_PER_PAGE,
+    checkin?: boolean
   ) {
     try {
+      if (checkin) {
+        return db.history.findMany({
+          where: {
+            AND: [
+              { OR: studentId.map(History.remapSupervisor) },
+              { OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }] },
+            ],
+          },
+          skip: page * elemPerPage,
+          take: elemPerPage,
+          orderBy: {
+            timestamp: "desc",
+          },
+          include: {
+            student: true,
+            supervisor: true,
+          },
+        });
+      }
       return db.history.findMany({
         skip: page * elemPerPage,
         take: elemPerPage,
         where: {
-          OR: studentId.map(History.remapStudent)
+          OR: studentId.map(History.remapStudent),
         },
         orderBy: {
           timestamp: "desc",
         },
         include: {
           student: true,
-          supervisor: true
-        }
-      })
+          supervisor: true,
+        },
+      });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(500, "failed to query history");
@@ -115,7 +172,7 @@ export class History {
         studentId,
         supervisorId,
         attachment
-      )
+      );
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(500, "failed to query history");
@@ -138,16 +195,16 @@ export class History {
         timestamp,
         studentId,
         supervisorId,
-        attachment
-      }
-    })
+        attachment,
+      },
+    });
   }
 
   private static remapStudent(value: string) {
-    return {studentId: value}
+    return { studentId: value };
   }
 
   private static remapSupervisor(value: string) {
-    return {supervisorId: value}
+    return { supervisorId: value };
   }
 }

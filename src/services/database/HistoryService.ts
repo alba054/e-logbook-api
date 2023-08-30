@@ -20,12 +20,14 @@ export class HistoryService {
   async retrieveHistoryBySupervisors(
     supervisorId: string[],
     page: number = 0,
-    elemPerPage?: number
+    elemPerPage?: number,
+    checkIn?: any
   ) {
     const history = await this.historyModel.getHistoryBySupervisors(
       supervisorId,
       page,
-      elemPerPage
+      elemPerPage,
+      checkIn
     );
 
     if (history && "error" in history) {
@@ -38,7 +40,8 @@ export class HistoryService {
   async retrieveHistoryByStudents(
     studentId: string[],
     page: number = 0,
-    elemPerPage?: number
+    elemPerPage?: number,
+    checkIn?: any
   ) {
     const history = await this.historyModel.getHistoryByStudents(
       studentId,
@@ -53,8 +56,12 @@ export class HistoryService {
     return await Promise.all(history.map(this.processHistoryResult));
   }
 
-  async retrieveHistory(page: number = 0, elemPerPage?: number) {
-    const history = await this.historyModel.getHistory(page, elemPerPage);
+  async retrieveHistory(page: number = 0, elemPerPage?: number, checkIn?: any) {
+    const history = await this.historyModel.getHistory(
+      page,
+      elemPerPage,
+      checkIn
+    );
 
     if (history && "error" in history) {
       return createErrorObject(500, history.message);
