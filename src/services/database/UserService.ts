@@ -19,6 +19,16 @@ export class UserService {
     this.userModel = new User();
   }
 
+  async getUserProfilePictureByUserId(userId: string) {
+    const user = await this.userModel.getUserById(userId);
+
+    if (!user?.profilePic) {
+      return createErrorObject(404, "no profile picture's uploaded");
+    }
+
+    return user?.profilePic;
+  }
+
   async getUserProfilePicture(tokenPayload: ITokenPayload) {
     const user = await this.userModel.getUserByUsername(tokenPayload.username);
 

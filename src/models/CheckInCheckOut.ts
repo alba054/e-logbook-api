@@ -54,21 +54,29 @@ export class CheckInCheckOut {
           checkInStatus: verified ? "VERIFIED" : "UNVERIFIED",
           userId,
         },
-      })
+      });
 
       if (verified) {
+        const checkIn = await db.checkInCheckOut.findFirst({
+          where: {
+            student: {
+              studentId,
+            },
+            unitId,
+          },
+        });
         try {
           await this.historyModel.insertHistory(
             "CHECK_IN",
             getUnixTimestamp(),
             studentId,
             undefined,
-            undefined
+            checkIn?.id
           );
         } catch (error) {}
       }
 
-      return result
+      return result;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to update in process checkin");

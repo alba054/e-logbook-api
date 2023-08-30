@@ -1,5 +1,9 @@
 import { History } from "../../models/History";
-import { History as HistoryDBObject, Student, Supervisor } from "@prisma/client"
+import {
+  History as HistoryDBObject,
+  Student,
+  Supervisor,
+} from "@prisma/client";
 import { IHistoryInfo } from "../../utils/interfaces/HistoryInfo";
 import { ClinicalRecord } from "../../models/ClinicalRecord";
 import { createErrorObject } from "../../utils";
@@ -18,11 +22,14 @@ export class HistoryService {
     page: number = 0,
     elemPerPage?: number
   ) {
-    const history = await
-      this.historyModel.getHistoryBySupervisors(supervisorId, page, elemPerPage);
+    const history = await this.historyModel.getHistoryBySupervisors(
+      supervisorId,
+      page,
+      elemPerPage
+    );
 
     if (history && "error" in history) {
-      return createErrorObject(500, history.message)
+      return createErrorObject(500, history.message);
     }
 
     return await Promise.all(history.map(this.processHistoryResult));
@@ -33,8 +40,11 @@ export class HistoryService {
     page: number = 0,
     elemPerPage?: number
   ) {
-    const history = await
-      this.historyModel.getHistoryByStudents(studentId, page, elemPerPage);
+    const history = await this.historyModel.getHistoryByStudents(
+      studentId,
+      page,
+      elemPerPage
+    );
 
     if (history && "error" in history) {
       return createErrorObject(500, history.message);
@@ -43,12 +53,8 @@ export class HistoryService {
     return await Promise.all(history.map(this.processHistoryResult));
   }
 
-  async retrieveHistory(
-    page: number = 0,
-    elemPerPage?: number
-  ) {
-    const history = await
-      this.historyModel.getHistory(page, elemPerPage);
+  async retrieveHistory(page: number = 0, elemPerPage?: number) {
+    const history = await this.historyModel.getHistory(page, elemPerPage);
 
     if (history && "error" in history) {
       return createErrorObject(500, history.message);
@@ -59,17 +65,19 @@ export class HistoryService {
 
   async processHistoryResult(
     value: HistoryDBObject & {
-      student: Student | null,
-      supervisor: Supervisor | null
+      student: Student | null;
+      supervisor: Supervisor | null;
     }
   ) {
-    let patientName: string|null = null;
-    let rating: number|null = null;
+    let patientName: string | null = null;
+    let rating: number | null = null;
     if (value.type == "CLINICAL_RECORD" && value.attachment) {
       // get patient name
       try {
         const clinicalRecord =
-          await this.clinicalRecordModel.getClinicalRecordsById(value.attachment);
+          await this.clinicalRecordModel.getClinicalRecordsById(
+            value.attachment
+          );
         patientName = clinicalRecord?.patientName ?? null;
         rating = clinicalRecord?.rating ?? null;
       } catch (error) {
@@ -84,6 +92,7 @@ export class HistoryService {
       timestamp: Number(value.timestamp),
       patientName: patientName,
       rating: rating,
+      attachment: value.attachment,
     } as IHistoryInfo;
   }
 }

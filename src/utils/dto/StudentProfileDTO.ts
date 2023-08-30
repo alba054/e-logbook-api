@@ -21,4 +21,5 @@ export interface IStudentProfileDTO {
   pkmStation?: string;
   periodLengthStation?: number;
   email?: string;
+  userId?: string;
 }

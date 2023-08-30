@@ -164,7 +164,7 @@ export class StudentHandler {
 
     const dailyActivities =
       await this.dailyActivityService.getDailyActivitiesByStudentNimAndUnitId(
-        student?.studentId ?? "",
+        tokenPayload.studentId ?? "",
         activeUnit?.activeUnit.activeUnit?.id ?? ""
       );
 
@@ -224,6 +224,7 @@ export class StudentHandler {
           address: student.address,
           email: student.User[0]?.email,
           phoneNumber: student.phoneNumber,
+          userId: student.User[0]?.id,
         } as IStudentProfileDTO)
       );
     } catch (error) {

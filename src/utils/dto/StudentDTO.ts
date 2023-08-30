@@ -4,4 +4,5 @@ export interface IListSupervisorStudent {
   id: string;
   activeUnitId: string;
   activeUnitName: string;
+  userId?: string;
 }
