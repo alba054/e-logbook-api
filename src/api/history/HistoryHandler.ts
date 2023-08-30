@@ -23,7 +23,11 @@ export class HistoryHandler {
         throw new BadRequestError("bad page");
       }
 
-      if (tokenPayload.role == "ER" || tokenPayload.role == "ADMIN") {
+      if (
+        tokenPayload.role == "ER" ||
+        tokenPayload.role == "ADMIN" ||
+        tokenPayload.badges?.includes("HEAD_DIV")
+      ) {
         // can see all history
         result = await this.historyService.retrieveHistory(
           page - 1,

@@ -4,14 +4,14 @@ import { constants } from "../../utils";
 import { HistoryHandler } from "./HistoryHandler";
 
 export class HistoryRouter {
-  path: string
-  router: Router
-  historyHandler: HistoryHandler
+  path: string;
+  router: Router;
+  historyHandler: HistoryHandler;
 
   constructor() {
     this.path = "/history";
     this.router = Router();
-    this.historyHandler = new HistoryHandler()
+    this.historyHandler = new HistoryHandler();
   }
 
   register() {
@@ -24,6 +24,7 @@ export class HistoryRouter {
           constants.SUPERVISOR_ROLE,
           constants.ER_ROLE,
           constants.ADMIN_ROLE,
+          constants.DPK_ROLE,
         ]),
         this.historyHandler.getHistory
       );
