@@ -56,6 +56,7 @@ export class SupervisorHandler {
             studentName: s.fullName,
             activeUnitId: s.activeUnit?.id,
             activeUnitName: s.activeUnit?.name,
+            userId: s.User[0]?.id,
           } as IListSupervisorStudent;
         })
       )

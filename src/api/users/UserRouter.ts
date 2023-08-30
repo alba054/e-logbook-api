@@ -74,7 +74,6 @@ export class UserRouter {
           constants.ER_ROLE,
           constants.DPK_ROLE,
           constants.ADMIN_ROLE,
-          constants.ADMIN_ROLE,
           constants.STUDENT_ROLE,
           constants.SUPERVISOR_ROLE,
         ]),
@@ -85,11 +84,22 @@ export class UserRouter {
           constants.ER_ROLE,
           constants.DPK_ROLE,
           constants.ADMIN_ROLE,
-          constants.ADMIN_ROLE,
           constants.STUDENT_ROLE,
           constants.SUPERVISOR_ROLE,
         ]),
         this.userHandler.deleteUserProfilePic
+      );
+
+    this.router
+      .route(this.path + "/:id/pic")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.ER_ROLE,
+          constants.DPK_ROLE,
+          constants.ADMIN_ROLE,
+          constants.SUPERVISOR_ROLE,
+        ]),
+        this.userHandler.getUserProfilePicByUserId
       );
 
     return this.router;

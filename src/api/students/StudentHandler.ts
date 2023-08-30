@@ -224,6 +224,7 @@ export class StudentHandler {
           address: student.address,
           email: student.User[0]?.email,
           phoneNumber: student.phoneNumber,
+          userId: student.User[0]?.id,
         } as IStudentProfileDTO)
       );
     } catch (error) {

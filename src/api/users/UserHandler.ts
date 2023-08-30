@@ -32,6 +32,34 @@ export class UserHandler {
     this.postProfilePicture = this.postProfilePicture.bind(this);
     this.getUserProfilePic = this.getUserProfilePic.bind(this);
     this.deleteUserProfilePic = this.deleteUserProfilePic.bind(this);
+    this.getUserProfilePicByUserId = this.getUserProfilePicByUserId.bind(this);
+  }
+
+  async getUserProfilePicByUserId(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.params;
+      const fileToSend = await this.userService.getUserProfilePictureByUserId(
+        id
+      );
+
+      if (typeof fileToSend === "string") {
+        return res.sendFile(`${constants.ABS_PATH}/${fileToSend}`);
+      }
+      switch (fileToSend?.error) {
+        case 400:
+          throw new BadRequestError(fileToSend.message);
+        case 404:
+          throw new NotFoundError(fileToSend.message);
+        default:
+          throw new InternalServerError();
+      }
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async deleteUserProfilePic(req: Request, res: Response, next: NextFunction) {

@@ -68,7 +68,6 @@ model Student {
   ProblemConsultation     ProblemConsultation[]
   WeekAssesment           WeekAssesment[]
 
-
   @@map("students")
 }
 
@@ -691,7 +690,6 @@ model MiniCexGrade {
   miniCexGradeItemId Int?
 }
 
-
 model History {
   id           Int         @id @default(autoincrement())
   type         HistoryType // Bisa merujuk ke UUID pada jenis-jenis riwayat
@@ -703,6 +701,7 @@ model History {
   supervisorId String?     @db.VarChar(100)
 
   @@index([timestamp(sort: Desc)])
+}
 
 model Reference {
   id     Int     @id @default(autoincrement())
@@ -724,7 +723,6 @@ model WeekAssesment {
   score              Float              @db.Float
 
   @@map("weekly_assesments")
-
 }
 
 enum ScientificGradeType {

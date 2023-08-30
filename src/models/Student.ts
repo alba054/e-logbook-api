@@ -13,6 +13,7 @@ export class Student {
     return db.student.findMany({
       include: {
         activeUnit: true,
+        User: true,
       },
     });
   }
@@ -28,6 +29,7 @@ export class Student {
       },
       include: {
         activeUnit: true,
+        User: true,
       },
     });
   }

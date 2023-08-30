@@ -155,6 +155,13 @@ export class Assesment {
           ],
         },
         type: "PERSONAL_BEHAVIOUR",
+        PersonalBehaviour: {
+          PersonalBehaviourGrade: {
+            some: {
+              verificationStatus: "INPROCESS",
+            },
+          },
+        },
       },
       include: {
         PersonalBehaviour: true,
