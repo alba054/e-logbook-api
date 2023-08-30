@@ -46,6 +46,9 @@ export class WeeklyAssesment {
         Student: true,
         Unit: true,
       },
+      orderBy: {
+        weekNum: "asc",
+      },
     });
   }
 }

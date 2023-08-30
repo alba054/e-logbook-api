@@ -33,6 +33,34 @@ export class UserHandler {
     this.getUserProfilePic = this.getUserProfilePic.bind(this);
     this.deleteUserProfilePic = this.deleteUserProfilePic.bind(this);
     this.getUserProfilePicByUserId = this.getUserProfilePicByUserId.bind(this);
+    this.getAllUsers = this.getAllUsers.bind(this);
+  }
+
+  async getAllUsers(req: Request, res: Response, next: NextFunction) {
+    const { role } = req.query;
+
+    let users;
+    if (role) {
+      users = await this.userService.getUserByRole(role);
+    } else {
+      users = await this.userService.getAllUsers();
+    }
+
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        users.map((u) => {
+          return {
+            id: u.id,
+            badges: u.badges,
+            role: u.role,
+            username: u.username,
+            email: u.email,
+            fullname: u.student?.fullName ?? u.supervisor?.fullname,
+          } as IUserProfileDTO;
+        })
+      )
+    );
   }
 
   async getUserProfilePicByUserId(
