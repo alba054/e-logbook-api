@@ -19,6 +19,10 @@ export class UserService {
     this.userModel = new User();
   }
 
+  async getAllUsers() {
+    return this.userModel.getAllUsers();
+  }
+
   async getUserProfilePictureByUserId(userId: string) {
     const user = await this.userModel.getUserById(userId);
 

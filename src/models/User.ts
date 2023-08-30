@@ -6,6 +6,20 @@ import { IPutUserProfile } from "../utils/interfaces/User";
 export class User {
   constructor() {}
 
+  async getAllUsers() {
+    return db.user.findMany({
+      select: {
+        id: true,
+        student: true,
+        supervisor: true,
+        badges: true,
+        email: true,
+        username: true,
+        role: true,
+      },
+    });
+  }
+
   async updateUserStudentProfile(userId: string, payload: IPutUserProfile) {
     try {
       return db.user.update({
@@ -112,6 +126,10 @@ export class User {
         id: true,
         student: true,
         supervisor: true,
+        username: true,
+        badges: true,
+        role: true,
+        email: true,
       },
     });
   }

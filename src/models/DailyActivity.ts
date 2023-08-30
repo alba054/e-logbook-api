@@ -34,6 +34,9 @@ export class DailyActivity {
           },
         },
       },
+      orderBy: {
+        weekNum: "asc",
+      },
     });
   }
 
@@ -55,6 +58,9 @@ export class DailyActivity {
           },
         },
         Student: true,
+      },
+      orderBy: {
+        weekNum: "asc",
       },
     });
   }

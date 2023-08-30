@@ -102,6 +102,13 @@ export class UserRouter {
         this.userHandler.getUserProfilePicByUserId
       );
 
+    this.router
+      .route(this.path + "/master")
+      .get(
+        AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+        this.userHandler.getAllUsers
+      );
+
     return this.router;
   }
 }
