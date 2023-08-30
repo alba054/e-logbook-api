@@ -1,12 +1,19 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
-import { createErrorObject } from "../utils";
+import { createErrorObject, getUnixTimestamp } from "../utils";
 import {
   IPostProblemConsultation,
   IPutProblemConsultation,
 } from "../utils/interfaces/ProblemConsultation";
+import { History } from "./History";
 
 export class ProblemConsultation {
+  private historyModel: History;
+
+  constructor() {
+    this.historyModel = new History();
+  }
+
   async updateProblemConsultationById(
     id: string,
     payload: IPutProblemConsultation
@@ -106,14 +113,25 @@ export class ProblemConsultation {
     unitId?: string
   ) {
     try {
-      return db.problemConsultation.create({
-        data: {
-          problem: payload.content,
-          id,
-          studentId,
-          unitId,
-        },
-      });
+      return (
+        await db.$transaction([
+          db.problemConsultation.create({
+            data: {
+              problem: payload.content,
+              id,
+              studentId,
+              unitId,
+            },
+          }),
+          this.historyModel.insertHistoryAsync(
+            "PROBLEM_CONSULTATION",
+            getUnixTimestamp(),
+            studentId,
+            undefined,
+            id
+          ),
+        ])
+      )[0];
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to insert problem consultation");

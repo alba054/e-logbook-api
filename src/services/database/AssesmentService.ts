@@ -68,6 +68,13 @@ export class AssesmentService {
             scientificAssesmentId,
           },
         }),
+        this.historyModel.insertHistoryAsync(
+          "ASSESMENT",
+          getUnixTimestamp(),
+          tokenPayload.studentId,
+          undefined,
+          scientificAssesmentId
+        ),
       ]);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {

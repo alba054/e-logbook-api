@@ -190,25 +190,27 @@ export class Competency {
     unitId?: string
   ) {
     try {
-      return (await db.$transaction([
-        db.competency.create({
-          data: {
-            id,
+      return (
+        await db.$transaction([
+          db.competency.create({
+            data: {
+              id,
+              studentId,
+              unitId,
+              competencyType: payload.type,
+              type: "CASE",
+              caseTypeId: payload.caseTypeId,
+            },
+          }),
+          this.historyModel.insertHistoryAsync(
+            "CASE",
+            getUnixTimestamp(),
             studentId,
-            unitId,
-            competencyType: payload.type,
-            type: "CASE",
-            caseTypeId: payload.caseTypeId,
-          },
-        }),
-        this.historyModel.insertHistoryAsync(
-          "COMPETENCY",
-          getUnixTimestamp(),
-          studentId,
-          undefined,
-          id
-        )
-      ]))[0]
+            undefined,
+            id
+          ),
+        ])
+      )[0];
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to insert new case");
@@ -254,25 +256,27 @@ export class Competency {
     unitId?: string
   ) {
     try {
-      return (await db.$transaction([
-        db.competency.create({
-          data: {
-            id,
+      return (
+        await db.$transaction([
+          db.competency.create({
+            data: {
+              id,
+              studentId,
+              unitId,
+              competencyType: payload.type,
+              type: "SKILL",
+              skillTypeId: payload.skillTypeId,
+            },
+          }),
+          this.historyModel.insertHistoryAsync(
+            "SKILL",
+            getUnixTimestamp(),
             studentId,
-            unitId,
-            competencyType: payload.type,
-            type: "SKILL",
-            skillTypeId: payload.skillTypeId,
-          },
-        }),
-        this.historyModel.insertHistoryAsync(
-          "COMPETENCY",
-          getUnixTimestamp(),
-          studentId,
-          undefined,
-          id
-        )
-      ]))[0]
+            undefined,
+            id
+          ),
+        ])
+      )[0];
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to insert new skill");

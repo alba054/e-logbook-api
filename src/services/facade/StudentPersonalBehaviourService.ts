@@ -57,12 +57,12 @@ export class studentPersonalBehaviourService {
           },
         }),
         this.historyModel.insertHistoryAsync(
-          "ASSESMENT",
+          "PERSONAL_BEHAVIOUR",
           getUnixTimestamp(),
           studentId,
           undefined,
           assesmentId
-        )
+        ),
       ];
     }
 

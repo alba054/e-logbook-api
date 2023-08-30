@@ -798,7 +798,12 @@ enum HistoryType {
   SCIENTIFIC_SESSION // "attachment" ScientificSession
   SELF_REFLECTION // "attachment" SelfReflection
   COMPETENCY // "attachment" Competency
+  CASE
+  SKILL
   ASSESMENT // "attachment" Assesment
+  MINI_CEX
+  PERSONAL_BEHAVIOUR
+  SCIENTIFIC_ASSESMENT
   PROBLEM_CONSULTATION // "attachment" is null (for now)
   CHECK_IN // "attachment" is null (for now)
   CHECK_OUT // "attachment" is null (for now)
