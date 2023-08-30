@@ -7,4 +7,5 @@ export interface IHistoryInfo {
   readonly rating: number | null;
   readonly attachment: string | null | undefined;
   readonly studentId: string | null | undefined;
+  readonly unitName: string | null | undefined;
 }
