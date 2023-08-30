@@ -56,30 +56,34 @@ export class CheckInCheckOut {
         },
       });
 
-      if (verified) {
-        const checkIn = await db.checkInCheckOut.findFirst({
-          where: {
-            student: {
-              studentId,
-            },
-            unitId,
-          },
-        });
-        try {
-          await this.historyModel.insertHistory(
-            "CHECK_IN",
-            getUnixTimestamp(),
+      const checkIn = await db.checkInCheckOut.findFirst({
+        where: {
+          student: {
             studentId,
-            undefined,
-            checkIn?.id
-          );
-        } catch (error) {}
-      }
+          },
+          unitId,
+        },
+      });
+
+      await this.historyModel.insertHistory(
+        "CHECK_IN",
+        getUnixTimestamp(),
+        checkIn?.studentId,
+        undefined,
+        checkIn?.id
+      );
+
+      // if (verified) {
+
+      //   // try {
+
+      //   // } catch (error) {}
+      // }
 
       return result;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        return createErrorObject(400, "failed to update in process checkin");
+        return createErrorObject(400, "failed to verify inprocess checkin");
       } else {
         return createErrorObject(500);
       }

@@ -165,21 +165,15 @@ export class History {
     supervisorId?: string,
     attachment?: string
   ) {
-    try {
-      return await this.insertHistoryAsync(
-        type,
-        timestamp,
-        studentId,
-        supervisorId,
-        attachment
-      );
-    } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        return createErrorObject(500, "failed to query history");
-      } else {
-        return createErrorObject(500);
-      }
-    }
+    const history = await this.insertHistoryAsync(
+      type,
+      timestamp,
+      studentId,
+      supervisorId,
+      attachment
+    );
+
+    return history;
   }
 
   insertHistoryAsync(
