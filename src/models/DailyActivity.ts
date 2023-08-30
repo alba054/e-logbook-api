@@ -26,6 +26,7 @@ export class DailyActivity {
         },
       },
       include: {
+        Unit: true,
         activities: {
           include: {
             ActivityName: true,

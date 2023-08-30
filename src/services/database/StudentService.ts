@@ -17,7 +17,11 @@ export class StudentService {
     this.checkInCheckoutModel = new CheckInCheckOut();
   }
 
-  async getStudentBySupervisorId(tokenPayload: ITokenPayload) {
+  async getStudentBySupervisorId(tokenPayload: ITokenPayload, ceu: any) {
+    if (ceu) {
+      return this.studentModel.getAllStudents();
+    }
+
     return this.studentModel.getStudentBySupervisorId(
       tokenPayload.supervisorId
     );
@@ -67,6 +71,20 @@ export class StudentService {
   }
 
   async setActiveUnit(studentId: string, payload: IPutStudentActiveUnit) {
+    const checkIn =
+      await this.checkInCheckoutModel.getCheckInCheckOutByUnitIdAndStudentId(
+        studentId,
+        payload.unitId
+      );
+
+    if (checkIn) {
+      this.checkInCheckoutModel.updateCheckInCounterByUnitIdAndStudentId(
+        studentId,
+        payload.unitId,
+        1
+      );
+    }
+
     return this.studentModel.updateStudentActiveUnitByStudentId(
       studentId,
       payload

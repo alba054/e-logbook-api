@@ -59,4 +59,5 @@ export const constants = {
   PROFILE_PIC_PATH: "storage/user-pic/",
   ASSESMENT_DOC_PATH: "storage/assesment/",
   HISTORY_ELEMENTS_PER_PAGE: 25
+  REFERENCE_PATH: "storage/reference/",
 };

@@ -20,6 +20,8 @@ export interface IListScientificAssesment {
   studentId: string;
   id: string;
   studentName: string;
+  case: string;
+  location: string;
 }
 
 export interface IScientificAssesmentDetail {

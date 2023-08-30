@@ -9,6 +9,14 @@ import { createErrorObject } from "../utils";
 export class Student {
   constructor() {}
 
+  async getAllStudents() {
+    return db.student.findMany({
+      include: {
+        activeUnit: true,
+      },
+    });
+  }
+
   async getStudentBySupervisorId(supervisorId: string | undefined) {
     return db.student.findMany({
       where: {
@@ -18,6 +26,9 @@ export class Student {
           { examinerSupervisorId: supervisorId },
         ],
       },
+      include: {
+        activeUnit: true,
+      },
     });
   }
 
@@ -25,6 +36,9 @@ export class Student {
     return db.student.findUnique({
       where: {
         studentId,
+      },
+      include: {
+        User: true,
       },
     });
   }

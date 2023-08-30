@@ -39,9 +39,11 @@ export class SupervisorHandler {
 
   async getSupervisorStudents(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
+    const { ceu } = req.query;
 
     const students = await this.studentService.getStudentBySupervisorId(
-      tokenPayload
+      tokenPayload,
+      ceu
     );
 
     return res.status(200).json(
@@ -52,6 +54,8 @@ export class SupervisorHandler {
             id: s.id,
             studentId: s.studentId,
             studentName: s.fullName,
+            activeUnitId: s.activeUnit?.id,
+            activeUnitName: s.activeUnit?.name,
           } as IListSupervisorStudent;
         })
       )

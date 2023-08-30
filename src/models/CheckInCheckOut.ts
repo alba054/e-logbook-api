@@ -10,6 +10,32 @@ export class CheckInCheckOut {
     this.historyModel = new History();
   }
 
+  async updateCheckInCounterByUnitIdAndStudentId(
+    studentId: string,
+    unitId: string,
+    count: number
+  ) {
+    try {
+      return db.checkInCheckOut.updateMany({
+        where: {
+          student: { studentId },
+          unitId,
+        },
+        data: {
+          countCheckIn: {
+            increment: count,
+          },
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to update in check in counter");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async verifyInProcessCheckIn(
     verified: boolean,
     userId: string,
@@ -19,9 +45,10 @@ export class CheckInCheckOut {
     try {
       const result = await db.checkInCheckOut.updateMany({
         where: {
+          student: {
+            studentId,
+          },
           unitId,
-          studentId,
-          checkInStatus: "INPROCESS",
         },
         data: {
           checkInStatus: verified ? "VERIFIED" : "UNVERIFIED",
@@ -51,11 +78,59 @@ export class CheckInCheckOut {
     }
   }
 
+  async verifyInProcessCheckOut(
+    verified: boolean,
+    userId: string,
+    studentId?: string,
+    unitId?: string
+  ) {
+    try {
+      const lastCheckin = await this.getLastCheckInByUnitIdAndStudentId(
+        studentId ?? "",
+        unitId ?? "",
+        "VERIFIED",
+        userId
+      );
+      if (lastCheckin === null) {
+        return createErrorObject(404, "cannot find last check-out");
+      }
+
+      return db.checkInCheckOut.updateMany({
+        where: {
+          id: lastCheckin.id,
+        },
+        data: {
+          checkOutStatus: verified ? "VERIFIED" : "UNVERIFIED",
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to update in process checkout");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async getStudentCheckIn() {
     return db.checkInCheckOut.findMany({
       where: {
         checkIn: true,
         checkInStatus: "INPROCESS",
+      },
+      include: {
+        student: true,
+        unit: true,
+      },
+    });
+  }
+
+  async getStudentCheckOut(userId: string) {
+    return db.checkInCheckOut.findMany({
+      where: {
+        checkOut: true,
+        checkOutStatus: "INPROCESS",
+        userId,
       },
       include: {
         student: true,
@@ -91,6 +166,38 @@ export class CheckInCheckOut {
     }
   }
 
+  // What is this name
+  // this process student checkout though.
+  async updateCheckOutCheckInCheckOutUnit(studentId: string, unitId: string) {
+    try {
+      const lastCheckin = await this.getLastCheckInByUnitIdAndStudentId(
+        studentId,
+        unitId,
+        "VERIFIED"
+      );
+      if (lastCheckin === null) {
+        return createErrorObject(404, "cannot find last check-out");
+      }
+
+      return db.checkInCheckOut.updateMany({
+        where: {
+          id: lastCheckin.id,
+        },
+        data: {
+          checkOut: true,
+          checkOutStatus: "INPROCESS",
+          checkOutTime: Math.floor(new Date().getTime() / 1000),
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to update in process checkout");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async getCheckInCheckOutByUnitIdAndStudentId(
     studentId: string,
     unitId: string
@@ -99,6 +206,25 @@ export class CheckInCheckOut {
       where: {
         unitId,
         studentId,
+      },
+    });
+  }
+
+  async getLastCheckInByUnitIdAndStudentId(
+    studentId: string,
+    unitId: string,
+    checkInStatus: "VERIFIED" | "UNVERIFIED" | "INPROCESS",
+    userId: string | undefined = undefined
+  ) {
+    return db.checkInCheckOut.findFirst({
+      where: {
+        unitId,
+        studentId,
+        userId,
+        checkInStatus,
+      },
+      orderBy: {
+        checkInTime: "desc",
       },
     });
   }

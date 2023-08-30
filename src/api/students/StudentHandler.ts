@@ -19,6 +19,7 @@ import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentCheckInCheckOutService } from "../../services/facade/StudentCheckInCheckOutService";
 import { IActiveUnitDTO } from "../../utils/dto/ActiveUnitDTO";
 import { IListInProcessCheckInDTO } from "../../utils/dto/StudentCheckInDTO";
+import { IListInProcessCheckOutDTO } from "../../utils/dto/StudentCheckOutDTO";
 import { CheckInCheckOutValidator } from "../../validator/checkInCheckOut/CheckInCheckOutValidator";
 import { CheckInCheckOutService } from "../../services/database/CheckInCheckOutService";
 import { ClinicalRecordService } from "../../services/database/ClinicalRecordService";
@@ -51,6 +52,11 @@ import { SglService } from "../../services/database/SglService";
 import { ISglDetail, IStudentSgl } from "../../utils/dto/SglDTO";
 import { ICstDetail, IStudentCst } from "../../utils/dto/CstDTO";
 import { CstService } from "../../services/database/CstService";
+import { ProblemConsultationService } from "../../services/database/ProblemConsultationService";
+import { IStudentProblemConsultations } from "../../utils/dto/ProblemConsultationDTO";
+import { IStudentProfileDTO } from "../../utils/dto/StudentProfileDTO";
+import { WeeklyAssesmentService } from "../../services/database/WeeklyAssesmentService";
+import { IStudentWeeklyAssesment } from "../../utils/dto/WeeklyAssesmentDTO";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -71,6 +77,8 @@ export class StudentHandler {
   private assesmentService: AssesmentService;
   private sglService: SglService;
   private cstService: CstService;
+  private problemConsultationService: ProblemConsultationService;
+  private weeklyAssesmentService: WeeklyAssesmentService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -91,6 +99,8 @@ export class StudentHandler {
     this.assesmentService = new AssesmentService();
     this.sglService = new SglService();
     this.cstService = new CstService();
+    this.problemConsultationService = new ProblemConsultationService();
+    this.weeklyAssesmentService = new WeeklyAssesmentService();
     this.validator = new Validator();
 
     this.postStudent = this.postStudent.bind(this);
@@ -101,8 +111,11 @@ export class StudentHandler {
     this.putActiveUnit = this.putActiveUnit.bind(this);
     this.getActiveUnit = this.getActiveUnit.bind(this);
     this.postCheckInActiveUnit = this.postCheckInActiveUnit.bind(this);
+    this.postCheckOutActiveUnit = this.postCheckOutActiveUnit.bind(this);
     this.getAllCheckInsStudent = this.getAllCheckInsStudent.bind(this);
+    this.getAllCheckOutsStudent = this.getAllCheckOutsStudent.bind(this);
     this.putVerificationCheckIn = this.putVerificationCheckIn.bind(this);
+    this.putVerificationCheckOut = this.putVerificationCheckOut.bind(this);
     this.putStudentProfile = this.putStudentProfile.bind(this);
     this.putStudentSupervisors = this.putStudentSupervisors.bind(this);
     this.getStudentClinicalRecords = this.getStudentClinicalRecords.bind(this);
@@ -122,6 +135,130 @@ export class StudentHandler {
     this.getAssesmentFinalScore = this.getAssesmentFinalScore.bind(this);
     this.getSgls = this.getSgls.bind(this);
     this.getCsts = this.getCsts.bind(this);
+    this.getStudentProblemConsultations =
+      this.getStudentProblemConsultations.bind(this);
+    this.getStudentProfileByStudentId =
+      this.getStudentProfileByStudentId.bind(this);
+    this.getStudentWeeklyAssesments =
+      this.getStudentWeeklyAssesments.bind(this);
+  }
+
+  async getStudentWeeklyAssesments(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+    const student = await this.studentService.getStudentById(
+      tokenPayload.studentId
+    );
+
+    const weeklyAssesment =
+      await this.weeklyAssesmentService.getWeeklyAssesmentByStudentIdAndUnitId(
+        student?.studentId ?? "",
+        activeUnit?.activeUnit.activeUnit?.id ?? ""
+      );
+
+    const dailyActivities =
+      await this.dailyActivityService.getDailyActivitiesByStudentNimAndUnitId(
+        student?.studentId ?? "",
+        activeUnit?.activeUnit.activeUnit?.id ?? ""
+      );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentName: weeklyAssesment[0]?.Student?.fullName,
+        studentId: weeklyAssesment[0]?.Student?.studentId,
+        assesments: weeklyAssesment.map((w) => {
+          return {
+            attendNum: dailyActivities
+              .find((a) => a.weekNum === w.weekNum)
+              ?.activities.filter((a) => a.activityStatus === "ATTEND").length,
+            notAttendNum: dailyActivities
+              .find((a) => a.weekNum === w.weekNum)
+              ?.activities.filter(
+                (a) =>
+                  a.activityStatus === "NOT_ATTEND" ||
+                  a.activityStatus === "SICK"
+              ).length,
+            score: w.score,
+            verificationStatus: w.verificationStatus,
+            weekNum: w.weekNum,
+            id: w.id,
+          };
+        }),
+      } as IStudentWeeklyAssesment)
+    );
+  }
+
+  async getStudentProfileByStudentId(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { studentId } = req.params;
+
+    try {
+      const student = await this.studentService.getStudentByStudentId(
+        studentId
+      );
+
+      if (student && "error" in student) {
+        switch (student.error) {
+          case 400:
+            throw new BadRequestError(student.message);
+          case 404:
+            throw new NotFoundError(student.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          studentId: student.studentId,
+          fullName: student.fullName,
+          address: student.address,
+          email: student.User[0]?.email,
+          phoneNumber: student.phoneNumber,
+        } as IStudentProfileDTO)
+      );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getStudentProblemConsultations(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const problemConsultations =
+      await this.problemConsultationService.getProblemConsultationsByStudentAndUnitId(
+        tokenPayload
+      );
+    const student = await this.userService.getUserByUsername(
+      tokenPayload.username
+    );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentId: student?.student?.studentId,
+        studentName: student?.student?.fullName,
+        listProblemConsultations: problemConsultations.map((c) => {
+          return {
+            content: c.problem,
+            problemConsultationId: c.id,
+            verificationStatus: c.verificationStatus,
+            solution: c.solution,
+          };
+        }),
+      } as IStudentProblemConsultations)
+    );
   }
 
   async getCsts(req: Request, res: Response, next: NextFunction) {
@@ -210,7 +347,7 @@ export class StudentHandler {
     assesments.forEach((a) => {
       let grade = 0;
       if (a.MiniCex) {
-        if (a.MiniCex.MiniCexGrade) {
+        if (a.MiniCex.MiniCexGrade.length) {
           a.MiniCex.MiniCexGrade.forEach((g) => {
             grade += g.score ?? 0;
           });
@@ -341,6 +478,8 @@ export class StudentHandler {
             id: r.scientificAssesmentId,
             studentId: student?.studentId,
             studentName: student?.fullName,
+            case: r.ScientificAssesment?.title,
+            location: r.ScientificAssesment?.location?.name,
           } as IListScientificAssesment;
         })
       )
@@ -359,18 +498,17 @@ export class StudentHandler {
     );
 
     return res.status(200).json(
-      createResponse(
-        constants.SUCCESS_RESPONSE_MESSAGE,
-        result.map((r) => {
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentId: student?.studentId,
+        studentName: student?.fullName,
+        data: result.map((r) => {
           return {
             case: r.MiniCex?.case,
             id: r.miniCexId,
             location: r.MiniCex?.location?.name,
-            studentId: student?.studentId,
-            studentName: student?.fullName,
           } as IListMiniCex;
-        })
-      )
+        }),
+      })
     );
   }
 
@@ -785,6 +923,56 @@ export class StudentHandler {
     }
   }
 
+  async putVerificationCheckOut(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const { studentId } = req.params;
+    const payload: { verified: boolean } = req.body;
+
+    try {
+      const validationResult =
+        this.checkInCheckOutValidator.validateCheckInVerificationPayload(
+          payload
+        );
+
+      if (validationResult && "error" in validationResult) {
+        throw new BadRequestError(validationResult.message);
+      }
+
+      const result =
+        await this.studentCheckInCheckOutService.verifyStudentCheckOut(
+          studentId,
+          tokenPayload.userId,
+          payload
+        );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully verify checkout"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
   async getAllCheckInsStudent(req: Request, res: Response, next: NextFunction) {
     const studentCheckIns =
       await this.checkInCheckOutService.getAllCheckInStudents();
@@ -801,6 +989,32 @@ export class StudentHandler {
             unitId: s.unit.id,
             unitName: s.unit.name,
           } as IListInProcessCheckInDTO;
+        })
+      )
+    );
+  }
+
+  async getAllCheckOutsStudent(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { userId } = res.locals.user as ITokenPayload;
+    const studentCheckIns =
+      await this.checkInCheckOutService.getAllCheckOutStudents(userId);
+
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        studentCheckIns.map((s) => {
+          return {
+            checkOutStatus: s.checkOutStatus,
+            checkOutTime: Number(s.checkOutTime),
+            fullname: s.student.fullName,
+            studentId: s.student.studentId,
+            unitId: s.unit.id,
+            unitName: s.unit.name,
+          } as IListInProcessCheckOutDTO;
         })
       )
     );
@@ -843,6 +1057,47 @@ export class StudentHandler {
     }
   }
 
+  async postCheckOutActiveUnit(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { studentId } = res.locals.user as ITokenPayload;
+
+    try {
+      if (!studentId) {
+        throw new InternalServerError();
+      }
+
+      const result =
+        await this.studentCheckInCheckOutService.studentCheckOutActiveUnit(
+          studentId
+        );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(201)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully check out"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
   async getActiveUnit(req: Request, res: Response, next: NextFunction) {
     const { studentId } = res.locals.user as ITokenPayload;
 
@@ -860,6 +1115,7 @@ export class StudentHandler {
           unitName: result?.activeUnit.activeUnit?.name,
           checkInTime: Number(result?.checkInCheckOutUnit?.checkInTime),
           checkOutTime: Number(result?.checkInCheckOutUnit?.checkOutTime),
+          countCheckIn: result?.checkInCheckOutUnit?.countCheckIn,
         } as IActiveUnitDTO)
       );
     } catch (error) {

@@ -31,6 +31,15 @@ export class StudentDailyActivityService {
               unitId,
             },
           }),
+          db.weekAssesment.create({
+            data: {
+              id: uuidv4(),
+              score: 0,
+              weekNum: i + 1,
+              studentId,
+              unitId,
+            },
+          }),
           db.activity.createMany({
             data: [
               {

@@ -19,6 +19,7 @@ export class User {
           student: {
             update: {
               studentId: payload.nim,
+              fullName: payload.fullname,
             },
           },
         },
@@ -45,6 +46,7 @@ export class User {
           supervisor: {
             update: {
               supervisorId: payload.nim,
+              fullname: payload.fullname,
             },
           },
         },

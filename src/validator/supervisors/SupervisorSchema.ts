@@ -9,7 +9,7 @@ export const SupervisorPayloadSchema = UserPayloadSchema.append({
   firstName: Joi.string().optional(),
   lastName: Joi.string().optional(),
   badges: Joi.array().items(Joi.number()).optional(),
-  roles: Joi.string().valid("DPK", "SUPERVISOR").required(),
+  roles: Joi.string().valid("DPK", "SUPERVISOR", "ER").required(),
 });
 
 export const SupervisorBadgePayloadSchema = Joi.object({

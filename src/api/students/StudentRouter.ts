@@ -29,6 +29,7 @@ export class StudentRouter {
         AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
         this.studentHandler.putStudentProfile
       );
+
     // * send otp and token for reset password
     this.router.post(
       this.path + "/reset-password",
@@ -70,6 +71,14 @@ export class StudentRouter {
       this.studentHandler.postCheckInActiveUnit
     );
 
+    // * check out current active unit
+    this.router.post(
+      this.path + "/units/check-out",
+      AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+      UnitCheckIn.restrictUnitActiveChanges(true),
+      this.studentHandler.postCheckOutActiveUnit
+    );
+
     // * test authorization for student
     this.router.get(
       this.path + "/test-authorization-student",
@@ -84,11 +93,26 @@ export class StudentRouter {
       this.studentHandler.getAllCheckInsStudent
     );
 
+    // * get all inprocess check outs student
+    // FIXME: ideally checkins and checkouts data should be done in 1 single API response.
+    this.router.get(
+      this.path + "/checkouts",
+      AuthorizationBearer.authorize([constants.HEAD_DIV_BADGE]),
+      this.studentHandler.getAllCheckOutsStudent
+    );
+
     // * verify student inprocess checkin
     this.router.put(
       this.path + "/checkins/:studentId",
       AuthorizationBearer.authorize([constants.HEAD_DIV_BADGE]),
       this.studentHandler.putVerificationCheckIn
+    );
+
+    // * verify student inprocess checkout
+    this.router.put(
+      this.path + "/checkouts/:studentId",
+      AuthorizationBearer.authorize([constants.HEAD_DIV_BADGE]),
+      this.studentHandler.putVerificationCheckOut
     );
 
     // * assign supervisors to student
@@ -121,6 +145,14 @@ export class StudentRouter {
       .get(
         AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
         this.studentHandler.getStudentSelfReflections
+      );
+
+    // * get list of self reflections submitted
+    this.router
+      .route(this.path + "/problem-consultations")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getStudentProblemConsultations
       );
 
     // * get list of cases submitted
@@ -201,6 +233,21 @@ export class StudentRouter {
       .get(
         AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
         this.studentHandler.getCsts
+      );
+
+    // * get weekly assesments
+    this.router
+      .route(this.path + "/weekly-assesments")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getStudentWeeklyAssesments
+      );
+    // * get student detail by studentId
+    this.router
+      .route(this.path + "/:studentId")
+      .get(
+        AuthorizationBearer.authorize([constants.SUPERVISOR_ROLE]),
+        this.studentHandler.getStudentProfileByStudentId
       );
 
     return this.router;
