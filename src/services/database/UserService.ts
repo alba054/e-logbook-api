@@ -19,6 +19,16 @@ export class UserService {
     this.userModel = new User();
   }
 
+  async deleteUserById(id: string) {
+    const user = await this.userModel.getUserById(id);
+
+    if (!user) {
+      return createErrorObject(404, "user's not found");
+    }
+
+    return this.userModel.deleteUserById(id);
+  }
+
   async getAllUsers() {
     return this.userModel.getAllUsers();
   }
