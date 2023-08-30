@@ -15,7 +15,7 @@ import { History } from "../../models/History";
 export class ClinicalRecordService {
   private studentService: StudentService;
   private clinicalRecordModel: ClinicalRecord;
-  private historyModel: History
+  private historyModel: History;
 
   constructor() {
     this.studentService = new StudentService();
@@ -277,8 +277,9 @@ export class ClinicalRecordService {
           getUnixTimestamp(),
           tokenPayload.studentId,
           payload.supervisorId,
-          clinicalRecordId
-        )
+          clinicalRecordId,
+          studentActiveUnit?.activeUnit.activeUnit?.id
+        ),
       ]);
     } catch (error) {
       console.log(error);

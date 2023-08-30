@@ -61,7 +61,8 @@ export class studentPersonalBehaviourService {
           getUnixTimestamp(),
           studentId,
           undefined,
-          assesmentId
+          assesmentId,
+          unitId
         ),
       ];
     }

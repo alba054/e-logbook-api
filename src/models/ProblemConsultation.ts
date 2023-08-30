@@ -128,7 +128,8 @@ export class ProblemConsultation {
             getUnixTimestamp(),
             studentId,
             undefined,
-            id
+            id,
+            unitId
           ),
         ])
       )[0];

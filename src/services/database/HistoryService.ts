@@ -3,6 +3,7 @@ import {
   History as HistoryDBObject,
   Student,
   Supervisor,
+  Unit,
 } from "@prisma/client";
 import { IHistoryInfo } from "../../utils/interfaces/HistoryInfo";
 import { ClinicalRecord } from "../../models/ClinicalRecord";
@@ -46,7 +47,8 @@ export class HistoryService {
     const history = await this.historyModel.getHistoryByStudents(
       studentId,
       page,
-      elemPerPage
+      elemPerPage,
+      checkIn
     );
 
     if (history && "error" in history) {
@@ -74,6 +76,7 @@ export class HistoryService {
     value: HistoryDBObject & {
       student: Student | null;
       supervisor: Supervisor | null;
+      Unit: Unit | null;
     }
   ) {
     let patientName: string | null = null;
@@ -101,6 +104,7 @@ export class HistoryService {
       rating: rating,
       attachment: value.attachment,
       studentId: value.student?.studentId,
+      unitName: value.Unit?.name,
     } as IHistoryInfo;
   }
 }

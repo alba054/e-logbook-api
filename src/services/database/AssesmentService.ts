@@ -69,11 +69,12 @@ export class AssesmentService {
           },
         }),
         this.historyModel.insertHistoryAsync(
-          "ASSESMENT",
+          "SCIENTIFIC_ASSESMENT",
           getUnixTimestamp(),
           tokenPayload.studentId,
           undefined,
-          scientificAssesmentId
+          scientificAssesmentId,
+          activeUnit?.activeUnit.activeUnit?.id
         ),
       ]);
     } catch (error) {
@@ -430,11 +431,12 @@ export class AssesmentService {
           },
         }),
         this.historyModel.insertHistoryAsync(
-          "ASSESMENT",
+          "MINI_CEX",
           getUnixTimestamp(),
           tokenPayload.studentId,
           undefined,
-          assesmentId
+          assesmentId,
+          activeUnit?.activeUnit.activeUnit?.id
         ),
       ]);
     } catch (error) {

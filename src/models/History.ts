@@ -37,6 +37,7 @@ export class History {
           include: {
             student: true,
             supervisor: true,
+            Unit: true,
           },
         });
       }
@@ -49,6 +50,7 @@ export class History {
         include: {
           student: true,
           supervisor: true,
+          Unit: true,
         },
       });
     } catch (error) {
@@ -83,6 +85,7 @@ export class History {
           include: {
             student: true,
             supervisor: true,
+            Unit: true,
           },
         });
       }
@@ -98,6 +101,7 @@ export class History {
         include: {
           student: true,
           supervisor: true,
+          Unit: true,
         },
       });
     } catch (error) {
@@ -132,6 +136,7 @@ export class History {
           include: {
             student: true,
             supervisor: true,
+            Unit: true,
           },
         });
       }
@@ -147,6 +152,7 @@ export class History {
         include: {
           student: true,
           supervisor: true,
+          Unit: true,
         },
       });
     } catch (error) {
@@ -163,14 +169,16 @@ export class History {
     timestamp: number,
     studentId?: string,
     supervisorId?: string,
-    attachment?: string
+    attachment?: string,
+    unitId?: string
   ) {
     const history = await this.insertHistoryAsync(
       type,
       timestamp,
       studentId,
       supervisorId,
-      attachment
+      attachment,
+      unitId
     );
 
     return history;
@@ -181,7 +189,8 @@ export class History {
     timestamp: number,
     studentId?: string,
     supervisorId?: string,
-    attachment?: string
+    attachment?: string,
+    unitId?: string
   ) {
     return db.history.create({
       data: {
@@ -190,6 +199,7 @@ export class History {
         studentId,
         supervisorId,
         attachment,
+        unitId,
       },
     });
   }
