@@ -2,9 +2,10 @@ import { CheckInCheckOut } from "../../models/CheckInCheckOut";
 import { Student } from "../../models/Student";
 import { v4 as uuidv4 } from "uuid";
 import { StudentDailyActivityService } from "./StudentDailyActivityService";
-import { createErrorObject } from "../../utils";
+import { createErrorObject, getUnixTimestamp } from "../../utils";
 import { studentPersonalBehaviourService } from "./StudentPersonalBehaviourService";
 import { StudentOsceAndCBTService } from "./StudentOsceAndCBTService";
+import { History } from "../../models/History";
 
 export class StudentCheckInCheckOutService {
   private studentModel: Student;
@@ -12,9 +13,11 @@ export class StudentCheckInCheckOutService {
   private studentDailyActivityService: StudentDailyActivityService;
   private studentPersonalBehaviourService: studentPersonalBehaviourService;
   studentOsceAndCBTService: StudentOsceAndCBTService;
+  private historyModel: History;
 
   constructor() {
     this.studentModel = new Student();
+    this.historyModel = new History();
     this.checkInCheckOutModel = new CheckInCheckOut();
     this.studentDailyActivityService = new StudentDailyActivityService();
     this.studentPersonalBehaviourService =
@@ -56,7 +59,7 @@ export class StudentCheckInCheckOutService {
     );
     const student = await this.studentModel.getStudentByStudentId(studentId);
 
-    const checkIn = this.checkInCheckOutModel.verifyInProcessCheckIn(
+    const checkIn = await this.checkInCheckOutModel.verifyInProcessCheckIn(
       payload.verified,
       userId,
       studentId,
