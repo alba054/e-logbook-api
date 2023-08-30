@@ -111,23 +111,26 @@ export class SelfReflection {
     unitId?: string
   ) {
     try {
-      return (await db.$transaction([
-        db.selfReflection.create({
-          data: {
-            content: payload.content,
-            id,
+      return (
+        await db.$transaction([
+          db.selfReflection.create({
+            data: {
+              content: payload.content,
+              id,
+              studentId,
+              unitId,
+            },
+          }),
+          this.historyModel.insertHistoryAsync(
+            "SELF_REFLECTION",
+            getUnixTimestamp(),
             studentId,
-            unitId,
-          },
-        }),
-        this.historyModel.insertHistoryAsync(
-          "SELF_REFLECTION",
-          getUnixTimestamp(),
-          studentId,
-          undefined,
-          id
-        )
-      ]))[0]
+            undefined,
+            id,
+            unitId
+          ),
+        ])
+      )[0];
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to insert self reflection");

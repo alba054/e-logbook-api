@@ -134,6 +134,7 @@ model Unit {
   ProblemConsultation ProblemConsultation[]
   Reference           Reference[]
   WeekAssesment       WeekAssesment[]
+  History             History[]
 
   @@map("units")
 }
@@ -696,6 +697,8 @@ model History {
   timestamp    BigInt      @db.UnsignedBigInt
   student      Student?    @relation(fields: [studentId], references: [id])
   supervisor   Supervisor? @relation(fields: [supervisorId], references: [id])
+  Unit         Unit?       @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId       String?     @db.VarChar(100)
   attachment   String?     @db.VarChar(100)
   studentId    String?     @db.VarChar(100)
   supervisorId String?     @db.VarChar(100)

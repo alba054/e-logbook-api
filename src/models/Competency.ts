@@ -207,7 +207,8 @@ export class Competency {
             getUnixTimestamp(),
             studentId,
             undefined,
-            id
+            id,
+            unitId
           ),
         ])
       )[0];
@@ -273,7 +274,8 @@ export class Competency {
             getUnixTimestamp(),
             studentId,
             undefined,
-            id
+            id,
+            unitId
           ),
         ])
       )[0];

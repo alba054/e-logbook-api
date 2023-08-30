@@ -5,7 +5,7 @@ import { IPostScientificSessionPayload } from "../utils/interfaces/ScientificSes
 import { History } from "./History";
 
 export class ScientificSession {
-  private historyModel: History
+  private historyModel: History;
 
   constructor() {
     this.historyModel = new History();
@@ -119,30 +119,33 @@ export class ScientificSession {
     unitId?: string
   ) {
     try {
-      return (await db.$transaction([
-        db.scientificSession.create({
-          data: {
+      return (
+        await db.$transaction([
+          db.scientificSession.create({
+            data: {
+              id,
+              studentId: studentId ?? "",
+              unitId: unitId ?? "",
+              reference: payload.reference,
+              title: payload.title,
+              topic: payload.topic,
+              attachment: payload.attachment,
+              note: payload.notes,
+              supervisorId: payload.supervisorId,
+              sessionTypeId: payload.sessionType,
+              scientificRoleId: payload.role,
+            },
+          }),
+          this.historyModel.insertHistoryAsync(
+            "SCIENTIFIC_SESSION",
+            getUnixTimestamp(),
+            studentId,
+            payload.supervisorId,
             id,
-            studentId: studentId ?? "",
-            unitId: unitId ?? "",
-            reference: payload.reference,
-            title: payload.title,
-            topic: payload.topic,
-            attachment: payload.attachment,
-            note: payload.notes,
-            supervisorId: payload.supervisorId,
-            sessionTypeId: payload.sessionType,
-            scientificRoleId: payload.role,
-          },
-        }),
-        this.historyModel.insertHistoryAsync(
-          "SCIENTIFIC_SESSION",
-          getUnixTimestamp(),
-          studentId,
-          payload.supervisorId,
-          id
-        )
-      ]))[0]
+            unitId
+          ),
+        ])
+      )[0];
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(

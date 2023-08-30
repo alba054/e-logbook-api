@@ -8,7 +8,7 @@ import {
 import { History } from "./History";
 
 export class Sgl {
-  private historyModel: History
+  private historyModel: History;
 
   constructor() {
     this.historyModel = new History();
@@ -204,36 +204,39 @@ export class Sgl {
     unitId: string | undefined
   ) {
     try {
-      return (await db.$transaction([
-        db.sGL.create({
-          data: {
-            id,
-            studentId,
-            unitId,
-            topics: {
-              create: {
-                id: topicId,
-                endTime: payload.endTime,
-                startTime: payload.startTime,
-                notes: payload.notes,
-                supervisorId: payload.supervisorId,
-                topic: {
-                  connect: payload.topicId.map((t) => {
-                    return { id: t };
-                  }),
+      return (
+        await db.$transaction([
+          db.sGL.create({
+            data: {
+              id,
+              studentId,
+              unitId,
+              topics: {
+                create: {
+                  id: topicId,
+                  endTime: payload.endTime,
+                  startTime: payload.startTime,
+                  notes: payload.notes,
+                  supervisorId: payload.supervisorId,
+                  topic: {
+                    connect: payload.topicId.map((t) => {
+                      return { id: t };
+                    }),
+                  },
                 },
               },
             },
-          },
-        }),
-        this.historyModel.insertHistoryAsync(
-          "SGL",
-          getUnixTimestamp(),
-          studentId,
-          payload.supervisorId,
-          id
-        )
-      ]))[0]
+          }),
+          this.historyModel.insertHistoryAsync(
+            "SGL",
+            getUnixTimestamp(),
+            studentId,
+            payload.supervisorId,
+            id,
+            unitId
+          ),
+        ])
+      )[0];
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to insert sgl");
