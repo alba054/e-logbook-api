@@ -100,6 +100,7 @@ export class HistoryService {
       patientName: patientName,
       rating: rating,
       attachment: value.attachment,
+      studentId: value.student?.studentId,
     } as IHistoryInfo;
   }
 }

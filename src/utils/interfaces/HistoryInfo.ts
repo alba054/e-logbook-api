@@ -6,4 +6,5 @@ export interface IHistoryInfo {
   readonly patientName: string | null;
   readonly rating: number | null;
   readonly attachment: string | null | undefined;
+  readonly studentId: string | null | undefined;
 }
