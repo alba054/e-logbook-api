@@ -164,7 +164,7 @@ export class StudentHandler {
 
     const dailyActivities =
       await this.dailyActivityService.getDailyActivitiesByStudentNimAndUnitId(
-        student?.studentId ?? "",
+        tokenPayload.studentId ?? "",
         activeUnit?.activeUnit.activeUnit?.id ?? ""
       );
 
