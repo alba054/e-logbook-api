@@ -10,7 +10,7 @@ export interface IStudentCases {
   listCases: IListCaseDTO[];
 }
 
-interface IListCaseDTO {
+export interface IListCaseDTO {
   caseId: string;
   caseTypeId: number;
   caseName: string;

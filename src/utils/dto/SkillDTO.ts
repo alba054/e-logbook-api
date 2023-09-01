@@ -10,7 +10,7 @@ export interface IStudentSkills {
   listSkills: IListSkillDTO[];
 }
 
-interface IListSkillDTO {
+export interface IListSkillDTO {
   skillId: string;
   skillName: string;
   skillTypeId: number;

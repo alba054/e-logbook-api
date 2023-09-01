@@ -242,6 +242,15 @@ export class StudentRouter {
         AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
         this.studentHandler.getStudentWeeklyAssesments
       );
+
+    // * student statistics
+    this.router
+      .route(this.path + "/statistics")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getStudentStatistics
+      );
+
     // * get student detail by studentId
     this.router
       .route(this.path + "/:studentId")

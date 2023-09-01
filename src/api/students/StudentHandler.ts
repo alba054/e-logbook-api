@@ -57,6 +57,7 @@ import { IStudentProblemConsultations } from "../../utils/dto/ProblemConsultatio
 import { IStudentProfileDTO } from "../../utils/dto/StudentProfileDTO";
 import { WeeklyAssesmentService } from "../../services/database/WeeklyAssesmentService";
 import { IStudentWeeklyAssesment } from "../../utils/dto/WeeklyAssesmentDTO";
+import { IStudentStastic } from "../../utils/dto/StudentDTO";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -141,6 +142,59 @@ export class StudentHandler {
       this.getStudentProfileByStudentId.bind(this);
     this.getStudentWeeklyAssesments =
       this.getStudentWeeklyAssesments.bind(this);
+    this.getStudentStatistics = this.getStudentStatistics.bind(this);
+  }
+
+  async getStudentStatistics(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    // const activeUnit = await this.studentService.getActiveUnit(
+    //   tokenPayload.studentId ?? ""
+    // );
+
+    const cases = await this.competencyService.getCasesByStudentAndUnitId(
+      tokenPayload
+    );
+    const skills = await this.competencyService.getSkillsByStudentAndUnitId(
+      tokenPayload
+    );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        discussedCases: cases.filter((c) => c.competencyType === "DISCUSSED")
+          .length,
+        obtainedCases: cases.filter((c) => c.competencyType === "OBTAINED")
+          .length,
+        observedCases: cases.filter((c) => c.competencyType === "OBSERVED")
+          .length,
+        discussedSkills: skills.filter((c) => c.competencyType === "DISCUSSED")
+          .length,
+        obtainedSkills: skills.filter((c) => c.competencyType === "OBTAINED")
+          .length,
+        observedSkills: skills.filter((c) => c.competencyType === "OBSERVED")
+          .length,
+        verifiedCases: cases.filter((c) => c.verificationStatus === "VERIFIED")
+          .length,
+        verifiedSkills: skills.filter(
+          (c) => c.verificationStatus === "VERIFIED"
+        ).length,
+        cases: cases.map((c) => {
+          return {
+            caseId: c.id,
+            caseName: c.name,
+            caseType: c.competencyType,
+            verificationStatus: c.verificationStatus,
+          };
+        }),
+        skills: skills.map((c) => {
+          return {
+            skillId: c.id,
+            skillName: c.name,
+            skillType: c.competencyType,
+            verificationStatus: c.verificationStatus,
+          };
+        }),
+      } as IStudentStastic)
+    );
   }
 
   async getStudentWeeklyAssesments(
