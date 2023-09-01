@@ -109,7 +109,7 @@ export class CheckInCheckOut {
       }
 
       await this.historyModel.insertHistory(
-        "CHECK_IN",
+        "CHECK_OUT",
         getUnixTimestamp(),
         lastCheckin?.studentId,
         undefined,
