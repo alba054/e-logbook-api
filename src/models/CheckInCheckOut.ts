@@ -70,7 +70,8 @@ export class CheckInCheckOut {
         getUnixTimestamp(),
         checkIn?.studentId,
         undefined,
-        checkIn?.id
+        checkIn?.id,
+        unitId
       );
 
       // if (verified) {
