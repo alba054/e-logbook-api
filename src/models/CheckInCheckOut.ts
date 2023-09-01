@@ -70,7 +70,8 @@ export class CheckInCheckOut {
         getUnixTimestamp(),
         checkIn?.studentId,
         undefined,
-        checkIn?.id
+        checkIn?.id,
+        unitId
       );
 
       // if (verified) {
@@ -106,6 +107,15 @@ export class CheckInCheckOut {
       if (lastCheckin === null) {
         return createErrorObject(404, "cannot find last check-out");
       }
+
+      await this.historyModel.insertHistory(
+        "CHECK_IN",
+        getUnixTimestamp(),
+        lastCheckin?.studentId,
+        undefined,
+        lastCheckin?.id,
+        unitId
+      );
 
       return db.checkInCheckOut.updateMany({
         where: {
