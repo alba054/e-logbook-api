@@ -108,6 +108,15 @@ export class CheckInCheckOut {
         return createErrorObject(404, "cannot find last check-out");
       }
 
+      await this.historyModel.insertHistory(
+        "CHECK_IN",
+        getUnixTimestamp(),
+        lastCheckin?.studentId,
+        undefined,
+        lastCheckin?.id,
+        unitId
+      );
+
       return db.checkInCheckOut.updateMany({
         where: {
           id: lastCheckin.id,
