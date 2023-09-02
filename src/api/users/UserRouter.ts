@@ -42,7 +42,17 @@ export class UserRouter {
         ]),
         this.userHandler.putUserProfile
       )
-      .post(BasicAuthMiddleware.authenticateAdmin(), this.userHandler.postUser);
+      .post(BasicAuthMiddleware.authenticateAdmin(), this.userHandler.postUser)
+      .delete(
+        AuthorizationBearer.authorize([
+          constants.ER_ROLE,
+          constants.DPK_ROLE,
+          constants.ADMIN_ROLE,
+          constants.STUDENT_ROLE,
+          constants.SUPERVISOR_ROLE,
+        ]),
+        this.userHandler.deleteUserAccount
+      );
     // * login
     this.router.post(
       this.path + "/login",

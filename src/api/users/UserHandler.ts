@@ -1,4 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { constants, createResponse } from "../../utils";
 import { AuthenticationService } from "../../services/facade/AuthenticationService";
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
@@ -35,6 +35,36 @@ export class UserHandler {
     this.getUserProfilePicByUserId = this.getUserProfilePicByUserId.bind(this);
     this.getAllUsers = this.getAllUsers.bind(this);
     this.deleteUserById = this.deleteUserById.bind(this);
+    this.deleteUserAccount = this.deleteUserAccount.bind(this);
+  }
+
+  async deleteUserAccount(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    try {
+      const result = await this.userService.deleteUserByUsername(
+        tokenPayload.username
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "deleted user")
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async deleteUserById(req: Request, res: Response, next: NextFunction) {
