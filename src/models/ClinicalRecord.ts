@@ -1,6 +1,6 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
-import { createErrorObject } from "../utils";
+import { constants, createErrorObject } from "../utils";
 import { IPutVerificationStatusClinicalRecord } from "../utils/interfaces/ClinicalRecord";
 import { ITokenPayload } from "../utils/interfaces/TokenPayload";
 
@@ -130,16 +130,30 @@ export class ClinicalRecord {
 
   async getClinicalRecordsByStatusAndSupervisorId(
     status: any,
+    page: any = 1,
+    offset: any = constants.HISTORY_ELEMENTS_PER_PAGE,
+    patient: any,
+    name: any,
+    nim: any,
+    sort: any,
+    order: "asc" | "desc",
     supervisorId?: string
   ) {
     return db.clinicalRecord.findMany({
       where: {
         verificationStatus: status,
+        Student: {
+          fullName: { contains: name },
+          studentId: nim,
+        },
+        patientName: patient,
         supervisorId,
       },
       include: {
         Student: true,
       },
+      take: offset,
+      skip: offset * (page - 1),
     });
   }
 }
