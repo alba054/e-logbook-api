@@ -5,6 +5,10 @@ export interface IPostStudentPayload {
   readonly email: string;
   readonly firstName: string;
   readonly lastName: string;
+  readonly address?: string;
+  readonly dateOfBirth?: number;
+  readonly placeOfBirth?: string;
+  readonly gender?: "MALE" | "FEMALE";
 }
 
 export interface IPutStudentData {

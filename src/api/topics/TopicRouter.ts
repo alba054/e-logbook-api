@@ -33,6 +33,13 @@ export class TopicRouter {
       this.topicHandler.postTopic
     );
 
+    // * delete topic
+    this.router.delete(
+      this.path + "/:id",
+      AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+      this.topicHandler.deleteTopic
+    );
+
     return this.router;
   }
 }

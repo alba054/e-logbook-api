@@ -19,6 +19,10 @@ export class UserService {
     this.userModel = new User();
   }
 
+  async getUserByFilter(role: any, name: any, nim: any, badge: any) {
+    return this.userModel.getUserByRoleNameNimBadge(role, name, nim, badge);
+  }
+
   async deleteUserByUsername(username: string) {
     const user = await this.userModel.getUserByUsername(username);
 
