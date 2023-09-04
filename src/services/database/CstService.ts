@@ -121,11 +121,23 @@ export class CstService {
     );
   }
 
-  async getCstsBySupervisor(tokenPayload: ITokenPayload) {
+  async getCstsBySupervisor(
+    tokenPayload: ITokenPayload,
+    name: any,
+    nim: any,
+    page: any,
+    take: any
+  ) {
     if (tokenPayload.badges?.includes(constants.CEU_BADGE)) {
-      return this.cstModel.getCsts();
+      return this.cstModel.getCsts(name, nim, page, take);
     }
-    return this.cstModel.getCstsBySupervisorId(tokenPayload.supervisorId);
+    return this.cstModel.getCstsBySupervisorId(
+      tokenPayload.supervisorId,
+      name,
+      nim,
+      page,
+      take
+    );
   }
 
   async insertNewCst(tokenPayload: ITokenPayload, payload: IPostCST) {

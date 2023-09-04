@@ -240,8 +240,15 @@ export class CstHandler {
 
   async getCsts(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
+    const { name, nim, page } = req.query;
 
-    const result = await this.cstService.getCstsBySupervisor(tokenPayload);
+    const result = await this.cstService.getCstsBySupervisor(
+      tokenPayload,
+      name,
+      nim,
+      parseInt(String(page ?? "1")),
+      constants.HISTORY_ELEMENTS_PER_PAGE
+    );
 
     return res.status(200).json(
       createResponse(

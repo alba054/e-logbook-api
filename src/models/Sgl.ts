@@ -78,12 +78,20 @@ export class Sgl {
     });
   }
 
-  async getSgls() {
+  async getSgls(name: any, nim: any, page: any, take: any) {
     return db.sGL.findMany({
+      where: {
+        Student: {
+          fullName: { contains: name },
+          studentId: nim,
+        },
+      },
       include: {
         topics: true,
         Student: true,
       },
+      skip: (page - 1) * take,
+      take,
     });
   }
 
@@ -176,13 +184,23 @@ export class Sgl {
     });
   }
 
-  async getSglsBySupervisorId(supervisorId: string | undefined) {
+  async getSglsBySupervisorId(
+    supervisorId: string | undefined,
+    name: any,
+    nim: any,
+    page: any,
+    take: any
+  ) {
     return db.sGL.findMany({
       where: {
         topics: {
           some: {
             supervisorId,
           },
+        },
+        Student: {
+          fullName: { contains: name },
+          studentId: nim,
         },
       },
       include: {
@@ -193,6 +211,8 @@ export class Sgl {
         },
         Student: true,
       },
+      skip: (page - 1) * take,
+      take,
     });
   }
 
