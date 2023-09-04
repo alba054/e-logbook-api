@@ -121,11 +121,23 @@ export class SglService {
     );
   }
 
-  async getSglsBySupervisor(tokenPayload: ITokenPayload) {
+  async getSglsBySupervisor(
+    tokenPayload: ITokenPayload,
+    name: any,
+    nim: any,
+    page: any,
+    take: any
+  ) {
     if (tokenPayload.badges?.includes(constants.CEU_BADGE)) {
-      return this.sglModel.getSgls();
+      return this.sglModel.getSgls(name, nim, page, take);
     }
-    return this.sglModel.getSglsBySupervisorId(tokenPayload.supervisorId);
+    return this.sglModel.getSglsBySupervisorId(
+      tokenPayload.supervisorId,
+      name,
+      nim,
+      page,
+      take
+    );
   }
 
   async insertNewSgl(tokenPayload: ITokenPayload, payload: IPostSGL) {

@@ -82,12 +82,20 @@ export class Cst {
     });
   }
 
-  async getCsts() {
+  async getCsts(name: any, nim: any, page: any, take: any) {
     return db.cST.findMany({
+      where: {
+        Student: {
+          fullName: { contains: name },
+          studentId: nim,
+        },
+      },
       include: {
         topics: true,
         Student: true,
       },
+      skip: (page - 1) * take,
+      take,
     });
   }
 
@@ -180,13 +188,23 @@ export class Cst {
     });
   }
 
-  async getCstsBySupervisorId(supervisorId: string | undefined) {
+  async getCstsBySupervisorId(
+    supervisorId: string | undefined,
+    name: any,
+    nim: any,
+    page: any,
+    take: any
+  ) {
     return db.cST.findMany({
       where: {
         topics: {
           some: {
             supervisorId,
           },
+        },
+        Student: {
+          fullName: { contains: name },
+          studentId: nim,
         },
       },
       include: {
@@ -197,6 +215,8 @@ export class Cst {
         },
         Student: true,
       },
+      skip: (page - 1) * take,
+      take,
     });
   }
 

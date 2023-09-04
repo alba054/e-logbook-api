@@ -150,6 +150,12 @@ export class StudentHandler {
     // const activeUnit = await this.studentService.getActiveUnit(
     //   tokenPayload.studentId ?? ""
     // );
+    const student = await this.studentService.getStudentById(
+      tokenPayload.studentId
+    );
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
 
     const cases = await this.competencyService.getCasesByStudentAndUnitId(
       tokenPayload
@@ -157,6 +163,51 @@ export class StudentHandler {
     const skills = await this.competencyService.getSkillsByStudentAndUnitId(
       tokenPayload
     );
+    const assesments =
+      await this.assesmentService.getAssesmentsByStudentIdAndUnitId(
+        student?.studentId ?? "",
+        activeUnit?.activeUnit.activeUnit?.id ?? ""
+      );
+
+    let finalScore = 0;
+
+    assesments.forEach((a) => {
+      let grade = 0;
+      if (a.MiniCex) {
+        if (a.MiniCex.MiniCexGrade) {
+          a.MiniCex.MiniCexGrade.forEach((g) => {
+            grade += g.score ?? 0;
+          });
+          grade = grade / a.MiniCex?.MiniCexGrade.length;
+        }
+      }
+
+      if (a.ScientificAssesment) {
+        if (a.ScientificAssesment?.grades) {
+          a.ScientificAssesment?.grades.forEach((g) => {
+            grade += g.score ?? 0;
+          });
+          grade = grade / a.ScientificAssesment?.grades.length;
+        }
+      }
+
+      if (a.osce) {
+        grade = a.osce.score ?? 0;
+      }
+
+      if (a.cbt) {
+        grade = a.cbt.score ?? 0;
+      }
+
+      finalScore =
+        finalScore +
+        grade *
+          (a.MiniCex?.weight ??
+            a.ScientificAssesment?.weight ??
+            a.osce?.weight ??
+            a.cbt?.weight ??
+            0);
+    });
 
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
@@ -193,6 +244,7 @@ export class StudentHandler {
             verificationStatus: c.verificationStatus,
           };
         }),
+        finalScore
       } as IStudentStastic)
     );
   }

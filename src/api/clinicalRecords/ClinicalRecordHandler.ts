@@ -349,7 +349,7 @@ export class ClinicalRecordHandler {
     const clinicalRecords =
       await this.clinicalRecordService.getSubmittedClinicalRecords(
         status,
-        parseInt(String(page)),
+        parseInt(String(page ?? "1")),
         constants.HISTORY_ELEMENTS_PER_PAGE,
         patient,
         name,

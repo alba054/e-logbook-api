@@ -129,7 +129,7 @@ export class ScientificSessionHandler {
     const scientificSessions =
       await this.scientificSessionService.getSubmittedScientificSessions(
         status,
-        parseInt(String(page)),
+        parseInt(String(page ?? "1")),
         constants.HISTORY_ELEMENTS_PER_PAGE,
         name,
         nim,
