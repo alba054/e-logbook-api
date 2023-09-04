@@ -18,6 +18,37 @@ export class TopicHandler {
 
     this.getTopics = this.getTopics.bind(this);
     this.postTopic = this.postTopic.bind(this);
+    this.deleteTopic = this.deleteTopic.bind(this);
+  }
+
+  async deleteTopic(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+
+    try {
+      const result = await this.topicService.deleteTopicById(Number(id));
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully delete topic"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async postTopic(req: Request, res: Response, next: NextFunction) {

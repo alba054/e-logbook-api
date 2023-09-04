@@ -8,6 +8,10 @@ export const StudentPayloadSchema = UserPayloadSchema.append({
     .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/),
   firstName: Joi.string().optional(),
   lastName: Joi.string().optional(),
+  placeOfBirth: Joi.string().optional(),
+  dateOfBirth: Joi.number().optional(),
+  address: Joi.string().optional(),
+  gender: Joi.string().valid("MALE", "FEMALE").optional(),
 });
 
 export const StudentResetPasswordPayloadSchema = Joi.object({

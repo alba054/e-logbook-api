@@ -95,11 +95,11 @@ export class UserHandler {
   }
 
   async getAllUsers(req: Request, res: Response, next: NextFunction) {
-    const { role } = req.query;
+    const { role, name, nim, badge } = req.query;
 
     let users;
-    if (role) {
-      users = await this.userService.getUserByRole(role);
+    if (role || name || nim || badge) {
+      users = await this.userService.getUserByFilter(role, name, nim, badge);
     } else {
       users = await this.userService.getAllUsers();
     }

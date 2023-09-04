@@ -6,6 +6,38 @@ import { IPutUserProfile } from "../utils/interfaces/User";
 export class User {
   constructor() {}
 
+  async getUserByRoleNameNimBadge(role: any, name: any, nim: any, badge: any) {
+    return db.user.findMany({
+      where: {
+        role,
+        badges: { some: badge },
+        OR: [
+          {
+            student: {
+              fullName: { contains: name },
+              studentId: nim,
+            },
+          },
+          {
+            supervisor: {
+              fullname: { contains: name },
+              supervisorId: nim,
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        student: true,
+        supervisor: true,
+        badges: true,
+        email: true,
+        username: true,
+        role: true,
+      },
+    });
+  }
+
   async deleteUserByUsername(username: string) {
     return db.user.delete({
       where: {

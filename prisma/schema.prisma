@@ -54,6 +54,9 @@ model Student {
   clinicalRecords         ClinicalRecord[]
   CheckInCheckOut         CheckInCheckOut[]
   unitId                  String?               @db.VarChar(100)
+  gender                  Gender?
+  placeOfBirth            String?               @db.VarChar(100)
+  dateOfBirth             BigInt?               @db.UnsignedBigInt
   User                    User[]
   ScientificSession       ScientificSession[]
   SelfReflection          SelfReflection[]
@@ -75,6 +78,10 @@ model Supervisor {
   id                 String              @id @db.VarChar(100)
   fullname           String?             @db.VarChar(255)
   supervisorId       String?             @unique @db.VarChar(50)
+  gender             Gender?
+  placeOfBirth       String?             @db.VarChar(100)
+  dateOfBirth        BigInt?             @db.UnsignedBigInt
+  address            String?             @db.VarChar(255)
   User               User[]
   academinSupervisor Student[]           @relation("academicSupervisor")
   supervisingDPK     Student[]           @relation("supervisingDPK")
