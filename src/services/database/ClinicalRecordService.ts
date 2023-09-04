@@ -179,22 +179,36 @@ export class ClinicalRecordService {
     supervisorId?: string | undefined
   ) {
     if (status || page || offset || patient || name || nim || sort) {
-      return this.clinicalRecordModel.getClinicalRecordsByStatusAndSupervisorId(
-        status,
-        page,
-        offset,
-        patient,
-        name,
-        nim,
-        sort,
-        order,
-        supervisorId
-      );
+      return {
+        data: await this.clinicalRecordModel.getClinicalRecordsByStatusAndSupervisorId(
+          status,
+          page,
+          offset,
+          patient,
+          name,
+          nim,
+          sort,
+          order,
+          supervisorId
+        ),
+        count: (
+          await this.clinicalRecordModel.getClinicalRecordsBySupervisorId(
+            supervisorId
+          )
+        ).length,
+      };
     }
 
-    return this.clinicalRecordModel.getClinicalRecordsBySupervisorId(
-      supervisorId
-    );
+    return {
+      data: await this.clinicalRecordModel.getClinicalRecordsBySupervisorId(
+        supervisorId
+      ),
+      count: (
+        await this.clinicalRecordModel.getClinicalRecordsBySupervisorId(
+          supervisorId
+        )
+      ).length,
+    };
   }
 
   async insertNewClinicalRecord(

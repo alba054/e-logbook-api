@@ -6,6 +6,7 @@ export interface IListClinicalRecordDTO {
   studentId?: string;
   attachment?: string;
   status: "VERIFIED" | "UNVERIFIED" | "INPROCESS";
+  pages?: number;
 }
 
 export interface IClinicalRecordDetailDTO {
