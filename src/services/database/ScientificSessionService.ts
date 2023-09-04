@@ -109,10 +109,21 @@ export class ScientificSessionService {
     return scientificSession.attachment;
   }
 
-  async getSubmittedScientificSessions(status: any, supervisorId?: string) {
+  async getSubmittedScientificSessions(
+    status: any,
+    page: any,
+    take: any,
+    name: any,
+    nim: any,
+    supervisorId?: string
+  ) {
     if (status) {
       return this.scientificSessionModel.getScientificSessionsByStatusAndSupervisorId(
         status,
+        page,
+        take,
+        name,
+        nim,
         supervisorId
       );
     }

@@ -123,12 +123,16 @@ export class ScientificSessionHandler {
     res: Response,
     next: NextFunction
   ) {
-    const { status } = req.query;
+    const { status, name, nim, page } = req.query;
 
     const tokenPayload: ITokenPayload = res.locals.user;
     const scientificSessions =
       await this.scientificSessionService.getSubmittedScientificSessions(
         status,
+        parseInt(String(page)),
+        constants.HISTORY_ELEMENTS_PER_PAGE,
+        name,
+        nim,
         tokenPayload.supervisorId
       );
 

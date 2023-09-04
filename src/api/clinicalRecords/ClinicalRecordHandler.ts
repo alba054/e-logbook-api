@@ -342,15 +342,20 @@ export class ClinicalRecordHandler {
     res: Response,
     next: NextFunction
   ) {
-    const { status, page, offset, query } = req.query;
+    const { status, page, patient, name, nim, sortBy, order } = req.query;
 
     const tokenPayload: ITokenPayload = res.locals.user;
+
     const clinicalRecords =
       await this.clinicalRecordService.getSubmittedClinicalRecords(
         status,
-        Number(page),
-        Number(offset),
-        query,
+        parseInt(String(page)),
+        constants.HISTORY_ELEMENTS_PER_PAGE,
+        patient,
+        name,
+        nim,
+        sortBy,
+        order,
         tokenPayload.supervisorId
       );
 

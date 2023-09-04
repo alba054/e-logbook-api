@@ -83,16 +83,26 @@ export class ScientificSession {
 
   async getScientificSessionsByStatusAndSupervisorId(
     status: any,
+    page: any,
+    take: any,
+    name: any,
+    nim: any,
     supervisorId?: string
   ) {
     return db.scientificSession.findMany({
       where: {
         verificationStatus: status,
+        Student: {
+          fullName: { contains: name },
+          studentId: nim,
+        },
         supervisorId,
       },
       include: {
         Student: true,
       },
+      take: take,
+      skip: take * (page - 1),
     });
   }
 

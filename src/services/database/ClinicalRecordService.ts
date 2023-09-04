@@ -6,7 +6,7 @@ import {
 } from "../../utils/interfaces/ClinicalRecord";
 import { v4 as uuidv4 } from "uuid";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { createErrorObject, getUnixTimestamp } from "../../utils";
+import { constants, createErrorObject, getUnixTimestamp } from "../../utils";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentService } from "./StudentService";
 import { ClinicalRecord } from "../../models/ClinicalRecord";
@@ -169,14 +169,25 @@ export class ClinicalRecordService {
 
   async getSubmittedClinicalRecords(
     status: any,
-    page: number | undefined,
-    offset: number | undefined,
-    query: any,
-    supervisorId?: string
+    page: any,
+    offset: any = constants.HISTORY_ELEMENTS_PER_PAGE,
+    patient: any,
+    name: any,
+    nim: any,
+    sort: any,
+    order: any,
+    supervisorId?: string | undefined
   ) {
-    if (status) {
+    if (status || page || offset || patient || name || nim || sort) {
       return this.clinicalRecordModel.getClinicalRecordsByStatusAndSupervisorId(
         status,
+        page,
+        offset,
+        patient,
+        name,
+        nim,
+        sort,
+        order,
         supervisorId
       );
     }
