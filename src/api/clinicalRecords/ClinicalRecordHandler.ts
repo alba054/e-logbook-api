@@ -362,7 +362,7 @@ export class ClinicalRecordHandler {
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        clinicalRecords.map((c) => {
+        clinicalRecords.data.map((c) => {
           return {
             patientName: c.patientName,
             studentId: c.Student?.studentId,
@@ -371,6 +371,9 @@ export class ClinicalRecordHandler {
             attachment: c.attachment,
             id: c.id,
             status: c.verificationStatus,
+            pages: Math.ceil(
+              clinicalRecords.count / constants.HISTORY_ELEMENTS_PER_PAGE
+            ),
           } as IListClinicalRecordDTO;
         })
       )

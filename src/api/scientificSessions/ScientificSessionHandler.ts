@@ -139,7 +139,7 @@ export class ScientificSessionHandler {
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        scientificSessions.map((c) => {
+        scientificSessions.data.map((c) => {
           return {
             studentId: c.Student?.studentId,
             studentName: c.Student?.fullName,
@@ -147,6 +147,9 @@ export class ScientificSessionHandler {
             attachment: c.attachment,
             id: c.id,
             status: c.verificationStatus,
+            pages: Math.ceil(
+              scientificSessions.count / constants.HISTORY_ELEMENTS_PER_PAGE
+            ),
           } as IListScientificSessionDTO;
         })
       )

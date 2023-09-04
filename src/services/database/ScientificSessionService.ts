@@ -118,19 +118,33 @@ export class ScientificSessionService {
     supervisorId?: string
   ) {
     if (status) {
-      return this.scientificSessionModel.getScientificSessionsByStatusAndSupervisorId(
-        status,
-        page,
-        take,
-        name,
-        nim,
-        supervisorId
-      );
+      return {
+        data: await this.scientificSessionModel.getScientificSessionsByStatusAndSupervisorId(
+          status,
+          page,
+          take,
+          name,
+          nim,
+          supervisorId
+        ),
+        count: (
+          await this.scientificSessionModel.getScientificSessionsBySupervisorId(
+            supervisorId
+          )
+        ).length,
+      };
     }
 
-    return this.scientificSessionModel.getScientificSessionsBySupervisorId(
-      supervisorId
-    );
+    return {
+      data: await this.scientificSessionModel.getScientificSessionsBySupervisorId(
+        supervisorId
+      ),
+      count: (
+        await this.scientificSessionModel.getScientificSessionsBySupervisorId(
+          supervisorId
+        )
+      ).length,
+    };
   }
 
   async verifyScientificSession(
