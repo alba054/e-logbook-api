@@ -95,7 +95,25 @@ export class UserHandler {
   }
 
   async getAllUsers(req: Request, res: Response, next: NextFunction) {
-    const { role, name, nim, badge } = req.query;
+    let { role, name, nim, badge } = req.query;
+
+    if (
+      role === "" ||
+      role !== constants.ER_ROLE ||
+      role !== constants.DPK_ROLE ||
+      role !== constants.ADMIN_ROLE ||
+      role !== constants.STUDENT_ROLE ||
+      role !== constants.SUPERVISOR_ROLE
+    ) {
+      role = undefined;
+    }
+    if (
+      badge === "" ||
+      badge !== constants.CEU_BADGE ||
+      badge !== constants.HEAD_DIV_BADGE
+    ) {
+      badge = undefined;
+    }
 
     let users;
     if (role || name || nim || badge) {

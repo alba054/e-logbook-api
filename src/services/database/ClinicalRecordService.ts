@@ -178,7 +178,7 @@ export class ClinicalRecordService {
     order: any,
     supervisorId?: string | undefined
   ) {
-    if (status || page || offset || patient || name || nim || sort) {
+    if (status || patient || name || nim || sort) {
       return {
         data: await this.clinicalRecordModel.getClinicalRecordsByStatusAndSupervisorId(
           status,

@@ -1,6 +1,6 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
-import { createErrorObject } from "../utils";
+import { constants, createErrorObject } from "../utils";
 import { IPutUserProfile } from "../utils/interfaces/User";
 
 export class User {

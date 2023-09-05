@@ -131,7 +131,7 @@ export class ClinicalRecord {
   async getClinicalRecordsByStatusAndSupervisorId(
     status: any,
     page: any = 1,
-    offset: any = constants.HISTORY_ELEMENTS_PER_PAGE,
+    offset: any,
     patient: any,
     name: any,
     nim: any,
