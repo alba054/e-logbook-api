@@ -342,7 +342,7 @@ export class ClinicalRecordHandler {
     res: Response,
     next: NextFunction
   ) {
-    const { status, page, patient, name, nim, sortBy, order } = req.query;
+    let { status, page, patient, name, nim, sortBy, order } = req.query;
 
     const tokenPayload: ITokenPayload = res.locals.user;
 

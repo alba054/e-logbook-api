@@ -161,7 +161,8 @@ export class AssesmentHandler {
           a.MiniCex.MiniCexGrade.forEach((g) => {
             grade += g.score ?? 0;
           });
-          grade = grade / a.MiniCex?.MiniCexGrade.length;
+          grade = grade / (a.MiniCex.MiniCexGrade.length || 1);
+          grade *= a.MiniCex.weight;
         }
       }
 
@@ -171,25 +172,21 @@ export class AssesmentHandler {
             grade += g.score ?? 0;
           });
           grade = grade / a.ScientificAssesment?.grades.length;
+          grade *= a.ScientificAssesment.weight;
         }
       }
 
       if (a.osce) {
         grade = a.osce.score ?? 0;
+        grade *= a.osce.weight;
       }
 
       if (a.cbt) {
         grade = a.cbt.score ?? 0;
+        grade *= a.cbt.weight;
       }
 
-      finalScore =
-        finalScore +
-        grade *
-          (a.MiniCex?.weight ??
-            a.ScientificAssesment?.weight ??
-            a.osce?.weight ??
-            a.cbt?.weight ??
-            0);
+      finalScore = finalScore + grade;
     });
 
     return res.status(200).json(

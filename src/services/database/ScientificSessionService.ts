@@ -117,7 +117,7 @@ export class ScientificSessionService {
     nim: any,
     supervisorId?: string
   ) {
-    if (status) {
+    if (status || name || nim) {
       return {
         data: await this.scientificSessionModel.getScientificSessionsByStatusAndSupervisorId(
           status,
