@@ -214,9 +214,7 @@ export class AssesmentService {
     }
 
     if (
-      miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
-      miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
-      miniCex?.Student?.academicSupervisorId !== tokenPayload.supervisorId
+      miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId
     ) {
       return createErrorObject(400, "data's not for you");
     }
@@ -311,11 +309,7 @@ export class AssesmentService {
       return createErrorObject(404, "mini cex's not found");
     }
 
-    if (
-      miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
-      miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
-      miniCex?.Student?.academicSupervisorId !== tokenPayload.supervisorId
-    ) {
+    if (miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId) {
       return createErrorObject(400, "data's not for you");
     }
 
