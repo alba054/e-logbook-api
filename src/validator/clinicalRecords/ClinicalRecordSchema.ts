@@ -1,4 +1,4 @@
-import Joi, { string } from "joi";
+import Joi from "joi";
 export const ClinicalRecordPayloadSchema = Joi.object({
   patientName: Joi.string().required(),
   patientAge: Joi.number().min(1),
@@ -9,19 +9,16 @@ export const ClinicalRecordPayloadSchema = Joi.object({
   studentFeedback: Joi.string().optional(),
   examinations: Joi.array().items(
     Joi.object({
-      affectedPartId: Joi.string().required(),
       examinationTypeId: Joi.array().items(Joi.string()).min(1),
     })
   ),
   diagnosiss: Joi.array().items(
     Joi.object({
-      affectedPartId: Joi.string().required(),
       diagnosisTypeId: Joi.array().items(Joi.string()).min(1),
     })
   ),
   managements: Joi.array().items(
     Joi.object({
-      affectedPartId: Joi.string().required(),
       management: Joi.array()
         .items(
           Joi.object({

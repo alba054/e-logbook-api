@@ -162,25 +162,12 @@ export class ClinicalRecordHandler {
         }
       }
 
-      const affectedPartIds = {
-        diagnosess: [] as string[],
-        examinations: [] as string[],
-        managements: [] as string[],
-      };
-
       const diagnosess = [];
       const examinations = [];
       const managements = [];
 
       for (let i = 0; i < clinicalRecord.ClinicalRecordDiagnosis.length; i++) {
-        const diagnosis = clinicalRecord.ClinicalRecordDiagnosis[i];
-        const affectedPart = diagnosis.affectedPartId;
-        if (affectedPartIds.diagnosess.includes(affectedPart)) {
-          continue;
-        }
         const types: string[] = [];
-
-        affectedPartIds.diagnosess.push(affectedPart);
 
         for (
           let j = 0;
@@ -189,13 +176,10 @@ export class ClinicalRecordHandler {
         ) {
           const diagToSeekFor = clinicalRecord.ClinicalRecordDiagnosis[j];
 
-          if (diagToSeekFor.affectedPartId === affectedPart) {
-            types.push(diagToSeekFor.DiagnosisType.typeName);
-          }
+          types.push(diagToSeekFor.DiagnosisType.typeName);
         }
 
         diagnosess.push({
-          affectedPart: diagnosis.affectedPart.partName,
           diagnosesType: types,
         });
       }
@@ -205,14 +189,7 @@ export class ClinicalRecordHandler {
         i < clinicalRecord.ClinicalRecordExamination.length;
         i++
       ) {
-        const examination = clinicalRecord.ClinicalRecordExamination[i];
-        const affectedPart = examination.affectedPartId;
-        if (affectedPartIds.examinations.includes(affectedPart)) {
-          continue;
-        }
         const types: string[] = [];
-
-        affectedPartIds.examinations.push(affectedPart);
 
         for (
           let j = 0;
@@ -221,26 +198,16 @@ export class ClinicalRecordHandler {
         ) {
           const diagToSeekFor = clinicalRecord.ClinicalRecordExamination[j];
 
-          if (diagToSeekFor.affectedPartId === affectedPart) {
-            types.push(diagToSeekFor.examinationType.typeName);
-          }
+          types.push(diagToSeekFor.examinationType.typeName);
         }
 
         examinations.push({
-          affectedPart: examination.affectedPart.partName,
           examinationType: types,
         });
       }
 
       for (let i = 0; i < clinicalRecord.ClinicalRecordManagement.length; i++) {
-        const management = clinicalRecord.ClinicalRecordManagement[i];
-        const affectedPart = management.affectedPartId;
-        if (affectedPartIds.managements.includes(affectedPart)) {
-          continue;
-        }
         const types = [];
-
-        affectedPartIds.managements.push(affectedPart);
 
         for (
           let j = 0;
@@ -249,16 +216,13 @@ export class ClinicalRecordHandler {
         ) {
           const diagToSeekFor = clinicalRecord.ClinicalRecordManagement[j];
 
-          if (diagToSeekFor.affectedPartId === affectedPart) {
-            types.push({
-              managementType: diagToSeekFor.managementType.typeName,
-              managementRole: diagToSeekFor.managementRole.roleName,
-            });
-          }
+          types.push({
+            managementType: diagToSeekFor.managementType.typeName,
+            managementRole: diagToSeekFor.managementRole.roleName,
+          });
         }
 
         managements.push({
-          affectedPart: management.affectedPart.partName,
           management: types,
         });
       }

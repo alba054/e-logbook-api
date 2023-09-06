@@ -11,6 +11,8 @@ export interface IPostSupervisorPayload {
   readonly dateOfBirth?: number;
   readonly placeOfBirth?: string;
   readonly gender?: "MALE" | "FEMALE";
+  readonly location?: number[];
+  readonly units?: string[];
 }
 
 export interface IPostSupervisorBadgePayload {

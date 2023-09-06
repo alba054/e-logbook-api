@@ -228,7 +228,7 @@ export class StudentHandler {
         cases: cases.map((c) => {
           return {
             caseId: c.id,
-            caseName: c.name,
+            caseName: c.case?.name,
             caseType: c.competencyType,
             verificationStatus: c.verificationStatus,
           };
@@ -236,12 +236,12 @@ export class StudentHandler {
         skills: skills.map((c) => {
           return {
             skillId: c.id,
-            skillName: c.name,
+            skillName: c.skill?.name,
             skillType: c.competencyType,
             verificationStatus: c.verificationStatus,
           };
         }),
-        finalScore
+        finalScore,
       } as IStudentStastic)
     );
   }
@@ -382,12 +382,14 @@ export class StudentHandler {
               createdAt: r.createdAt,
               verificationStatus: r.verificationStatus,
               cstId: r.id,
+              endTime: Number(r.endTime),
+              startTime: Number(r.startTime),
+              supervisorName: r.supervisor.fullname,
+              supervisorId: r.supervisor.supervisorId,
               topic: r.topics.map((t) => ({
                 topicName: t.topic.map((n) => n.name),
                 verificationStatus: t.verificationStatus,
-                endTime: Number(t.endTime),
                 notes: t.notes,
-                startTime: Number(t.startTime),
                 id: t.id,
               })),
             } as ICstDetail)
@@ -412,13 +414,15 @@ export class StudentHandler {
             ({
               createdAt: r.createdAt,
               verificationStatus: r.verificationStatus,
+              endTime: Number(r.endTime),
               sglId: r.id,
+              startTime: Number(r.startTime),
+              supervisorId: r.supervisor.supervisorId,
+              supervisorName: r.supervisor.fullname,
               topic: r.topics.map((t) => ({
                 topicName: t.topic.map((n) => n.name),
                 verificationStatus: t.verificationStatus,
-                endTime: Number(t.endTime),
                 notes: t.notes,
-                startTime: Number(t.startTime),
                 id: t.id,
               })),
             } as ISglDetail)

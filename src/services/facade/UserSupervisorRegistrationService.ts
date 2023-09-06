@@ -37,6 +37,16 @@ export class UserSupervisorRegistrationService {
                 placeOfBirth: payload.placeOfBirth,
                 dateOfBirth: payload.dateOfBirth,
                 gender: payload.gender,
+                locations: {
+                  connect: payload.location?.map((l) => {
+                    return { id: l };
+                  }),
+                },
+                units: {
+                  connect: payload.units?.map((l) => {
+                    return { id: l };
+                  }),
+                },
               },
             },
           },

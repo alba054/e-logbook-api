@@ -5,6 +5,7 @@ import { constants, createErrorObject } from "../../utils";
 import db from "../../database";
 import {
   IPostCST,
+  IPostCSTTopic,
   IPutCstTopicVerificationStatus,
 } from "../../utils/interfaces/Cst";
 import { Cst } from "../../models/Cst";
@@ -16,6 +17,38 @@ export class CstService {
   constructor() {
     this.studentService = new StudentService();
     this.cstModel = new Cst();
+  }
+
+  async verifyAllCstTopics(
+    id: string,
+    tokenPayload: ITokenPayload,
+    payload: IPutCstTopicVerificationStatus
+  ) {
+    const cst = await this.cstModel.getCstById(id);
+
+    if (!cst) {
+      return createErrorObject(404, "cst topic's not found");
+    }
+
+    if (cst?.supervisorId !== tokenPayload.supervisorId) {
+      return createErrorObject(
+        400,
+        "you are not authorized to verify this cst"
+      );
+    }
+
+    return db.$transaction(
+      cst.topics.map((t) => {
+        return db.cstTopic.update({
+          where: {
+            id: t.id,
+          },
+          data: {
+            verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
+          },
+        });
+      })
+    );
   }
 
   async getCstsByStudentIdAndUnitId(tokenPayload: ITokenPayload) {
@@ -32,7 +65,7 @@ export class CstService {
   async addTopicToCst(
     id: string,
     tokenPayload: ITokenPayload,
-    payload: IPostCST
+    payload: IPostCSTTopic
   ) {
     const sgl = await this.cstModel.getCstById(id);
 
@@ -97,7 +130,7 @@ export class CstService {
       return createErrorObject(404, "Cst topic's not found");
     }
 
-    if (CstTopic?.supervisorId !== tokenPayload.supervisorId) {
+    if (CstTopic?.CST[0]?.supervisorId !== tokenPayload.supervisorId) {
       return createErrorObject(
         400,
         "you are not authorized to verify this Cst"

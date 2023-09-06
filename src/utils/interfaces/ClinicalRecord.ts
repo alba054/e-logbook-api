@@ -23,17 +23,14 @@ export interface IPutFeedbackClinicalRecord {
 }
 
 interface ClinicalRecordExamination {
-  affectedPartId: string;
   examinationTypeId: string[];
 }
 
 interface ClinicalRecordDiagnosis {
-  affectedPartId: string;
   diagnosisTypeId: string[];
 }
 
 interface ClinicalRecordManagement {
-  affectedPartId: string;
   management: [
     {
       managementTypeId: string;

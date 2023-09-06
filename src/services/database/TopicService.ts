@@ -9,6 +9,10 @@ export class TopicService {
     this.topicModel = new Topic();
   }
 
+  async getTopicsByUnitId(unitId: string) {
+    return this.topicModel.getTopicsByUnitId(unitId);
+  }
+
   async deleteTopicById(id: number) {
     const topic = await this.topicModel.getTopicById(id);
 

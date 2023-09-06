@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import bcryptjs from "bcryptjs";
 import { createErrorObject } from "../../utils";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
+import db from "../../database";
 
 interface IUserData {
   id: string;
@@ -40,7 +41,26 @@ export class UserService {
       return createErrorObject(404, "user's not found");
     }
 
-    return this.userModel.deleteUserById(id);
+    const roleToDelete = user.supervisorId
+      ? db.supervisor.delete({
+          where: {
+            id: user.supervisorId ?? "",
+          },
+        })
+      : db.student.delete({
+          where: {
+            id: user.studentId ?? "",
+          },
+        });
+    // return this.userModel.deleteUserById(id);
+    return db.$transaction([
+      db.user.delete({
+        where: {
+          id,
+        },
+      }),
+      roleToDelete,
+    ]);
   }
 
   async getAllUsers() {

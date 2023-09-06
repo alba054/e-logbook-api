@@ -11,17 +11,19 @@ export interface IStudentCst {
 }
 
 export interface ICstDetail {
+  startTime?: number;
+  endTime?: number;
   createdAt: Date | string;
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
   cstId: string;
+  supervisorName?: string;
+  supervisorId?: string;
   topic: ICstTopic[];
 }
 
 export interface ICstTopic {
   topicName: string[];
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
-  startTime?: number;
-  endTime?: number;
   notes?: string;
   id: string;
 }

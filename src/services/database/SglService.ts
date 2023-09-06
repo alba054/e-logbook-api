@@ -1,6 +1,7 @@
 import { Sgl } from "../../models/Sgl";
 import {
   IPostSGL,
+  IPostSGLTopic,
   IPutSglTopicVerificationStatus,
 } from "../../utils/interfaces/Sgl";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
@@ -17,6 +18,37 @@ export class SglService {
     this.studentService = new StudentService();
     this.sglModel = new Sgl();
   }
+  async verifyAllSglTopics(
+    id: string,
+    tokenPayload: ITokenPayload,
+    payload: IPutSglTopicVerificationStatus
+  ) {
+    const sgl = await this.sglModel.getSglById(id);
+
+    if (!sgl) {
+      return createErrorObject(404, "sgl topic's not found");
+    }
+
+    if (sgl?.supervisorId !== tokenPayload.supervisorId) {
+      return createErrorObject(
+        400,
+        "you are not authorized to verify this sgl"
+      );
+    }
+
+    return db.$transaction(
+      sgl.topics.map((t) => {
+        return db.sglTopic.update({
+          where: {
+            id: t.id,
+          },
+          data: {
+            verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
+          },
+        });
+      })
+    );
+  }
 
   async getSglsByStudentIdAndUnitId(tokenPayload: ITokenPayload) {
     const activeUnit = await this.studentService.getActiveUnit(
@@ -32,7 +64,7 @@ export class SglService {
   async addTopicToSgl(
     id: string,
     tokenPayload: ITokenPayload,
-    payload: IPostSGL
+    payload: IPostSGLTopic
   ) {
     const sgl = await this.sglModel.getSglById(id);
 
@@ -97,7 +129,7 @@ export class SglService {
       return createErrorObject(404, "sgl topic's not found");
     }
 
-    if (sglTopic?.supervisorId !== tokenPayload.supervisorId) {
+    if (sglTopic?.SGL?.supervisorId !== tokenPayload.supervisorId) {
       return createErrorObject(
         400,
         "you are not authorized to verify this sgl"

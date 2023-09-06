@@ -4,6 +4,14 @@ import { createErrorObject } from "../utils";
 import { IPostTopicPayload } from "../utils/interfaces/Topic";
 
 export class Topic {
+  async getTopicsByUnitId(unitId: string) {
+    return db.topic.findMany({
+      where: {
+        unitId,
+      },
+    });
+  }
+
   async deleteTopicById(id: number) {
     return db.topic.delete({
       where: {
@@ -25,6 +33,7 @@ export class Topic {
       return db.topic.create({
         data: {
           name: payload.name,
+          unitId: payload.unitId,
         },
       });
     } catch (error) {

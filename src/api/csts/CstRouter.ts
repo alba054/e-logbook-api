@@ -63,6 +63,17 @@ export class CstRouter {
         this.handler.putTopicCst
       );
 
+    // * verify all topics by supervisor
+    this.router
+      .route(this.path + "/:id/topics/verify")
+      .put(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.putAllTopicsVerificationStatus
+      );
+
     // * verify cst topic
     this.router
       .route(this.path + "/topics/:topicId")

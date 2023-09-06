@@ -1,11 +1,30 @@
+import db from "../../database";
 import { Reference } from "../../models/Reference";
 import { createErrorObject } from "../../utils";
+import { UnitService } from "./UnitService";
 
 export class ReferenceService {
   private referenceModel: Reference;
+  private unitService: UnitService;
 
   constructor() {
     this.referenceModel = new Reference();
+    this.unitService = new UnitService();
+  }
+
+  async uploadReferenceToAllUnits(savedFile: string) {
+    const units = await this.unitService.getAllUnits();
+
+    return db.$transaction(
+      units.map((u) => {
+        return db.reference.create({
+          data: {
+            file: savedFile,
+            unitId: u.id,
+          },
+        });
+      })
+    );
   }
 
   async getReferencesByUnit(unitId: string) {

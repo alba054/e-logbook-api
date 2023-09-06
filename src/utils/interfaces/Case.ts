@@ -1,6 +1,7 @@
 export interface IPostCase {
   readonly type: "OBTAINED" | "DISCUSSED" | "OBSERVED";
   readonly caseTypeId: number;
+  readonly supervisorId: string;
 }
 
 export interface IPutCaseVerificationStatus {
