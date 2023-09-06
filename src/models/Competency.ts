@@ -49,19 +49,7 @@ export class Competency {
   async getCompetenciesBySupervisor(supervisorId: string | undefined) {
     return db.competency.findMany({
       where: {
-        Student: {
-          OR: [
-            {
-              academicSupervisorId: supervisorId,
-            },
-            {
-              supervisingSupervisorId: supervisorId,
-            },
-            {
-              examinerSupervisorId: supervisorId,
-            },
-          ],
-        },
+        supervisorId,
         verificationStatus: "INPROCESS",
       },
       orderBy: {
@@ -102,20 +90,8 @@ export class Competency {
   ) {
     return db.competency.findMany({
       where: {
-        Student: {
-          OR: [
-            {
-              academicSupervisorId: supervisorId,
-            },
-            {
-              supervisingSupervisorId: supervisorId,
-            },
-            {
-              examinerSupervisorId: supervisorId,
-            },
-          ],
-          studentId,
-        },
+        supervisorId,
+        studentId,
         type: "CASE",
       },
       include: {
@@ -131,20 +107,8 @@ export class Competency {
   ) {
     return db.competency.findMany({
       where: {
-        Student: {
-          OR: [
-            {
-              academicSupervisorId: supervisorId,
-            },
-            {
-              supervisingSupervisorId: supervisorId,
-            },
-            {
-              examinerSupervisorId: supervisorId,
-            },
-          ],
-          studentId,
-        },
+        supervisorId,
+        studentId,
         type: "SKILL",
       },
       include: {
@@ -157,19 +121,6 @@ export class Competency {
   async getCasesBySupervisor(supervisorId?: string) {
     return db.competency.findMany({
       where: {
-        Student: {
-          OR: [
-            {
-              academicSupervisorId: supervisorId,
-            },
-            {
-              supervisingSupervisorId: supervisorId,
-            },
-            {
-              examinerSupervisorId: supervisorId,
-            },
-          ],
-        },
         verificationStatus: "INPROCESS",
         type: "CASE",
       },
@@ -200,13 +151,14 @@ export class Competency {
               competencyType: payload.type,
               type: "CASE",
               caseTypeId: payload.caseTypeId,
+              supervisorId: payload.supervisorId,
             },
           }),
           this.historyModel.insertHistoryAsync(
             "CASE",
             getUnixTimestamp(),
             studentId,
-            undefined,
+            payload.supervisorId,
             id,
             unitId
           ),
@@ -224,19 +176,7 @@ export class Competency {
   async getSkillsBySupervisor(supervisorId?: string) {
     return db.competency.findMany({
       where: {
-        Student: {
-          OR: [
-            {
-              academicSupervisorId: supervisorId,
-            },
-            {
-              supervisingSupervisorId: supervisorId,
-            },
-            {
-              examinerSupervisorId: supervisorId,
-            },
-          ],
-        },
+        supervisorId,
         verificationStatus: "INPROCESS",
         type: "SKILL",
       },
@@ -267,13 +207,14 @@ export class Competency {
               competencyType: payload.type,
               type: "SKILL",
               skillTypeId: payload.skillTypeId,
+              supervisorId: payload.supervisorId,
             },
           }),
           this.historyModel.insertHistoryAsync(
             "SKILL",
             getUnixTimestamp(),
             studentId,
-            undefined,
+            payload.supervisorId,
             id,
             unitId
           ),

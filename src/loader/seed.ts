@@ -1,7 +1,17 @@
 import db from "../database";
 import { v4 as uuidv4 } from "uuid";
+import bcryptjs from "bcryptjs";
 
 const main = async () => {
+  await db.user.create({
+    data: {
+      id: uuidv4(),
+      username: "admin",
+      password: await bcryptjs.hash("randompassword", 10),
+      role: "ADMIN",
+    },
+  });
+
   await db.badge.createMany({
     data: [
       {
@@ -109,26 +119,6 @@ const main = async () => {
       {
         id: uuidv4(),
         roleName: "management role 3",
-      },
-    ],
-  });
-
-  await db.affectedPart.createMany({
-    data: [
-      {
-        id: uuidv4(),
-        partName: "left eye",
-        unitId: anestesiId,
-      },
-      {
-        id: uuidv4(),
-        partName: "right eye",
-        unitId: anestesiId,
-      },
-      {
-        id: uuidv4(),
-        partName: "both",
-        unitId: anestesiId,
       },
     ],
   });

@@ -6,6 +6,11 @@ export interface IPostSGL {
   notes?: string;
 }
 
+export interface IPostSGLTopic {
+  topicId: number[];
+  notes?: string;
+}
+
 export interface IPutSglTopicVerificationStatus {
   readonly verified: boolean;
 }

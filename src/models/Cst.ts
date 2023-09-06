@@ -3,6 +3,7 @@ import db from "../database";
 import { createErrorObject, getUnixTimestamp } from "../utils";
 import {
   IPostCST,
+  IPostCSTTopic,
   IPutCstTopicVerificationStatus,
 } from "../utils/interfaces/Cst";
 import { History } from "./History";
@@ -30,19 +31,21 @@ export class Cst {
           },
         },
         Student: true,
+        supervisor: true,
       },
     });
   }
 
-  async addTopicToCstById(cstId: string, topicId: string, payload: IPostCST) {
+  async addTopicToCstById(
+    cstId: string,
+    topicId: string,
+    payload: IPostCSTTopic
+  ) {
     try {
       return db.cstTopic.create({
         data: {
           id: topicId,
-          endTime: payload.endTime,
           notes: payload.notes,
-          startTime: payload.startTime,
-          supervisorId: payload.supervisorId,
           topic: {
             connect: payload.topicId.map((t) => {
               return { id: t };
@@ -78,6 +81,7 @@ export class Cst {
           },
         },
         Student: true,
+        supervisor: true,
       },
     });
   }
@@ -156,6 +160,9 @@ export class Cst {
       where: {
         id: topicId,
       },
+      include: {
+        CST: true,
+      },
     });
   }
 
@@ -168,22 +175,16 @@ export class Cst {
         Student: {
           studentId,
         },
-        topics: {
-          some: {
-            supervisorId,
-          },
-        },
+        supervisorId,
       },
       include: {
         topics: {
-          where: {
-            supervisorId,
-          },
           include: {
             topic: true,
           },
         },
         Student: true,
+        supervisor: true,
       },
     });
   }
@@ -197,22 +198,14 @@ export class Cst {
   ) {
     return db.cST.findMany({
       where: {
-        topics: {
-          some: {
-            supervisorId,
-          },
-        },
+        supervisorId,
         Student: {
           fullName: { contains: name },
           studentId: nim,
         },
       },
       include: {
-        topics: {
-          where: {
-            supervisorId,
-          },
-        },
+        topics: true,
         Student: true,
       },
       skip: (page - 1) * take,
@@ -235,13 +228,13 @@ export class Cst {
               id,
               studentId,
               unitId,
+              endTime: payload.endTime,
+              startTime: payload.startTime,
+              supervisorId: payload.supervisorId,
               topics: {
                 create: {
                   id: topicId,
-                  endTime: payload.endTime,
-                  startTime: payload.startTime,
                   notes: payload.notes,
-                  supervisorId: payload.supervisorId,
                   topic: {
                     connect: payload.topicId.map((t) => {
                       return { id: t };

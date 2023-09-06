@@ -1,4 +1,6 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
+import { ParamsDictionary } from "express-serve-static-core";
+import { ParsedQs } from "qs";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
@@ -16,6 +18,35 @@ export class ReferenceHandler {
     this.getAllReferences = this.getAllReferences.bind(this);
     this.getReferenceFile = this.getReferenceFile.bind(this);
     this.getReferecesByUnit = this.getReferecesByUnit.bind(this);
+    this.postUploadedFileReferenceToAllUnits =
+      this.postUploadedFileReferenceToAllUnits.bind(this);
+  }
+
+  async postUploadedFileReferenceToAllUnits(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      if (!req.file?.buffer) {
+        throw new BadRequestError("upload file with fieldname file");
+      }
+
+      const savedFile = UploadFileHelper.uploadFileBuffer(
+        req.file.originalname,
+        constants.REFERENCE_PATH,
+        req.file.buffer,
+        true
+      );
+
+      await this.referenceService.uploadReferenceToAllUnits(savedFile);
+
+      return res
+        .status(201)
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, savedFile));
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getReferecesByUnit(req: Request, res: Response, next: NextFunction) {

@@ -8,11 +8,13 @@ import { constants, createResponse } from "../../utils";
 import { ISglDetail, IStudentSgl, ISubmittedSgl } from "../../utils/dto/SglDTO";
 import {
   IPostSGL,
+  IPostSGLTopic,
   IPutSglTopicVerificationStatus,
 } from "../../utils/interfaces/Sgl";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import {
   SglPayloadSchema,
+  SglTopicPayloadSchema,
   SglTopicVerificationStatusSchema,
 } from "../../validator/sgl/SglSchema";
 import { Validator } from "../../validator/Validator";
@@ -34,15 +36,73 @@ export class SglHandler {
       this.putVerificationStatusSglTopic.bind(this);
     this.putVerificationStatusSgl = this.putVerificationStatusSgl.bind(this);
     this.putTopicSgl = this.putTopicSgl.bind(this);
+    this.putAllTopicsVerificationStatus =
+      this.putAllTopicsVerificationStatus.bind(this);
+  }
+
+  async putAllTopicsVerificationStatus(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const { id } = req.params;
+    const payload: IPutSglTopicVerificationStatus = req.body;
+
+    try {
+      const validationResult = this.validator.validate(
+        SglTopicVerificationStatusSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        switch (validationResult.error) {
+          case 400:
+            throw new BadRequestError(validationResult.message);
+          case 404:
+            throw new NotFoundError(validationResult.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      const result = await this.sglService.verifyAllSglTopics(
+        id,
+        tokenPayload,
+        payload
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "verify topic successfully"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async putTopicSgl(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
-    const payload: IPostSGL = req.body;
+    const payload: IPostSGLTopic = req.body;
     const { id } = req.params;
 
     try {
-      const result = this.validator.validate(SglPayloadSchema, payload);
+      const result = this.validator.validate(SglTopicPayloadSchema, payload);
 
       if (result && "error" in result) {
         switch (result.error) {
@@ -224,12 +284,14 @@ export class SglHandler {
               createdAt: r.createdAt,
               verificationStatus: r.verificationStatus,
               sglId: r.id,
+              endTime: Number(r.endTime),
+              startTime: Number(r.startTime),
+              supervisorName: r.supervisor.fullname,
+              supervisorId: r.supervisor.supervisorId,
               topic: r.topics.map((t) => ({
                 topicName: t.topic.map((n) => n.name),
                 verificationStatus: t.verificationStatus,
-                endTime: Number(t.endTime),
                 notes: t.notes,
-                startTime: Number(t.startTime),
                 id: t.id,
               })),
             } as ISglDetail)

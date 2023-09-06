@@ -93,19 +93,16 @@ export class ClinicalRecord {
       include: {
         ClinicalRecordDiagnosis: {
           include: {
-            affectedPart: true,
             DiagnosisType: true,
           },
         },
         ClinicalRecordExamination: {
           include: {
-            affectedPart: true,
             examinationType: true,
           },
         },
         ClinicalRecordManagement: {
           include: {
-            affectedPart: true,
             managementRole: true,
             managementType: true,
           },

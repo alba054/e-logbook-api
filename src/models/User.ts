@@ -29,7 +29,7 @@ export class User {
       select: {
         id: true,
         student: true,
-        supervisor: true,
+        supervisor: { include: { locations: true, units: true } },
         badges: true,
         email: true,
         username: true,
@@ -59,7 +59,7 @@ export class User {
       select: {
         id: true,
         student: true,
-        supervisor: true,
+        supervisor: { include: { locations: true, units: true } },
         badges: true,
         email: true,
         username: true,
@@ -227,7 +227,12 @@ export class User {
             supervisingDPK: true,
           },
         },
-        supervisor: true,
+        supervisor: {
+          include: {
+            locations: true,
+            units: true,
+          },
+        },
       },
     });
   }

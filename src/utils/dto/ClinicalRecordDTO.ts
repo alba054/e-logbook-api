@@ -40,17 +40,14 @@ interface IListStudentClinicalRecordsDTO {
 }
 
 interface IExaminationClinicalRecordDetail {
-  affectedPart: string;
   examinationType: string[];
 }
 
 interface IDiagnosesClinicalRecordDetail {
-  affectedPart: string;
   diagnosesType: string[];
 }
 
 interface IManagementClinicalRecordDetail {
-  affectedPart: string;
   management: {
     managementType: string;
     managementRole: string;

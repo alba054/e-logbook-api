@@ -6,6 +6,11 @@ export interface IPostCST {
   notes?: string;
 }
 
+export interface IPostCSTTopic {
+  topicId: number[];
+  notes?: string;
+}
+
 export interface IPutCstTopicVerificationStatus {
   readonly verified: boolean;
 }

@@ -133,6 +133,14 @@ export class UserHandler {
             username: u.username,
             email: u.email,
             fullname: u.student?.fullName ?? u.supervisor?.fullname,
+            supervisor: {
+              id: u.supervisor?.id,
+              userId: u.id,
+              fullName: u.supervisor?.fullname,
+              locations: u.supervisor?.locations.map((l) => l.name),
+              units: u.supervisor?.units.map((l) => l.name),
+              supervisorId: u.supervisor?.supervisorId,
+            },
           } as IUserProfileDTO;
         })
       )
@@ -352,7 +360,14 @@ export class UserHandler {
           pkmStation: user?.student?.pkmStation,
           periodLengthStation: Number(user?.student?.periodLengthStation),
         },
-        supervisor: user?.supervisor,
+        supervisor: {
+          userId: user?.id,
+          id: user?.supervisorId,
+          supervisorId: user?.supervisor?.supervisorId,
+          fullName: user?.supervisor?.fullname,
+          locations: user?.supervisor?.locations.map((l) => l.name),
+          units: user?.supervisor?.units.map((l) => l.name),
+        },
       } as IUserProfileDTO)
     );
   }

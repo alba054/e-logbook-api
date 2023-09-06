@@ -3,6 +3,7 @@ import db from "../database";
 import { createErrorObject, getUnixTimestamp } from "../utils";
 import {
   IPostSGL,
+  IPostSGLTopic,
   IPutSglTopicVerificationStatus,
 } from "../utils/interfaces/Sgl";
 import { History } from "./History";
@@ -30,19 +31,21 @@ export class Sgl {
           },
         },
         Student: true,
+        supervisor: true,
       },
     });
   }
 
-  async addTopicToSglById(sglId: string, topicId: string, payload: IPostSGL) {
+  async addTopicToSglById(
+    sglId: string,
+    topicId: string,
+    payload: IPostSGLTopic
+  ) {
     try {
       return db.sglTopic.create({
         data: {
           id: topicId,
-          endTime: payload.endTime,
           notes: payload.notes,
-          startTime: payload.startTime,
-          supervisorId: payload.supervisorId,
           topic: {
             connect: payload.topicId.map((t) => {
               return { id: t };
@@ -74,6 +77,7 @@ export class Sgl {
           },
         },
         Student: true,
+        supervisor: true,
       },
     });
   }
@@ -152,6 +156,9 @@ export class Sgl {
       where: {
         id: topicId,
       },
+      include: {
+        SGL: true,
+      },
     });
   }
 
@@ -164,21 +171,15 @@ export class Sgl {
         Student: {
           studentId,
         },
-        topics: {
-          some: {
-            supervisorId,
-          },
-        },
+        supervisorId,
       },
       include: {
         topics: {
-          where: {
-            supervisorId,
-          },
           include: {
             topic: true,
           },
         },
+        supervisor: true,
         Student: true,
       },
     });
@@ -193,22 +194,14 @@ export class Sgl {
   ) {
     return db.sGL.findMany({
       where: {
-        topics: {
-          some: {
-            supervisorId,
-          },
-        },
+        supervisorId,
         Student: {
           fullName: { contains: name },
           studentId: nim,
         },
       },
       include: {
-        topics: {
-          where: {
-            supervisorId,
-          },
-        },
+        topics: true,
         Student: true,
       },
       skip: (page - 1) * take,
@@ -231,13 +224,13 @@ export class Sgl {
               id,
               studentId,
               unitId,
+              supervisorId: payload.supervisorId,
+              endTime: payload.endTime,
+              startTime: payload.startTime,
               topics: {
                 create: {
                   id: topicId,
-                  endTime: payload.endTime,
-                  startTime: payload.startTime,
                   notes: payload.notes,
-                  supervisorId: payload.supervisorId,
                   topic: {
                     connect: payload.topicId.map((t) => {
                       return { id: t };

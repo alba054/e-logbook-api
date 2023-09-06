@@ -83,15 +83,20 @@ model Supervisor {
   dateOfBirth        BigInt?             @db.UnsignedBigInt
   address            String?             @db.VarChar(255)
   User               User[]
+  locations          ActivityLocation[]
+  units              Unit[]
   academinSupervisor Student[]           @relation("academicSupervisor")
   supervisingDPK     Student[]           @relation("supervisingDPK")
   examinerDPK        Student[]           @relation("examinerDPK")
   ClinicalRecord     ClinicalRecord[]
   ScientificSession  ScientificSession[]
-  SglTopic           SglTopic[]
-  CstTopic           CstTopic[]
   Activity           Activity[]
   History            History[]
+  SGL                SGL[]
+  CST                CST[]
+  Case               Case[]
+  Skill              Skill[]
+  Competency         Competency[]
 
   @@map("supervisors")
 }
@@ -121,7 +126,6 @@ model Unit {
   id                  String                @id @db.VarChar(100)
   name                String                @db.VarChar(100)
   clinicalRecords     ClinicalRecord[]
-  affectedParts       AffectedPart[]
   examinationTypes    ExaminationType[]
   DiagnosisType       DiagnosisType[]
   ManagementType      ManagementType[]
@@ -142,6 +146,9 @@ model Unit {
   Reference           Reference[]
   WeekAssesment       WeekAssesment[]
   History             History[]
+  Supervisor          Supervisor?           @relation(fields: [supervisorId], references: [id])
+  supervisorId        String?               @db.VarChar(100)
+  Topic               Topic[]
 
   @@map("units")
 }
@@ -203,18 +210,6 @@ model ClinicalRecord {
   @@map("clinical_records")
 }
 
-model AffectedPart {
-  id                        String                      @id @db.VarChar(100)
-  partName                  String                      @db.VarChar(100)
-  Unit                      Unit?                       @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  unitId                    String?                     @db.VarChar(100)
-  ClinicalRecordExamination ClinicalRecordExamination[]
-  ClinicalRecordDiagnosis   ClinicalRecordDiagnosis[]
-  ClinicalRecordManagement  ClinicalRecordManagement[]
-
-  @@map("affected_parts")
-}
-
 model ExaminationType {
   id                        String                      @id @db.VarChar(100)
   typeName                  String                      @db.VarChar(100)
@@ -226,14 +221,12 @@ model ExaminationType {
 }
 
 model ClinicalRecordExamination {
-  affectedPart      AffectedPart    @relation(fields: [affectedPartId], references: [id])
   examinationType   ExaminationType @relation(fields: [examinationTypeId], references: [id])
   clinicalRecord    ClinicalRecord  @relation(fields: [clinicalRecordId], references: [id])
-  affectedPartId    String          @db.VarChar(100)
   examinationTypeId String          @db.VarChar(100)
   clinicalRecordId  String          @db.VarChar(100)
 
-  @@id([affectedPartId, examinationTypeId, clinicalRecordId])
+  @@id([examinationTypeId, clinicalRecordId])
   @@map("clinical_record_examinations")
 }
 
@@ -248,14 +241,12 @@ model DiagnosisType {
 }
 
 model ClinicalRecordDiagnosis {
-  affectedPart     AffectedPart   @relation(fields: [affectedPartId], references: [id])
   DiagnosisType    DiagnosisType  @relation(fields: [DiagnosisTypeId], references: [id])
   clinicalRecord   ClinicalRecord @relation(fields: [clinicalRecordId], references: [id])
-  affectedPartId   String         @db.VarChar(100)
   DiagnosisTypeId  String         @db.VarChar(100)
   clinicalRecordId String         @db.VarChar(100)
 
-  @@id([affectedPartId, DiagnosisTypeId, clinicalRecordId])
+  @@id([DiagnosisTypeId, clinicalRecordId])
   @@map("clinical_record_diagnosis")
 }
 
@@ -278,16 +269,14 @@ model ManagementRole {
 }
 
 model ClinicalRecordManagement {
-  affectedPart     AffectedPart   @relation(fields: [affectedPartId], references: [id])
   managementType   ManagementType @relation(fields: [managementTypeId], references: [id])
   managementRole   ManagementRole @relation(fields: [managementRoleId], references: [id])
   clinicalRecord   ClinicalRecord @relation(fields: [clinicalRecordId], references: [id])
-  affectedPartId   String         @db.VarChar(100)
   managementTypeId String         @db.VarChar(100)
   clinicalRecordId String         @db.VarChar(100)
   managementRoleId String         @db.VarChar(100)
 
-  @@id([affectedPartId, managementTypeId, clinicalRecordId, managementRoleId])
+  @@id([managementTypeId, clinicalRecordId, managementRoleId])
   @@map("clinical_record_managements")
 }
 
@@ -382,6 +371,8 @@ model Competency {
   type               Type
   caseTypeId         Int?
   skillTypeId        Int?
+  supervisor         Supervisor         @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  supervisorId       String             @db.VarChar(100)
 
   @@map("competencies")
 }
@@ -418,6 +409,8 @@ model Skill {
   unitId             String?            @db.VarChar(100)
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
+  supervisor         Supervisor         @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  supervisorId       String             @db.VarChar(100)
 
   @@map("skills")
 }
@@ -434,6 +427,8 @@ model Case {
   unitId             String?            @db.VarChar(100)
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @default(now()) @updatedAt
+  supervisor         Supervisor         @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  supervisorId       String             @db.VarChar(100)
 
   @@map("cases")
 }
@@ -441,6 +436,8 @@ model Case {
 model Topic {
   id       Int        @id @default(autoincrement())
   name     String     @db.VarChar(255)
+  Unit     Unit?      @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId   String?    @db.VarChar(100)
   SglTopic SglTopic[]
   CstTopic CstTopic[]
 
@@ -451,11 +448,15 @@ model SGL {
   id                 String             @id @db.VarChar(100)
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @default(now()) @updatedAt
+  startTime          BigInt?            @db.UnsignedBigInt
+  endTime            BigInt?            @db.UnsignedBigInt
   verificationStatus VerificationStatus @default(INPROCESS)
   Student            Student?           @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   studentId          String?            @db.VarChar(100)
   Unit               Unit?              @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   unitId             String?            @db.VarChar(100)
+  supervisor         Supervisor         @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  supervisorId       String             @db.VarChar(100)
   topics             SglTopic[]
 
   @@map("sgls")
@@ -467,10 +468,6 @@ model SglTopic {
   updatedAt          DateTime           @default(now()) @updatedAt
   verificationStatus VerificationStatus @default(INPROCESS)
   notes              String?            @db.Text
-  startTime          BigInt?            @db.UnsignedBigInt
-  endTime            BigInt?            @db.UnsignedBigInt
-  supervisor         Supervisor         @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  supervisorId       String             @db.VarChar(100)
   topic              Topic[]
   SGL                SGL?               @relation(fields: [sGLId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   sGLId              String?            @db.VarChar(100)
@@ -487,7 +484,11 @@ model CST {
   studentId          String?            @db.VarChar(100)
   Unit               Unit?              @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   unitId             String?            @db.VarChar(100)
+  supervisor         Supervisor         @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  supervisorId       String             @db.VarChar(100)
   topics             CstTopic[]
+  startTime          BigInt?            @db.UnsignedBigInt
+  endTime            BigInt?            @db.UnsignedBigInt
 
   @@map("csts")
 }
@@ -498,10 +499,6 @@ model CstTopic {
   updatedAt          DateTime           @default(now()) @updatedAt
   verificationStatus VerificationStatus @default(INPROCESS)
   notes              String?            @db.Text
-  startTime          BigInt?            @db.UnsignedBigInt
-  endTime            BigInt?            @db.UnsignedBigInt
-  supervisor         Supervisor         @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  supervisorId       String             @db.VarChar(100)
   topic              Topic[]
   CST                CST[]
   topicId            Int?
@@ -556,6 +553,8 @@ model ActivityLocation {
   Activity            Activity[]
   MiniCex             MiniCex[]
   ScientificAssesment ScientificAssesment[]
+  Supervisor          Supervisor?           @relation(fields: [supervisorId], references: [id])
+  supervisorId        String?               @db.VarChar(100)
 
   @@map("activity_locations")
 }

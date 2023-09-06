@@ -33,6 +33,18 @@ export class TopicRouter {
       this.topicHandler.postTopic
     );
 
+    // * get topics for each unit
+    this.router.get(
+      this.path + "/units/:unitId",
+      AuthorizationBearer.authorize([
+        constants.ADMIN_ROLE,
+        constants.STUDENT_ROLE,
+        constants.SUPERVISOR_ROLE,
+        constants.DPK_ROLE,
+      ]),
+      this.topicHandler.getTopicsUnit
+    );
+
     // * delete topic
     this.router.delete(
       this.path + "/:id",

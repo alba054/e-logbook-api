@@ -64,11 +64,7 @@ export class CompetencyService {
   ) {
     const skill = await this.competencyModel.getCaseById(id);
 
-    if (
-      skill?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
-      skill?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
-      skill?.Student?.academicSupervisorId !== tokenPayload.supervisorId
-    ) {
+    if (skill?.supervisorId !== tokenPayload.supervisorId) {
       return createErrorObject(
         400,
         "you are not authorized to verify this case"
@@ -161,19 +157,9 @@ export class CompetencyService {
         db.competency.updateMany({
           where: {
             Student: {
-              OR: [
-                {
-                  academicSupervisorId: tokenPayload.supervisorId,
-                },
-                {
-                  supervisingSupervisorId: tokenPayload.supervisorId,
-                },
-                {
-                  examinerSupervisorId: tokenPayload.supervisorId,
-                },
-              ],
               studentId,
             },
+            supervisorId: tokenPayload.supervisorId,
             type: "SKILL",
             OR: [
               {
@@ -224,19 +210,9 @@ export class CompetencyService {
         db.competency.updateMany({
           where: {
             Student: {
-              OR: [
-                {
-                  academicSupervisorId: tokenPayload.supervisorId,
-                },
-                {
-                  supervisingSupervisorId: tokenPayload.supervisorId,
-                },
-                {
-                  examinerSupervisorId: tokenPayload.supervisorId,
-                },
-              ],
               studentId,
             },
+            supervisorId: tokenPayload.supervisorId,
             type: "CASE",
             OR: [
               {
@@ -277,11 +253,7 @@ export class CompetencyService {
   ) {
     const skill = await this.competencyModel.getSkillById(id);
 
-    if (
-      skill?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
-      skill?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
-      skill?.Student?.academicSupervisorId !== tokenPayload.supervisorId
-    ) {
+    if (skill?.supervisorId !== tokenPayload.supervisorId) {
       return createErrorObject(
         400,
         "you are not authorized to verify this skill"

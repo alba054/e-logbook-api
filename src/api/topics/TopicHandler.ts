@@ -19,6 +19,17 @@ export class TopicHandler {
     this.getTopics = this.getTopics.bind(this);
     this.postTopic = this.postTopic.bind(this);
     this.deleteTopic = this.deleteTopic.bind(this);
+    this.getTopicsUnit = this.getTopicsUnit.bind(this);
+  }
+
+  async getTopicsUnit(req: Request, res: Response, next: NextFunction) {
+    const { unitId } = req.params;
+
+    const topics = await this.topicService.getTopicsByUnitId(unitId);
+
+    return res
+      .status(200)
+      .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, topics));
   }
 
   async deleteTopic(req: Request, res: Response, next: NextFunction) {

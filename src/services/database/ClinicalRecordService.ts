@@ -246,7 +246,6 @@ export class ClinicalRecordService {
           diagnosiss.push(
             db.clinicalRecordDiagnosis.create({
               data: {
-                affectedPartId: payload.diagnosiss[i].affectedPartId,
                 DiagnosisTypeId: payload.diagnosiss[i].diagnosisTypeId[j],
                 clinicalRecordId: clinicalRecordId,
               },
@@ -265,7 +264,6 @@ export class ClinicalRecordService {
           examinations.push(
             db.clinicalRecordExamination.create({
               data: {
-                affectedPartId: payload.examinations[i].affectedPartId,
                 examinationTypeId: payload.examinations[i].examinationTypeId[j],
                 clinicalRecordId: clinicalRecordId,
               },
@@ -280,7 +278,6 @@ export class ClinicalRecordService {
           managements.push(
             db.clinicalRecordManagement.create({
               data: {
-                affectedPartId: payload.managements[i].affectedPartId,
                 managementTypeId:
                   payload.managements[i].management[j].managementTypeId,
                 managementRoleId:

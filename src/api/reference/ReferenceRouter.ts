@@ -17,11 +17,17 @@ export class ReferenceRouter {
 
   register() {
     // * get all references
+    // * post reference all units
     this.router
       .route(this.path)
       .get(
         AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
         this.handler.getAllReferences
+      )
+      .post(
+        AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+        multerHelper.upload.single("file"),
+        this.handler.postUploadedFileReferenceToAllUnits
       );
 
     // * get reference file

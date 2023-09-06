@@ -63,6 +63,17 @@ export class SglRouter {
         this.handler.putTopicSgl
       );
 
+    // * verify all topics by supervisor
+    this.router
+      .route(this.path + "/:id/topics/verify")
+      .put(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.putAllTopicsVerificationStatus
+      );
+
     // * verify sgl topic
     this.router
       .route(this.path + "/topics/:topicId")

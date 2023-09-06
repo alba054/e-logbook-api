@@ -14,14 +14,17 @@ export interface ISglDetail {
   createdAt: Date | string;
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
   sglId: string;
+  startTime?: number;
+  endTime?: number;
+  supervisorName?: string;
+  supervisorId?: string;
   topic: ISglTopic[];
 }
 
 export interface ISglTopic {
   topicName: string[];
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
-  startTime?: number;
-  endTime?: number;
+
   notes?: string;
   id: string;
 }
