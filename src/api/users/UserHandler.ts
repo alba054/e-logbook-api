@@ -98,18 +98,18 @@ export class UserHandler {
     let { role, name, nim, badge } = req.query;
 
     if (
-      role === "" ||
-      role !== constants.ER_ROLE ||
-      role !== constants.DPK_ROLE ||
-      role !== constants.ADMIN_ROLE ||
-      role !== constants.STUDENT_ROLE ||
+      role === "" &&
+      role !== constants.ER_ROLE &&
+      role !== constants.DPK_ROLE &&
+      role !== constants.ADMIN_ROLE &&
+      role !== constants.STUDENT_ROLE &&
       role !== constants.SUPERVISOR_ROLE
     ) {
       role = undefined;
     }
     if (
-      badge === "" ||
-      badge !== constants.CEU_BADGE ||
+      badge === "" &&
+      badge !== constants.CEU_BADGE &&
       badge !== constants.HEAD_DIV_BADGE
     ) {
       badge = undefined;
@@ -140,6 +140,9 @@ export class UserHandler {
               locations: u.supervisor?.locations.map((l) => l.name),
               units: u.supervisor?.units.map((l) => l.name),
               supervisorId: u.supervisor?.supervisorId,
+            },
+            student: {
+              studentId: u.student?.studentId,
             },
           } as IUserProfileDTO;
         })
