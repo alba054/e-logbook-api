@@ -1,5 +1,5 @@
 export interface IPostCase {
-  readonly type: "OBTAINED" | "DISCUSSED" | "OBSERVED";
+  readonly type: "OBTAINED" | "DISCUSSED";
   readonly caseTypeId: number;
   readonly supervisorId: string;
 }

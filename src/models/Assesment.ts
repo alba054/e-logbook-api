@@ -5,6 +5,22 @@ import {
 } from "../utils/interfaces/Assesment";
 
 export class Assesment {
+  async verifiedOsce(studentId: string, unitId: string, verified: boolean) {
+    return db.oSCE.updateMany({
+      where: {
+        Assesment: {
+          Student: {
+            studentId,
+          },
+          unitId,
+        },
+      },
+      data: {
+        verified,
+      },
+    });
+  }
+
   async getAssesmentsByStudentIdAndUnitIdAndType(
     studentId: string | undefined,
     unitId: string | undefined,

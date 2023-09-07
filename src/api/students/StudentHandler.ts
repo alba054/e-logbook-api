@@ -208,39 +208,35 @@ export class StudentHandler {
 
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-        discussedCases: cases.filter((c) => c.competencyType === "DISCUSSED")
-          .length,
-        obtainedCases: cases.filter((c) => c.competencyType === "OBTAINED")
-          .length,
-        observedCases: cases.filter((c) => c.competencyType === "OBSERVED")
-          .length,
-        discussedSkills: skills.filter((c) => c.competencyType === "DISCUSSED")
-          .length,
-        obtainedSkills: skills.filter((c) => c.competencyType === "OBTAINED")
-          .length,
-        observedSkills: skills.filter((c) => c.competencyType === "OBSERVED")
-          .length,
+        totalCases: cases.length,
+        totalSkills: skills.length,
         verifiedCases: cases.filter((c) => c.verificationStatus === "VERIFIED")
           .length,
         verifiedSkills: skills.filter(
-          (c) => c.verificationStatus === "VERIFIED"
+          (s) => s.verificationStatus === "VERIFIED"
         ).length,
-        cases: cases.map((c) => {
-          return {
-            caseId: c.id,
-            caseName: c.case?.name,
-            caseType: c.competencyType,
-            verificationStatus: c.verificationStatus,
-          };
-        }),
-        skills: skills.map((c) => {
-          return {
-            skillId: c.id,
-            skillName: c.skill?.name,
-            skillType: c.competencyType,
-            verificationStatus: c.verificationStatus,
-          };
-        }),
+        cases: cases
+          .filter((c) => c.verificationStatus === "VERIFIED")
+          .map((c) => {
+            return {
+              caseId: c.id,
+              caseName: c.case?.name,
+              caseType: c.competencyType,
+              caseTypeId: c.caseTypeId,
+              verificationStatus: c.verificationStatus,
+            };
+          }),
+        skills: skills
+          .filter((c) => c.verificationStatus === "VERIFIED")
+          .map((c) => {
+            return {
+              skillId: c.id,
+              skillName: c.skill?.name,
+              skillType: c.competencyType,
+              skillTypeId: c.skillTypeId,
+              verificationStatus: c.verificationStatus,
+            };
+          }),
         finalScore,
       } as IStudentStastic)
     );
@@ -271,30 +267,30 @@ export class StudentHandler {
         activeUnit?.activeUnit.activeUnit?.id ?? ""
       );
 
-    return res.status(200).json(
-      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-        studentName: weeklyAssesment[0]?.Student?.fullName,
-        studentId: weeklyAssesment[0]?.Student?.studentId,
-        assesments: weeklyAssesment.map((w) => {
-          return {
-            attendNum: dailyActivities
-              .find((a) => a.weekNum === w.weekNum)
-              ?.activities.filter((a) => a.activityStatus === "ATTEND").length,
-            notAttendNum: dailyActivities
-              .find((a) => a.weekNum === w.weekNum)
-              ?.activities.filter(
-                (a) =>
-                  a.activityStatus === "NOT_ATTEND" ||
-                  a.activityStatus === "SICK"
-              ).length,
-            score: w.score,
-            verificationStatus: w.verificationStatus,
-            weekNum: w.weekNum,
-            id: w.id,
-          };
-        }),
-      } as IStudentWeeklyAssesment)
-    );
+    // return res.status(200).json(
+    //   createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+    //     studentName: weeklyAssesment[0]?.Student?.fullName,
+    //     studentId: weeklyAssesment[0]?.Student?.studentId,
+    //     assesments: weeklyAssesment.map((w) => {
+    //       return {
+    //         attendNum: dailyActivities
+    //           .find((a) => a.weekNum === w.weekNum)
+    //           ?.activities.filter((a) => a.activityStatus === "ATTEND").length,
+    //         notAttendNum: dailyActivities
+    //           .find((a) => a.weekNum === w.weekNum)
+    //           ?.activities.filter(
+    //             (a) =>
+    //               a.activityStatus === "NOT_ATTEND" ||
+    //               a.activityStatus === "SICK"
+    //           ).length,
+    //         score: w.score,
+    //         verificationStatus: w.verificationStatus,
+    //         weekNum: w.weekNum,
+    //         id: w.id,
+    //       };
+    //     }),
+    //   } as IStudentWeeklyAssesment)
+    // );
   }
 
   async getStudentProfileByStudentId(
@@ -451,6 +447,7 @@ export class StudentHandler {
       );
 
     let finalScore = 0;
+    let isFinalScoreShown = true;
 
     assesments.forEach((a) => {
       let grade = 0;
@@ -474,6 +471,7 @@ export class StudentHandler {
 
       if (a.osce) {
         grade = a.osce.score ?? 0;
+        isFinalScoreShown = a.osce.verified;
       }
 
       if (a.cbt) {
@@ -492,7 +490,7 @@ export class StudentHandler {
 
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-        finalScore,
+        finalScore: isFinalScoreShown ? finalScore : null,
         assesments: assesments.map((a) => {
           let grade = 0;
           if (a.MiniCex) {
@@ -622,43 +620,46 @@ export class StudentHandler {
 
   async getDailyActivities(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
+    const student = await this.studentService.getStudentById(
+      tokenPayload.studentId
+    );
 
     const result =
       await this.dailyActivityService.getDailyActivitiesByStudentIdAndUnitId(
         tokenPayload
       );
 
-    return res.status(200).json(
-      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-        unitName: result[0]?.Unit?.name,
-        inprocessDailyActivity: result.filter(
-          (r) => r.verificationStatus === "INPROCESS"
-        ).length,
-        verifiedDailyActivity: result.filter(
-          (r) => r.verificationStatus === "VERIFIED"
-        ).length,
-        unverifiedDailyActivity: result.filter(
-          (r) => r.verificationStatus === "UNVERIFIED"
-        ).length,
-        dailyActivities: result.map((r) => {
-          return {
-            verificationStatus: r.verificationStatus,
-            weekName: r.weekNum,
-            dailyActivityId: r.id,
-            activitiesStatus: r.activities.map((a) => {
-              return {
-                activityStatus: a.activityStatus,
-                day: a.day,
-                verificationStatus: a.verificationStatus,
-                activityName: a.ActivityName?.name,
-                location: a.location?.name,
-                detail: a.detail,
-              } as IActivitiesDetail;
-            }),
-          };
-        }),
-      } as IStudentDailyActivities)
-    );
+    // return res.status(200).json(
+    //   createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+    //     unitName: result[0]?.Unit?.name,
+    //     inprocessDailyActivity: result.filter(
+    //       (r) => r.verificationStatus === "INPROCESS"
+    //     ).length,
+    //     verifiedDailyActivity: result.filter(
+    //       (r) => r.verificationStatus === "VERIFIED"
+    //     ).length,
+    //     unverifiedDailyActivity: result.filter(
+    //       (r) => r.verificationStatus === "UNVERIFIED"
+    //     ).length,
+    //     dailyActivities: result.map((r) => {
+    //       return {
+    //         verificationStatus: r.verificationStatus,
+    //         weekName: r.weekNum,
+    //         dailyActivityId: r.id,
+    //         activitiesStatus: r.activities.map((a) => {
+    //           return {
+    //             activityStatus: a.activityStatus,
+    //             day: a.day,
+    //             verificationStatus: a.verificationStatus,
+    //             activityName: a.ActivityName?.name,
+    //             location: a.location?.name,
+    //             detail: a.detail,
+    //           } as IActivitiesDetail;
+    //         }),
+    //       };
+    //     }),
+    //   } as IStudentDailyActivities)
+    // );
   }
 
   async putDailyActivityActivity(
@@ -736,27 +737,27 @@ export class StudentHandler {
         }
       }
 
-      return res.status(200).json(
-        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-          alpha: result.activities.filter((a) => a.activityStatus !== "ATTEND")
-            .length,
-          attend: result.activities.filter((a) => a.activityStatus === "ATTEND")
-            .length,
-          weekName: result.weekNum,
-          verificationStatus: result.verificationStatus,
-          activities: result.activities.map((a) => {
-            return {
-              activityStatus: a.activityStatus,
-              day: a.day,
-              verificationStatus: a.verificationStatus,
-              activityName: a.ActivityName?.name,
-              detail: a.detail,
-              location: a.location?.name,
-              id: a.id,
-            } as IActivitiesDetail;
-          }),
-        } as IListActivitiesPerWeek)
-      );
+      // return res.status(200).json(
+      //   createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+      //     alpha: result.activities.filter((a) => a.activityStatus !== "ATTEND")
+      //       .length,
+      //     attend: result.activities.filter((a) => a.activityStatus === "ATTEND")
+      //       .length,
+      //     weekName: result.weekNum,
+      //     verificationStatus: result.verificationStatus,
+      //     activities: result.activities.map((a) => {
+      //       return {
+      //         activityStatus: a.activityStatus,
+      //         day: a.day,
+      //         verificationStatus: a.verificationStatus,
+      //         activityName: a.ActivityName?.name,
+      //         detail: a.detail,
+      //         location: a.location?.name,
+      //         id: a.id,
+      //       } as IActivitiesDetail;
+      //     }),
+      //   } as IListActivitiesPerWeek)
+      // );
     } catch (error) {
       return next(error);
     }

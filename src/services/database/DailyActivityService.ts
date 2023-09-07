@@ -86,18 +86,18 @@ export class DailyActivityService {
       id
     );
 
-    if (
-      dailyActivity?.Student?.examinerSupervisorId !==
-        tokenPayload.supervisorId &&
-      dailyActivity?.Student?.supervisingSupervisorId !==
-        tokenPayload.supervisorId &&
-      dailyActivity?.Student?.academicSupervisorId !== tokenPayload.supervisorId
-    ) {
-      return createErrorObject(
-        400,
-        "you are not authorized to verify this self reflection"
-      );
-    }
+    // if (
+    //   dailyActivity?.Student?.examinerSupervisorId !==
+    //     tokenPayload.supervisorId &&
+    //   dailyActivity?.Student?.supervisingSupervisorId !==
+    //     tokenPayload.supervisorId &&
+    //   dailyActivity?.Student?.academicSupervisorId !== tokenPayload.supervisorId
+    // ) {
+    //   return createErrorObject(
+    //     400,
+    //     "you are not authorized to verify this self reflection"
+    //   );
+    // }
 
     return db.$transaction([
       db.dailyActivity.update({
@@ -156,11 +156,11 @@ export class DailyActivityService {
       return createErrorObject(404, "activity's not found");
     }
 
-    if (
-      dailyActivityActivity?.DailyActivity?.studentId !== tokenPayload.studentId
-    ) {
-      return createErrorObject(400, "activity's not for you");
-    }
+    // if (
+    //   dailyActivityActivity?.DailyActivity?.studentId !== tokenPayload.studentId
+    // ) {
+    //   return createErrorObject(400, "activity's not for you");
+    // }
 
     return this.dailyActivityModel.editDailyActivityActivityById(id, payload);
   }
@@ -181,16 +181,16 @@ export class DailyActivityService {
       return createErrorObject(404, "daily activity's not found");
     }
 
-    if (
-      dailyActivity.studentId !== tokenPayload.studentId &&
-      dailyActivity.Student?.examinerSupervisorId !==
-        tokenPayload.supervisorId &&
-      dailyActivity.Student?.supervisingSupervisorId !==
-        tokenPayload.supervisorId &&
-      dailyActivity.Student?.academicSupervisorId !== tokenPayload.supervisorId
-    ) {
-      return createErrorObject(400, "daily activity's not for you");
-    }
+    // if (
+    //   dailyActivity.studentId !== tokenPayload.studentId &&
+    //   dailyActivity.Student?.examinerSupervisorId !==
+    //     tokenPayload.supervisorId &&
+    //   dailyActivity.Student?.supervisingSupervisorId !==
+    //     tokenPayload.supervisorId &&
+    //   dailyActivity.Student?.academicSupervisorId !== tokenPayload.supervisorId
+    // ) {
+    //   return createErrorObject(400, "daily activity's not for you");
+    // }
 
     return dailyActivity;
   }

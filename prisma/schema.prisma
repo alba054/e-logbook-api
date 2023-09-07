@@ -149,6 +149,7 @@ model Unit {
   Supervisor          Supervisor?           @relation(fields: [supervisorId], references: [id])
   supervisorId        String?               @db.VarChar(100)
   Topic               Topic[]
+  Week                Week[]
 
   @@map("units")
 }
@@ -506,9 +507,35 @@ model CstTopic {
   @@map("cst_topics")
 }
 
+model Week {
+  id            String          @id @db.VarChar(100)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @default(now()) @updatedAt
+  weekNum       Int             @db.UnsignedSmallInt
+  Unit          Unit?           @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId        String?         @db.VarChar(100)
+  startDate     BigInt          @db.UnsignedBigInt
+  endDate       BigInt          @db.UnsignedBigInt
+  Day           Day[]
+  DailyActivity DailyActivity[]
+
+  @@map("weeks")
+}
+
+model Day {
+  id        String     @id @db.VarChar(100)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now()) @updatedAt
+  day       String     @db.VarChar(15)
+  week      Week?      @relation(fields: [weekId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  weekId    String     @db.VarChar(100)
+  Activity  Activity[]
+
+  @@map("days")
+}
+
 model DailyActivity {
   id                 String             @id @db.VarChar(100)
-  weekNum            Int                @db.UnsignedTinyInt
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @default(now()) @updatedAt
   verificationStatus VerificationStatus @default(INPROCESS)
@@ -516,7 +543,7 @@ model DailyActivity {
   studentId          String?            @db.VarChar(100)
   Unit               Unit?              @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   unitId             String?            @db.VarChar(100)
-  activities         Activity[]
+  weeks              Week[]
 
   @@map("daily_activities")
 }
@@ -525,9 +552,9 @@ model Activity {
   id                 String             @id @db.VarChar(100)
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @default(now()) @updatedAt
-  day                String
   activityStatus     ActivityStatus     @default(NOT_ATTEND)
   detail             String?            @db.Text
+  day                Day?               @relation(fields: [dayId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   supervisor         Supervisor?        @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   supervisorId       String?            @db.VarChar(100)
   location           ActivityLocation?  @relation(fields: [activityLocationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -535,8 +562,7 @@ model Activity {
   activityLocationId Int?
   ActivityName       ActivityName?      @relation(fields: [activityNameId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   activityNameId     Int?
-  DailyActivity      DailyActivity?     @relation(fields: [dailyActivityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  dailyActivityId    String?            @db.VarChar(100)
+  dayId              String?            @db.VarChar(100)
 
   @@map("activities")
 }
@@ -633,6 +659,7 @@ model OSCE {
   Assesment   Assesment?
   assesmentId String?    @db.VarChar(100)
   score       Float?     @default(0)
+  verified    Boolean    @default(false)
 
   @@map("osces")
 }
@@ -762,7 +789,8 @@ enum AssesmentType {
 enum CompetencyType {
   OBTAINED
   DISCUSSED
-  OBSERVED
+  OBSERVER
+  PERFORM
 }
 
 enum Type {
@@ -798,6 +826,7 @@ enum ActivityStatus {
   SICK
   ATTEND
   NOT_ATTEND
+  HOLIDAY
 }
 
 enum HistoryType {

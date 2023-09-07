@@ -40,6 +40,31 @@ export const deleteFileByPath = (path: string) => {
   return fs.unlink(path);
 };
 
+// generate day from startTime to endTime
+// startTime and endTime in seconds
+export const generateDay = (startTime: number, endTime: number) => {
+  let curTime = startTime;
+  const DAYS = [
+    "SUNDAY",
+    "MONDAY",
+    "TUESDAY",
+    "WEDNESDAY",
+    "THURSDAY",
+    "FRIDAY",
+    "SATURDAY",
+  ];
+
+  const results = [];
+
+  while (curTime <= endTime) {
+    const day = new Date(curTime * 1000).getDay();
+    results.push(DAYS[day]);
+    curTime += 24 * 3600;
+  }
+
+  return results;
+};
+
 export const constants = {
   SUCCESS_RESPONSE_MESSAGE: "success",
   FAILED_RESPONSE_MESSAGE: "failed",

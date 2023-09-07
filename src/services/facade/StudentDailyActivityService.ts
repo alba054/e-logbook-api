@@ -9,6 +9,8 @@ export class StudentDailyActivityService {
     this.dailyActivityModel = new DailyActivity();
   }
 
+  // !unused the flow has changed
+  /*
   async generateDailyActivity(
     studentId: string | undefined,
     unitId: string | undefined
@@ -73,4 +75,5 @@ export class StudentDailyActivityService {
       }
     }
   }
+  */
 }

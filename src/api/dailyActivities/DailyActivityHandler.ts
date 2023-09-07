@@ -124,16 +124,16 @@ export class DailyActivityHandler {
         payload
       );
 
-      if (result && "error" in result) {
-        switch (result.error) {
-          case 400:
-            throw new BadRequestError(result.message);
-          case 404:
-            throw new NotFoundError(result.message);
-          default:
-            throw new InternalServerError();
-        }
-      }
+      // if (result && "error" in result) {
+      //   switch (result.error) {
+      //     case 400:
+      //       throw new BadRequestError(result.message);
+      //     case 404:
+      //       throw new NotFoundError(result.message);
+      //     default:
+      //       throw new InternalServerError();
+      //   }
+      // }
 
       return res
         .status(200)
@@ -169,26 +169,26 @@ export class DailyActivityHandler {
         }
       }
 
-      return res.status(200).json(
-        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-          alpha: result.activities.filter((a) => a.activityStatus !== "ATTEND")
-            .length,
-          attend: result.activities.filter((a) => a.activityStatus === "ATTEND")
-            .length,
-          weekName: result.weekNum,
-          verificationStatus: result.verificationStatus,
-          activities: result.activities.map((a) => {
-            return {
-              activityStatus: a.activityStatus,
-              day: a.day,
-              verificationStatus: a.verificationStatus,
-              activityName: a.ActivityName?.name,
-              detail: a.detail,
-              location: a.location?.name,
-            } as IActivitiesDetail;
-          }),
-        } as IListActivitiesPerWeek)
-      );
+      // return res.status(200).json(
+      //   createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+      //     alpha: result.activities.filter((a) => a.activityStatus !== "ATTEND")
+      //       .length,
+      //     attend: result.activities.filter((a) => a.activityStatus === "ATTEND")
+      //       .length,
+      //     weekName: result.weekNum,
+      //     verificationStatus: result.verificationStatus,
+      //     activities: result.activities.map((a) => {
+      //       return {
+      //         activityStatus: a.activityStatus,
+      //         day: a.day,
+      //         verificationStatus: a.verificationStatus,
+      //         activityName: a.ActivityName?.name,
+      //         detail: a.detail,
+      //         location: a.location?.name,
+      //       } as IActivitiesDetail;
+      //     }),
+      //   } as IListActivitiesPerWeek)
+      // );
     } catch (error) {
       return next(error);
     }
@@ -222,36 +222,36 @@ export class DailyActivityHandler {
             throw new InternalServerError();
         }
       }
-      return res.status(200).json(
-        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-          unitName: activities[0]?.Unit?.name,
-          dailyActivities: activities.map((r) => {
-            return {
-              verificationStatus: r.verificationStatus,
-              weekName: r.weekNum,
-              dailyActivityId: r.id,
-              attendNum: r.activities.filter(
-                (a) => a.activityStatus === "ATTEND"
-              ).length,
-              notAttendNum: r.activities.filter(
-                (a) => a.activityStatus === "NOT_ATTEND"
-              ).length,
-              sickNum: r.activities.filter((a) => a.activityStatus === "SICK")
-                .length,
-              activitiesStatus: r.activities.map((a) => {
-                return {
-                  activityStatus: a.activityStatus,
-                  day: a.day,
-                  verificationStatus: a.verificationStatus,
-                  activityName: a.ActivityName?.name,
-                  location: a.location?.name,
-                  detail: a.detail,
-                } as IActivitiesDetail;
-              }),
-            };
-          }),
-        } as IStudentDailyActivities)
-      );
+      // return res.status(200).json(
+      //   createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+      //     unitName: activities[0]?.Unit?.name,
+      //     dailyActivities: activities.map((r) => {
+      //       return {
+      //         verificationStatus: r.verificationStatus,
+      //         weekName: r.weekNum,
+      //         dailyActivityId: r.id,
+      //         attendNum: r.activities.filter(
+      //           (a) => a.activityStatus === "ATTEND"
+      //         ).length,
+      //         notAttendNum: r.activities.filter(
+      //           (a) => a.activityStatus === "NOT_ATTEND"
+      //         ).length,
+      //         sickNum: r.activities.filter((a) => a.activityStatus === "SICK")
+      //           .length,
+      //         activitiesStatus: r.activities.map((a) => {
+      //           return {
+      //             activityStatus: a.activityStatus,
+      //             day: a.day,
+      //             verificationStatus: a.verificationStatus,
+      //             activityName: a.ActivityName?.name,
+      //             location: a.location?.name,
+      //             detail: a.detail,
+      //           } as IActivitiesDetail;
+      //         }),
+      //       };
+      //     }),
+      //   } as IStudentDailyActivities)
+      // );
     } catch (error) {
       return next(error);
     }
