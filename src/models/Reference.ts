@@ -1,6 +1,14 @@
 import db from "../database";
 
 export class Reference {
+  async deleteReferenceByFile(file: string | null) {
+    return db.reference.deleteMany({
+      where: {
+        file,
+      },
+    });
+  }
+
   async getReferencesByUnitId(unitId: string) {
     return db.reference.findMany({
       where: {

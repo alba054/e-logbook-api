@@ -1,6 +1,6 @@
 import db from "../../database";
 import { Reference } from "../../models/Reference";
-import { createErrorObject } from "../../utils";
+import { constants, createErrorObject, deleteFileByPath } from "../../utils";
 import { UnitService } from "./UnitService";
 
 export class ReferenceService {
@@ -10,6 +10,17 @@ export class ReferenceService {
   constructor() {
     this.referenceModel = new Reference();
     this.unitService = new UnitService();
+  }
+
+  async deleteReferenceById(id: number) {
+    const reference = await this.referenceModel.getReferenceById(id);
+
+    if (!reference) {
+      return createErrorObject(404, "reference's not found");
+    }
+
+    this.referenceModel.deleteReferenceByFile(reference.file);
+    await deleteFileByPath(constants.ABS_PATH + "/" + (reference.file ?? ""));
   }
 
   async uploadReferenceToAllUnits(savedFile: string) {
