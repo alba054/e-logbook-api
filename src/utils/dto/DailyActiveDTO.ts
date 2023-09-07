@@ -7,13 +7,13 @@ export interface IListActivitiesPerWeek {
 }
 
 export interface IActivitiesDetail {
-  id: string;
+  id?: string;
   day: string;
   location?: string;
   detail?: string;
   activityStatus: "SICK" | "ATTEND" | "NOT_ATTEND";
   activityName?: string;
-  verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
+  verificationStatus?: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
 }
 
 export interface IStudentDailyActivities {
@@ -21,6 +21,13 @@ export interface IStudentDailyActivities {
   inprocessDailyActivity?: number;
   verifiedDailyActivity?: number;
   unverifiedDailyActivity?: number;
+  weeks: {
+    weekName: number;
+    unitId: string;
+    unitName: string;
+    startDate: number;
+    endDate: number;
+  }[];
   dailyActivities: IDailyActivities[];
 }
 

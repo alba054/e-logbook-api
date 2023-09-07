@@ -73,6 +73,7 @@ export class CompetencyHandler {
             latest: c.createdAt,
             studentName: c.Student?.fullName,
             studentId: c.Student?.studentId,
+            unitName: c.Unit?.name,
           } as ICompetencySubmitted;
         })
       )
@@ -363,6 +364,7 @@ export class CompetencyHandler {
             latest: s.createdAt,
             studentId: s.Student?.studentId,
             studentName: s.Student?.fullName,
+            unitName: s.Unit?.name,
           } as ISubmittedCase;
         })
       )
@@ -384,6 +386,7 @@ export class CompetencyHandler {
             latest: s.createdAt,
             studentId: s.Student?.studentId,
             studentName: s.Student?.fullName,
+            unitName: s.Unit?.name,
           } as ISubmittedSkill;
         })
       )

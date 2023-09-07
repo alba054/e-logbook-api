@@ -198,15 +198,10 @@ export class SelfReflectionHandler {
     const { studentId } = req.params;
 
     try {
-      const selfReflections =
-        await this.selfReflectionService.getSelfReflectionsByStudentId(
-          tokenPayload,
-          studentId
-        );
-
       const student = await this.studentService.getStudentByStudentId(
         studentId
       );
+
       if (student && "error" in student) {
         switch (student.error) {
           case 400:
@@ -217,6 +212,13 @@ export class SelfReflectionHandler {
             throw new InternalServerError();
         }
       }
+
+      const selfReflections =
+        await this.selfReflectionService.getSelfReflectionsByStudentId(
+          tokenPayload,
+          studentId,
+          student.unitId ?? ""
+        );
 
       return res.status(200).json(
         createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
@@ -256,6 +258,7 @@ export class SelfReflectionHandler {
             latest: s.createdAt,
             studentId: s.Student?.studentId,
             studentName: s.Student?.fullName,
+            unitName: s.Unit?.name,
           } as ISubmittedSelfReflections;
         })
       )

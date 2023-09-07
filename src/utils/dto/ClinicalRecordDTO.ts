@@ -7,6 +7,7 @@ export interface IListClinicalRecordDTO {
   attachment?: string;
   status: "VERIFIED" | "UNVERIFIED" | "INPROCESS";
   pages?: number;
+  unitName?: string;
 }
 
 export interface IClinicalRecordDetailDTO {

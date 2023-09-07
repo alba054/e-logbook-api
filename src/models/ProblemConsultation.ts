@@ -59,6 +59,7 @@ export class ProblemConsultation {
           ],
           studentId,
         },
+        verificationStatus: "INPROCESS",
       },
     });
   }
@@ -87,6 +88,7 @@ export class ProblemConsultation {
       distinct: ["studentId"],
       include: {
         Student: true,
+        Unit: true,
       },
     });
   }

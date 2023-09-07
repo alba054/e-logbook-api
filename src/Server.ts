@@ -32,6 +32,7 @@ import { HistoryRouter } from "./api/history/HistoryRouter";
 import { ProblemConsultationRouter } from "./api/problemConsultations/ProblemConsultationRouter";
 import { ReferenceRouter } from "./api/reference/ReferenceRouter";
 import { WeeklyAssesmentRouter } from "./api/weeklyAssesment/WeeklyAssesmentRouter";
+import { WeekRouter } from "./api/week/WeekRouter";
 
 dotenv.config();
 
@@ -88,6 +89,7 @@ class Server {
     this.app.use("/api", new ProblemConsultationRouter().register());
     this.app.use("/api", new ReferenceRouter().register());
     this.app.use("/api", new WeeklyAssesmentRouter().register());
+    this.app.use("/api", new WeekRouter().register());
     // * error handling
     this.app.use(ErrorHandler);
   }

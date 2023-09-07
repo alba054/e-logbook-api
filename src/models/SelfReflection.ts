@@ -39,7 +39,8 @@ export class SelfReflection {
 
   async getSelfReflectionsBySupervisorAndStudentId(
     supervisorId: string | undefined,
-    studentId: string
+    studentId: string,
+    activeUnit?: string
   ) {
     return db.selfReflection.findMany({
       where: {
@@ -56,6 +57,7 @@ export class SelfReflection {
             },
           ],
           studentId,
+          unitId: activeUnit,
         },
       },
     });
@@ -85,6 +87,7 @@ export class SelfReflection {
       distinct: ["studentId"],
       include: {
         Student: true,
+        Unit: true,
       },
     });
   }

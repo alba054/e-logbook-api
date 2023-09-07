@@ -204,12 +204,6 @@ export class ProblemConsultationHandler {
     const { studentId } = req.params;
 
     try {
-      const ProblemConsultations =
-        await this.problemConsultationService.getProblemConsultationsByStudentId(
-          tokenPayload,
-          studentId
-        );
-
       const student = await this.studentService.getStudentByStudentId(
         studentId
       );
@@ -223,6 +217,12 @@ export class ProblemConsultationHandler {
             throw new InternalServerError();
         }
       }
+
+      const ProblemConsultations =
+        await this.problemConsultationService.getProblemConsultationsByStudentId(
+          tokenPayload,
+          studentId
+        );
 
       return res.status(200).json(
         createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
@@ -263,6 +263,7 @@ export class ProblemConsultationHandler {
             studentName: p.Student?.fullName,
             studentId: p.Student?.studentId,
             latest: p.createdAt,
+            unitName: p.Unit?.name,
           } as ISubmittedProblemConsultations;
         })
       )

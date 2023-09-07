@@ -1,7 +1,7 @@
-import { NotFoundError } from "@prisma/client/runtime/library";
 import { NextFunction, Request, Response } from "express";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
+import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
 import { AssesmentService } from "../../services/database/AssesmentService";
 import { constants, createErrorObject, createResponse } from "../../utils";
 import {
@@ -69,7 +69,7 @@ export class AssesmentHandler {
     const { verified } = req.body;
 
     try {
-      if (!verified) {
+      if (typeof verified === "undefined") {
         return createErrorObject(400, "provide verified");
       }
 

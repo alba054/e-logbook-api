@@ -1,12 +1,14 @@
 export interface ISubmittedSgl {
   studentName: string;
   latest: Date | string;
+  unitName?: string;
   studentId: string;
 }
 
 export interface IStudentSgl {
   studentName: string;
   studentId: string;
+  unitName?: string;
   sgls: ISglDetail[];
 }
 

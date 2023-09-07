@@ -142,15 +142,17 @@ export class CstService {
 
   async getCstsBySupervisorAndStudentId(
     tokenPayload: ITokenPayload,
-    studentId: string
+    studentId: string,
+    activeUnit?: string
   ) {
     if (tokenPayload.badges?.includes(constants.CEU_BADGE)) {
-      return this.cstModel.getCstsByStudentId(studentId);
+      return this.cstModel.getCstsByStudentId(studentId, activeUnit);
     }
 
     return this.cstModel.getCstsBySupervisorIdAndStudentId(
       tokenPayload.supervisorId,
-      studentId
+      studentId,
+      activeUnit
     );
   }
 

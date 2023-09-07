@@ -257,11 +257,6 @@ export class CstHandler {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { studentId } = req.params;
 
-    const result = await this.cstService.getCstsBySupervisorAndStudentId(
-      tokenPayload,
-      studentId
-    );
-
     const student = await this.studentService.getStudentByStudentId(studentId);
     if (student && "error" in student) {
       switch (student.error) {
@@ -274,6 +269,11 @@ export class CstHandler {
       }
     }
 
+    const result = await this.cstService.getCstsBySupervisorAndStudentId(
+      tokenPayload,
+      studentId,
+      student.unitId ?? ""
+    );
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
         studentId: student.studentId,
@@ -320,6 +320,7 @@ export class CstHandler {
             latest: r.updatedAt,
             studentId: r.Student?.studentId,
             studentName: r.Student?.fullName,
+            unitName: r.Unit?.name,
           } as ISubmittedCst;
         })
       )

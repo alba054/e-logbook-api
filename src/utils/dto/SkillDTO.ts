@@ -2,6 +2,7 @@ export interface ISubmittedSkill {
   studentName: string;
   latest: Date | string;
   studentId: string;
+  unitName?: string;
 }
 
 export interface IStudentSkills {

@@ -141,15 +141,17 @@ export class SglService {
 
   async getSglsBySupervisorAndStudentId(
     tokenPayload: ITokenPayload,
-    studentId: string
+    studentId: string,
+    activeUnit?: string
   ) {
     if (tokenPayload.badges?.includes(constants.CEU_BADGE)) {
-      return this.sglModel.getSglsByStudentId(studentId);
+      return this.sglModel.getSglsByStudentId(studentId, activeUnit);
     }
 
     return this.sglModel.getSglsBySupervisorIdAndStudentId(
       tokenPayload.supervisorId,
-      studentId
+      studentId,
+      activeUnit
     );
   }
 

@@ -116,11 +116,13 @@ export class SelfReflectionService {
 
   async getSelfReflectionsByStudentId(
     tokenPayload: ITokenPayload,
-    studentId: string
+    studentId: string,
+    activeUnit?: string
   ) {
     return this.selfReflectionModel.getSelfReflectionsBySupervisorAndStudentId(
       tokenPayload.supervisorId,
-      studentId
+      studentId,
+      activeUnit
     );
   }
 

@@ -8,6 +8,7 @@ export interface ISubmittedSelfReflections {
   studentName: string;
   latest: Date | string;
   studentId: string;
+  unitName?: string;
 }
 
 export interface ISelfReflectionDetailDTO {

@@ -121,6 +121,7 @@ export class ClinicalRecord {
       },
       include: {
         Student: true,
+        Unit: true,
       },
     });
   }
@@ -148,6 +149,7 @@ export class ClinicalRecord {
       },
       include: {
         Student: true,
+        Unit: true,
       },
       take: offset,
       skip: offset * (page - 1),

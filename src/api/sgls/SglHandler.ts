@@ -257,11 +257,6 @@ export class SglHandler {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { studentId } = req.params;
 
-    const result = await this.sglService.getSglsBySupervisorAndStudentId(
-      tokenPayload,
-      studentId
-    );
-
     const student = await this.studentService.getStudentByStudentId(studentId);
     if (student && "error" in student) {
       switch (student.error) {
@@ -274,10 +269,17 @@ export class SglHandler {
       }
     }
 
+    const result = await this.sglService.getSglsBySupervisorAndStudentId(
+      tokenPayload,
+      studentId,
+      student.unitId ?? ""
+    );
+
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
         studentId: student.studentId,
         studentName: student.fullName,
+        unitName: result[0].Unit?.name,
         sgls: result.map(
           (r) =>
             ({
@@ -320,6 +322,7 @@ export class SglHandler {
             latest: r.updatedAt,
             studentId: r.Student?.studentId,
             studentName: r.Student?.fullName,
+            unitName: r.Unit?.name,
           } as ISubmittedSgl;
         })
       )
