@@ -8,6 +8,7 @@ import { UnauthorizedError } from "../../exceptions/httpError/UnauthorizedError"
 import { constants } from "../../utils";
 import { UnauthenticatedError } from "../../exceptions/httpError/UnauthenticatedError";
 import { UserService } from "../../services/database/UserService";
+import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
 
 export class AuthorizationBearer {
   static authorize(roles: string[]) {
@@ -57,6 +58,17 @@ export class AuthorizationBearer {
 
         const userService = new UserService();
         const user = await userService.getUserByUsername(tokenPayload.username);
+
+        if (user && "error" in user) {
+          switch (user.error) {
+            case 400:
+              throw new BadRequestError(user.message);
+            case 404:
+              throw new NotFoundError(user.message);
+            default:
+              throw new InternalServerError();
+          }
+        }
 
         if (
           user?.badges &&

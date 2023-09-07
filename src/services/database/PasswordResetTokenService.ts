@@ -18,12 +18,8 @@ export class PasswordResetTokenService {
   async generateTokenResetPassword(email: string) {
     const user = await this.userService.getUserByEmail(email);
 
-    if (!user) {
-      return { error: 404, message: "user's not found" };
-    }
-
-    if (!user.email) {
-      return { error: 400, message: "user has no email" };
+    if ("error" in user) {
+      return user;
     }
 
     const testError =
@@ -39,7 +35,7 @@ export class PasswordResetTokenService {
         html: `<h3>OTP: ${testError.otp}</h3><br>OTP hanya berlaku selama 5 menit<br><h3>${config.config.FRONTEND_RESET_PASSWORD_URI}token=${testError.token}</h3>`,
         subject: "RESIDENT RESET PASSWORD",
         text: "",
-        to: user.email,
+        to: user.email ?? "",
       });
     }
 

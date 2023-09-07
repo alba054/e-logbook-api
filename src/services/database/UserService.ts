@@ -137,10 +137,26 @@ export class UserService {
   }
 
   async getUserByUsername(username: string) {
-    return this.userModel.getUserByUsername(username);
+    const user = await this.userModel.getUserByUsername(username);
+
+    if (!user) {
+      return createErrorObject(404, "user's not found");
+    }
+
+    return user;
   }
 
   async getUserByEmail(email: string) {
-    return this.userModel.getUserByEmail(email);
+    const user = await this.userModel.getUserByEmail(email);
+
+    if (!user) {
+      return createErrorObject(404, "user's not found");
+    }
+
+    if (!user.email) {
+      return createErrorObject(400, "user has no email");
+    }
+
+    return user;
   }
 }
