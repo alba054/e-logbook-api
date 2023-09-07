@@ -2,6 +2,7 @@ export interface ISubmittedCst {
   studentName: string;
   latest: Date | string;
   studentId: string;
+  unitName: string;
 }
 
 export interface IStudentCst {

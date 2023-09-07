@@ -5,6 +5,7 @@ export interface IListScientificSessionDTO {
   studentId?: string;
   attachment?: string;
   status: "VERIFIED" | "UNVERIFIED" | "INPROCESS";
+  unitName?: string;
 }
 
 export interface IScientificSessionDetail {

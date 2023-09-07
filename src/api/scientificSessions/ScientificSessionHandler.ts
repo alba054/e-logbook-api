@@ -150,6 +150,7 @@ export class ScientificSessionHandler {
             pages: Math.ceil(
               scientificSessions.count / constants.HISTORY_ELEMENTS_PER_PAGE
             ),
+            unitName: c.Unit?.name,
           } as IListScientificSessionDTO;
         })
       )

@@ -77,6 +77,7 @@ export class ScientificSession {
       },
       include: {
         Student: true,
+        Unit: true,
       },
     });
   }
@@ -100,6 +101,7 @@ export class ScientificSession {
       },
       include: {
         Student: true,
+        Unit: true,
       },
       take: take,
       skip: take * (page - 1),

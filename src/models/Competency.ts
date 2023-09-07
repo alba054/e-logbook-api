@@ -58,6 +58,7 @@ export class Competency {
       distinct: ["studentId", "type"],
       include: {
         Student: true,
+        Unit: true,
       },
     });
   }
@@ -135,6 +136,7 @@ export class Competency {
       distinct: ["studentId"],
       include: {
         Student: true,
+        Unit: true,
       },
     });
   }
@@ -191,6 +193,7 @@ export class Competency {
       distinct: ["studentId"],
       include: {
         Student: true,
+        Unit: true,
       },
     });
   }

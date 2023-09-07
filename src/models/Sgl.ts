@@ -63,12 +63,14 @@ export class Sgl {
     }
   }
 
-  async getSglsByStudentId(studentId: string) {
+  async getSglsByStudentId(studentId: string, activeUnit?: string) {
     return db.sGL.findMany({
       where: {
         Student: {
           studentId,
         },
+        unitId: activeUnit,
+        verificationStatus: "INPROCESS",
       },
       include: {
         topics: {
@@ -78,6 +80,7 @@ export class Sgl {
         },
         Student: true,
         supervisor: true,
+        Unit: true,
       },
     });
   }
@@ -89,10 +92,12 @@ export class Sgl {
           fullName: { contains: name },
           studentId: nim,
         },
+        verificationStatus: "INPROCESS",
       },
       include: {
         topics: true,
         Student: true,
+        Unit: true,
       },
       skip: (page - 1) * take,
       take,
@@ -164,7 +169,8 @@ export class Sgl {
 
   async getSglsBySupervisorIdAndStudentId(
     supervisorId: string | undefined,
-    studentId: string
+    studentId: string,
+    activeUnit?: string
   ) {
     return db.sGL.findMany({
       where: {
@@ -172,6 +178,8 @@ export class Sgl {
           studentId,
         },
         supervisorId,
+        unitId: activeUnit,
+        verificationStatus: "INPROCESS",
       },
       include: {
         topics: {
@@ -181,6 +189,7 @@ export class Sgl {
         },
         supervisor: true,
         Student: true,
+        Unit: true,
       },
     });
   }
@@ -203,6 +212,7 @@ export class Sgl {
       include: {
         topics: true,
         Student: true,
+        Unit: true,
       },
       skip: (page - 1) * take,
       take,

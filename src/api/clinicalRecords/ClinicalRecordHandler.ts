@@ -338,6 +338,7 @@ export class ClinicalRecordHandler {
             pages: Math.ceil(
               clinicalRecords.count / constants.HISTORY_ELEMENTS_PER_PAGE
             ),
+            unitName: c.Unit?.name,
           } as IListClinicalRecordDTO;
         })
       )

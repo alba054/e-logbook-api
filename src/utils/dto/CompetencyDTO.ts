@@ -3,4 +3,5 @@ export interface ICompetencySubmitted {
   studentId: string;
   latest: Date | string;
   competencyType: "CASE" | "SKILL";
+  unitName?: string;
 }

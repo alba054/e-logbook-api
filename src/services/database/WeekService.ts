@@ -15,6 +15,10 @@ export class WeekService {
     this.dayModel = new Day();
   }
 
+  async getWeeksByUnitId(unitId: string | undefined) {
+    return this.weekModel.getWeeksByUnitId(unitId);
+  }
+
   async insertWeek(payload: IPostWeek) {
     const weekId = uuidv4();
 

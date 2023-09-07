@@ -67,12 +67,14 @@ export class Cst {
     }
   }
 
-  async getCstsByStudentId(studentId: string) {
+  async getCstsByStudentId(studentId: string, activeUnit?: string) {
     return db.cST.findMany({
       where: {
         Student: {
           studentId,
         },
+        unitId: activeUnit,
+        verificationStatus: "INPROCESS",
       },
       include: {
         topics: {
@@ -93,10 +95,12 @@ export class Cst {
           fullName: { contains: name },
           studentId: nim,
         },
+        verificationStatus: "INPROCESS",
       },
       include: {
         topics: true,
         Student: true,
+        Unit: true,
       },
       skip: (page - 1) * take,
       take,
@@ -168,7 +172,8 @@ export class Cst {
 
   async getCstsBySupervisorIdAndStudentId(
     supervisorId: string | undefined,
-    studentId: string
+    studentId: string,
+    activeUnit?: string
   ) {
     return db.cST.findMany({
       where: {
@@ -176,6 +181,8 @@ export class Cst {
           studentId,
         },
         supervisorId,
+        unitId: activeUnit,
+        verificationStatus: "INPROCESS",
       },
       include: {
         topics: {
@@ -203,10 +210,12 @@ export class Cst {
           fullName: { contains: name },
           studentId: nim,
         },
+        verificationStatus: "INPROCESS",
       },
       include: {
         topics: true,
         Student: true,
+        Unit: true,
       },
       skip: (page - 1) * take,
       take,
