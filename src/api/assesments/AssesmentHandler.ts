@@ -233,7 +233,6 @@ export class AssesmentHandler {
           a.cbt?.weight ??
           0,
         score: grade,
-        verified: a.osce?.verified ?? null,
       } as IStudentAssesmentUnit);
     });
 
@@ -256,6 +255,8 @@ export class AssesmentHandler {
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
         finalScore,
+        verified:
+          assesments.filter((a) => a.osce !== null)[0].osce?.verified ?? null,
         assesments: responses,
       })
     );

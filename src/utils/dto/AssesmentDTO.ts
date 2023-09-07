@@ -58,7 +58,6 @@ export interface IStudentAssesmentUnit {
     | "CBT";
   score: number | null;
   weight: number;
-  verified?: boolean;
 }
 
 interface IMiniCexGradeItem {
