@@ -66,10 +66,11 @@ export class StudentCheckInCheckOutService {
       studentActiveUnit?.activeUnit?.id
     );
 
-    this.studentDailyActivityService.generateDailyActivity(
-      student?.id,
-      studentActiveUnit?.activeUnit?.id
-    );
+    // !unused doesn't generate daily activity anymore
+    // this.studentDailyActivityService.generateDailyActivity(
+    //   student?.id,
+    //   studentActiveUnit?.activeUnit?.id
+    // );
 
     this.studentPersonalBehaviourService.generatePersonalBehaviourAssesment(
       student?.id,

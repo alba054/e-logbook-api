@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 import { AssesmentService } from "../../services/database/AssesmentService";
-import { constants, createResponse } from "../../utils";
+import { constants, createErrorObject, createResponse } from "../../utils";
 import {
   IListMiniCex,
   IListScientificAssesment,
@@ -61,6 +61,35 @@ export class AssesmentHandler {
     this.putAssesmentScore = this.putAssesmentScore.bind(this);
     this.postAssesmentScientificAsessment =
       this.postAssesmentScientificAsessment.bind(this);
+    this.putVerifiedAssesment = this.putVerifiedAssesment.bind(this);
+  }
+
+  async putVerifiedAssesment(req: Request, res: Response, next: NextFunction) {
+    const { studentId, unitId } = req.params;
+    const { verified } = req.body;
+
+    try {
+      if (!verified) {
+        return createErrorObject(400, "provide verified");
+      }
+
+      await this.assesmentService.submitFinalScore(
+        studentId,
+        unitId,
+        Boolean(verified)
+      );
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "succesfully submit final score"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async postAssesmentScientificAsessment(
@@ -211,7 +240,7 @@ export class AssesmentHandler {
       responses.push({
         type: "MINI_CEX",
         weight: 0.25,
-        score: 0,
+        score: null,
       } as IStudentAssesmentUnit);
     }
 
@@ -219,7 +248,7 @@ export class AssesmentHandler {
       responses.push({
         type: "SCIENTIFIC_ASSESMENT",
         weight: 0.15,
-        score: 0,
+        score: null,
       } as IStudentAssesmentUnit);
     }
 

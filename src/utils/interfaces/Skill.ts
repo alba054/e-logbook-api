@@ -1,5 +1,5 @@
 export interface IPostSkill {
-  readonly type: "OBTAINED" | "DISCUSSED" | "OBSERVED";
+  readonly type: "OBSERVER" | "PERFORM";
   readonly skillTypeId: number;
   readonly supervisorId: string;
 }

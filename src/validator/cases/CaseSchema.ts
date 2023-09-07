@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 export const CasePayloadSchema = Joi.object({
-  type: Joi.string().valid("OBTAINED", "OBSERVED", "DISCUSSED"),
+  type: Joi.string().valid("OBTAINED", "DISCUSSED"),
   caseTypeId: Joi.number().required(),
   supervisorId: Joi.string().required(),
 });

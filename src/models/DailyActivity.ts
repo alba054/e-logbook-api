@@ -25,18 +25,18 @@ export class DailyActivity {
           studentId,
         },
       },
-      include: {
-        Unit: true,
-        activities: {
-          include: {
-            ActivityName: true,
-            location: true,
-          },
-        },
-      },
-      orderBy: {
-        weekNum: "asc",
-      },
+      // include: {
+      //   Unit: true,
+      //   activities: {
+      //     include: {
+      //       ActivityName: true,
+      //       location: true,
+      //     },
+      //   },
+      // },
+      // orderBy: {
+      //   weekNum: "asc",
+      // },
     });
   }
 
@@ -49,19 +49,19 @@ export class DailyActivity {
         studentId,
         unitId,
       },
-      include: {
-        Unit: true,
-        activities: {
-          include: {
-            ActivityName: true,
-            location: true,
-          },
-        },
-        Student: true,
-      },
-      orderBy: {
-        weekNum: "asc",
-      },
+      // include: {
+      //   Unit: true,
+      //   activities: {
+      //     include: {
+      //       ActivityName: true,
+      //       location: true,
+      //     },
+      //   },
+      //   Student: true,
+      // },
+      // orderBy: {
+      //   weekNum: "asc",
+      // },
     });
   }
 
@@ -99,9 +99,9 @@ export class DailyActivity {
       where: {
         id,
       },
-      include: {
-        DailyActivity: true,
-      },
+      // include: {
+      //   DailyActivity: true,
+      // },
     });
   }
 
@@ -110,15 +110,15 @@ export class DailyActivity {
       where: {
         id,
       },
-      include: {
-        activities: {
-          include: {
-            ActivityName: true,
-            location: true,
-          },
-        },
-        Student: true,
-      },
+      // include: {
+      //   activities: {
+      //     include: {
+      //       ActivityName: true,
+      //       location: true,
+      //     },
+      //   },
+      //   Student: true,
+      // },
     });
   }
 }

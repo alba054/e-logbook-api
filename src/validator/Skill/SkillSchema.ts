@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 export const SkillPayloadSchema = Joi.object({
-  type: Joi.string().valid("OBTAINED", "OBSERVED", "DISCUSSED"),
+  type: Joi.string().valid("OBSERVER", "PERFORM"),
   skillTypeId: Joi.number().required(),
   supervisorId: Joi.string().required(),
 });

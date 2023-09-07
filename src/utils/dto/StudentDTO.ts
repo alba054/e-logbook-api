@@ -12,13 +12,9 @@ export interface IListSupervisorStudent {
 
 export interface IStudentStastic {
   finalScore: number;
-  obtainedCases: number;
-  discussedCases: number;
-  observedCases: number;
+  totalCases: number;
+  totalSkills: number;
   verifiedCases: number;
-  obtainedSkills: number;
-  discussedSkills: number;
-  observedSkills: number;
   verifiedSkills: number;
   cases: IListCaseDTO[];
   skills: IListSkillDTO[];

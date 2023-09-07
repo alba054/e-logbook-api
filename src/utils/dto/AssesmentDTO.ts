@@ -56,7 +56,7 @@ export interface IStudentAssesmentUnit {
     | "PERSONAL_BEHAVIOUR"
     | "OSCE"
     | "CBT";
-  score: number;
+  score: number | null;
   weight: number;
 }
 

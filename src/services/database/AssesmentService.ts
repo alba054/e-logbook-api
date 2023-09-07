@@ -30,6 +30,10 @@ export class AssesmentService {
       new ScientificAssesmentGradeItemService();
   }
 
+  async submitFinalScore(studentId: string, unitId: string, verified: boolean) {
+    return this.assesmentModel.verifiedOsce(studentId, unitId, verified);
+  }
+
   async addScientificAssesment(
     tokenPayload: ITokenPayload,
     payload: IPostMiniCex
