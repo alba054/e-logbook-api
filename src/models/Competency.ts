@@ -91,7 +91,9 @@ export class Competency {
     return db.competency.findMany({
       where: {
         supervisorId,
-        studentId,
+        Student: {
+          studentId,
+        },
         type: "CASE",
       },
       include: {
@@ -108,7 +110,9 @@ export class Competency {
     return db.competency.findMany({
       where: {
         supervisorId,
-        studentId,
+        Student: {
+          studentId,
+        },
         type: "SKILL",
       },
       include: {
@@ -121,6 +125,7 @@ export class Competency {
   async getCasesBySupervisor(supervisorId?: string) {
     return db.competency.findMany({
       where: {
+        supervisorId,
         verificationStatus: "INPROCESS",
         type: "CASE",
       },
