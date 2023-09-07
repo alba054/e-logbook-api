@@ -13,6 +13,9 @@ export interface IMiniCexDetail {
   studentName: string;
   id: string;
   grade: number;
+  supervisingDPKId: string;
+  examinerDPKId: string;
+  academicSupervisorId: string;
   scores: IMiniCexGradeItem[];
 }
 
