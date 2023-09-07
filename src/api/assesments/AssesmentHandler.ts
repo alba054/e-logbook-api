@@ -153,6 +153,7 @@ export class AssesmentHandler {
       );
 
     let finalScore = 0;
+    const responses: IStudentAssesmentUnit[] = [];
 
     assesments.forEach((a) => {
       let grade = 0;
@@ -162,7 +163,7 @@ export class AssesmentHandler {
             grade += g.score ?? 0;
           });
           grade = grade / (a.MiniCex.MiniCexGrade.length || 1);
-          grade *= a.MiniCex.weight;
+          // grade *= a.MiniCex.weight;
         }
       }
 
@@ -172,65 +173,60 @@ export class AssesmentHandler {
             grade += g.score ?? 0;
           });
           grade = grade / a.ScientificAssesment?.grades.length;
-          grade *= a.ScientificAssesment.weight;
+          // grade *= a.ScientificAssesment.weight;
         }
       }
 
       if (a.osce) {
         grade = a.osce.score ?? 0;
-        grade *= a.osce.weight;
+        // grade *= a.osce.weight;
       }
 
       if (a.cbt) {
         grade = a.cbt.score ?? 0;
-        grade *= a.cbt.weight;
+        // grade *= a.cbt.weight;
       }
 
-      finalScore = finalScore + grade;
+      finalScore =
+        finalScore +
+        grade *
+          (a.MiniCex?.weight ??
+            a.ScientificAssesment?.weight ??
+            a.osce?.weight ??
+            a.cbt?.weight ??
+            0);
+      responses.push({
+        type: a.type,
+        weight:
+          a.MiniCex?.weight ??
+          a.ScientificAssesment?.weight ??
+          a.osce?.weight ??
+          a.cbt?.weight ??
+          0,
+        score: grade,
+      } as IStudentAssesmentUnit);
     });
+
+    if (!responses.filter((r) => r.type === "MINI_CEX").length) {
+      responses.push({
+        type: "MINI_CEX",
+        weight: 0.25,
+        score: 0,
+      } as IStudentAssesmentUnit);
+    }
+
+    if (!responses.filter((r) => r.type === "SCIENTIFIC_ASSESMENT").length) {
+      responses.push({
+        type: "SCIENTIFIC_ASSESMENT",
+        weight: 0.15,
+        score: 0,
+      } as IStudentAssesmentUnit);
+    }
 
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
         finalScore,
-        assesments: assesments.map((a) => {
-          let grade = 0;
-          if (a.MiniCex) {
-            if (a.MiniCex.MiniCexGrade) {
-              a.MiniCex.MiniCexGrade.forEach((g) => {
-                grade += g.score ?? 0;
-              });
-              grade = grade / a.MiniCex?.MiniCexGrade.length;
-            }
-          }
-
-          if (a.ScientificAssesment) {
-            if (a.ScientificAssesment?.grades) {
-              a.ScientificAssesment?.grades.forEach((g) => {
-                grade += g.score ?? 0;
-              });
-              grade = grade / a.ScientificAssesment?.grades.length;
-            }
-          }
-
-          if (a.osce) {
-            grade = a.osce.score ?? 0;
-          }
-
-          if (a.cbt) {
-            grade = a.cbt.score ?? 0;
-          }
-
-          return {
-            type: a.type,
-            weight:
-              a.MiniCex?.weight ??
-              a.ScientificAssesment?.weight ??
-              a.osce?.weight ??
-              a.cbt?.weight ??
-              0,
-            score: grade,
-          } as IStudentAssesmentUnit;
-        }),
+        assesments: responses,
       })
     );
   }
@@ -509,6 +505,9 @@ export class AssesmentHandler {
             };
           }),
           grade,
+          academicSupervisorId: miniCex.Student?.academicSupervisorId,
+          examinerDPKId: miniCex.Student?.examinerSupervisorId,
+          supervisingDPKId: miniCex.Student?.supervisingSupervisorId,
         } as IMiniCexDetail)
       );
     } catch (error) {
@@ -645,6 +644,9 @@ export class AssesmentHandler {
             };
           }),
           grade,
+          academicSupervisorId: miniCex.Student?.academicSupervisorId,
+          examinerDPKId: miniCex.Student?.examinerSupervisorId,
+          supervisingDPKId: miniCex.Student?.supervisingSupervisorId,
         } as IMiniCexDetail)
       );
     } catch (error) {
