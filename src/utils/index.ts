@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import dotenv from "dotenv";
+import fs from "fs/promises";
 
 dotenv.config();
 
@@ -34,6 +35,10 @@ export const generateRandomString = (length: number) => {
 };
 
 export const getUnixTimestamp = () => Math.floor(new Date().getTime() / 1000);
+
+export const deleteFileByPath = (path: string) => {
+  return fs.unlink(path);
+};
 
 export const constants = {
   SUCCESS_RESPONSE_MESSAGE: "success",

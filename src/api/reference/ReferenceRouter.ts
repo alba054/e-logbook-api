@@ -39,6 +39,10 @@ export class ReferenceRouter {
           constants.ADMIN_ROLE,
         ]),
         this.handler.getReferenceFile
+      )
+      .delete(
+        AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+        this.handler.deleteReferenceFile
       );
 
     // * upload file reference per unit

@@ -20,6 +20,39 @@ export class ReferenceHandler {
     this.getReferecesByUnit = this.getReferecesByUnit.bind(this);
     this.postUploadedFileReferenceToAllUnits =
       this.postUploadedFileReferenceToAllUnits.bind(this);
+    this.deleteReferenceFile = this.deleteReferenceFile.bind(this);
+  }
+
+  async deleteReferenceFile(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+
+    try {
+      const result = await this.referenceService.deleteReferenceById(
+        Number(id)
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully delete reference"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async postUploadedFileReferenceToAllUnits(
