@@ -345,6 +345,17 @@ export class StudentHandler {
       tokenPayload.username
     );
 
+    if (student && "error" in student) {
+      switch (student.error) {
+        case 400:
+          throw new BadRequestError(student.message);
+        case 404:
+          throw new NotFoundError(student.message);
+        default:
+          throw new InternalServerError();
+      }
+    }
+
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
         studentId: student?.student?.studentId,
@@ -772,6 +783,17 @@ export class StudentHandler {
       tokenPayload.username
     );
 
+    if (student && "error" in student) {
+      switch (student.error) {
+        case 400:
+          throw new BadRequestError(student.message);
+        case 404:
+          throw new NotFoundError(student.message);
+        default:
+          throw new InternalServerError();
+      }
+    }
+
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
         studentId: student?.student?.studentId,
@@ -798,6 +820,17 @@ export class StudentHandler {
     const student = await this.userService.getUserByUsername(
       tokenPayload.username
     );
+
+    if (student && "error" in student) {
+      switch (student.error) {
+        case 400:
+          throw new BadRequestError(student.message);
+        case 404:
+          throw new NotFoundError(student.message);
+        default:
+          throw new InternalServerError();
+      }
+    }
 
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
@@ -829,6 +862,17 @@ export class StudentHandler {
     const student = await this.userService.getUserByUsername(
       tokenPayload.username
     );
+
+    if (student && "error" in student) {
+      switch (student.error) {
+        case 400:
+          throw new BadRequestError(student.message);
+        case 404:
+          throw new NotFoundError(student.message);
+        default:
+          throw new InternalServerError();
+      }
+    }
 
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {

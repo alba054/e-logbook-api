@@ -332,6 +332,17 @@ export class UserHandler {
       tokenPayload.username
     );
 
+    if (user && "error" in user) {
+      switch (user.error) {
+        case 400:
+          throw new BadRequestError(user.message);
+        case 404:
+          throw new NotFoundError(user.message);
+        default:
+          throw new InternalServerError();
+      }
+    }
+
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
         badges: user?.badges,

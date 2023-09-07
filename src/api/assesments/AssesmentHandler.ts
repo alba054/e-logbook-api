@@ -233,6 +233,7 @@ export class AssesmentHandler {
           a.cbt?.weight ??
           0,
         score: grade,
+        verified: a.osce?.verified ?? null,
       } as IStudentAssesmentUnit);
     });
 
