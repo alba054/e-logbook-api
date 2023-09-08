@@ -115,31 +115,30 @@ export class WeeklyAssesmentHandler {
           unitId
         );
 
-      // return res.status(200).json(
-      //   createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-      //     studentName: weeklyAssesment[0]?.Student?.fullName,
-      //     studentId: weeklyAssesment[0]?.Student?.studentId,
-      //     assesments: weeklyAssesment.map((w) => {
-      //       return {
-      //         attendNum: dailyActivities
-      //           .find((a) => a.weekNum === w.weekNum)
-      //           ?.activities.filter((a) => a.activityStatus === "ATTEND")
-      //           .length,
-      //         notAttendNum: dailyActivities
-      //           .find((a) => a.weekNum === w.weekNum)
-      //           ?.activities.filter(
-      //             (a) =>
-      //               a.activityStatus === "NOT_ATTEND" ||
-      //               a.activityStatus === "SICK"
-      //           ).length,
-      //         score: w.score,
-      //         verificationStatus: w.verificationStatus,
-      //         weekNum: w.weekNum,
-      //         id: w.id,
-      //       };
-      //     }),
-      //   } as IStudentWeeklyAssesment)
-      // );
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          studentName: weeklyAssesment[0]?.Student?.fullName,
+          studentId: weeklyAssesment[0]?.Student?.studentId,
+          assesments: weeklyAssesment.map((w) => {
+            return {
+              attendNum: dailyActivities
+                .filter((a) => a.day?.week?.weekNum === w.weekNum)
+                .filter((a) => a.Activity?.activityStatus === "ATTEND").length,
+              notAttendNum: dailyActivities
+                .filter((a) => a.day?.week?.weekNum === w.weekNum)
+                .filter(
+                  (a) =>
+                    a.Activity?.activityStatus === "NOT_ATTEND" ||
+                    a.Activity?.activityStatus === "SICK"
+                ).length,
+              score: w.score,
+              verificationStatus: w.verificationStatus,
+              weekNum: w.weekNum,
+              id: w.id,
+            };
+          }),
+        } as IStudentWeeklyAssesment)
+      );
     } catch (error) {
       return next(error);
     }

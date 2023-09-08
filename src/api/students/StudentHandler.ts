@@ -640,39 +640,72 @@ export class StudentHandler {
     const weeks = await this.weekService.getWeeksByUnitId(
       activeUnit?.activeUnit.activeUnit?.id
     );
-    // const result =
-    //   await this.dailyActivityService.getDailyActivitiesByStudentIdAndUnitId(
-    //     tokenPayload
-    //   );
+    const result =
+      await this.dailyActivityService.getDailyActivitiesByStudentIdAndUnitId(
+        tokenPayload
+      );
 
-    // return res.status(200).json(
-    //   createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-    //     weeks: weeks.map((w) => {
-    //       return {
-    //         endDate: Number(w.endDate),
-    //         startDate: Number(w.startDate),
-    //         unitId: w.unitId,
-    //         unitName: w.Unit?.name,
-    //         weekName: w.weekNum,
-    //       };
-    //     }),
-    //     // dailyActivities: result?.weeks.map((r) => {
-    //     //   return {
-    //     //     weekName: r.weekNum,
-    //     //     // activitiesStatus: r.days.map((a) => {
-    //     //     //   return {
-    //     //     //     activityStatus: a.activityStatus,
-    //     //     //     day: a.day,
-    //     //     //     verificationStatus: a.verificationStatus,
-    //     //     //     activityName: a.ActivityName?.name,
-    //     //     //     location: a.location?.name,
-    //     //     //     detail: a.detail,
-    //     //     //   } as IActivitiesDetail;
-    //     //     // }),
-    //     //   };
-    //     // }),
-    //   } as IStudentDailyActivities)
-    // );
+    const weekNums = new Map();
+
+    result.forEach((r) => {
+      const weekNum = r.day?.week?.weekNum;
+      if (weekNums.has(weekNum)) {
+        const activities: any[] = weekNums.get(weekNum);
+        activities.push(r);
+        weekNums.set(weekNum, activities);
+      }
+      weekNums.set(weekNum, [r]);
+    });
+
+    const dailyActivities: { weekNum: number; activities: any }[] = [];
+
+    weekNums.forEach((v, k) => {
+      dailyActivities.push({
+        weekNum: k,
+        activities: v,
+      });
+    });
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        unitName: result[0]?.Unit?.name,
+        weeks: weeks.map((w) => {
+          return {
+            endDate: Number(w.endDate),
+            startDate: Number(w.startDate),
+            unitId: w.unitId,
+            unitName: w.Unit?.name,
+            weekName: w.weekNum,
+            id: w.id
+          };
+        }),
+        dailyActivities: dailyActivities.map((d) => {
+          return {
+            weekName: d.weekNum,
+            attendNum: d.activities.filter(
+              (a: any) => a.Activity.activityStatus === "ATTEND"
+            ).length,
+            notAttendNum: d.activities.filter(
+              (a: any) => a.Activity.activityStatus === "NOT_ATTEND"
+            ).length,
+            sickNum: d.activities.filter(
+              (a: any) => a.Activity.activityStatus === "SICK"
+            ).length,
+            activitiesStatus: d.activities.map((d: any) => {
+              return {
+                id: d.id,
+                day: d.day.day,
+                location: d.Activity.location.name,
+                detail: d.Activity.detail,
+                activityStatus: d.Activity.activityStatus,
+                activityName: d.Activity.ActivityName.name,
+                verificationStatus: d.verificationStatus,
+              };
+            }),
+          };
+        }),
+      } as IStudentDailyActivities)
+    );
   }
 
   async putDailyActivityActivity(
@@ -733,44 +766,40 @@ export class StudentHandler {
     const { id } = req.params;
 
     try {
+      const days = await this.weekService.getDaysByWeekId(id);
+
       const result =
-        await this.dailyActivityService.getActivitiesByDailyActivityId(
-          tokenPayload,
-          id
+        await this.dailyActivityService.getActivitiesByWeekIdStudentIdUnitId(
+          id,
+          tokenPayload
         );
 
-      if (result && "error" in result) {
-        switch (result.error) {
-          case 400:
-            throw new BadRequestError(result.message);
-          case 404:
-            throw new NotFoundError(result.message);
-          default:
-            throw new InternalServerError();
-        }
-      }
-
-      // return res.status(200).json(
-      //   createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-      //     alpha: result.activities.filter((a) => a.activityStatus !== "ATTEND")
-      //       .length,
-      //     attend: result.activities.filter((a) => a.activityStatus === "ATTEND")
-      //       .length,
-      //     weekName: result.weekNum,
-      //     verificationStatus: result.verificationStatus,
-      //     activities: result.activities.map((a) => {
-      //       return {
-      //         activityStatus: a.activityStatus,
-      //         day: a.day,
-      //         verificationStatus: a.verificationStatus,
-      //         activityName: a.ActivityName?.name,
-      //         detail: a.detail,
-      //         location: a.location?.name,
-      //         id: a.id,
-      //       } as IActivitiesDetail;
-      //     }),
-      //   } as IListActivitiesPerWeek)
-      // );
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          days: days?.Day.map((d) => {
+            return {
+              day: d.day,
+              id: d.id,
+            };
+          }),
+          alpha: result.filter((a) => a.Activity?.activityStatus !== "ATTEND")
+            .length,
+          attend: result.filter((a) => a.Activity?.activityStatus === "ATTEND")
+            .length,
+          weekName: days?.weekNum,
+          activities: result.map((a) => {
+            return {
+              activityStatus: a.Activity?.activityStatus,
+              day: a.day?.day,
+              verificationStatus: a.verificationStatus,
+              activityName: a.Activity?.ActivityName?.name,
+              detail: a.Activity?.detail,
+              location: a.Activity?.location?.name,
+              id: a.id,
+            } as IActivitiesDetail;
+          }),
+        } as IListActivitiesPerWeek)
+      );
     } catch (error) {
       return next(error);
     }

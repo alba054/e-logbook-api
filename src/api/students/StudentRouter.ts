@@ -181,7 +181,7 @@ export class StudentRouter {
 
     // * get list of activities per week
     this.router
-      .route(this.path + "/daily-activities/:id")
+      .route(this.path + "/daily-activities/weeks/:id")
       .get(
         AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
         this.studentHandler.getDailyActivitiesPerWeek

@@ -1,5 +1,5 @@
 export interface IPutDailyActivityActivity {
-  activityStatus: "SICK" | "ATTEND" | "NOT_ATTEND";
+  activityStatus: "SICK" | "ATTEND" | "NOT_ATTEND" | "HOLIDAY";
   detail?: string;
   supervisorId: string;
   locationId: number;

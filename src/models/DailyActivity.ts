@@ -4,6 +4,98 @@ import { createErrorObject } from "../utils";
 import { IPutDailyActivityActivity } from "../utils/interfaces/DailyActivity";
 
 export class DailyActivity {
+  async getActivitiesByWeekIdAndStudentIdAndUnitId(
+    weekId: string,
+    studentId: string | undefined,
+    unitId: string | null | undefined
+  ) {
+    return db.dailyActivity.findMany({
+      where: {
+        studentId,
+        unitId,
+        day: {
+          weekId,
+        },
+      },
+      include: {
+        Activity: {
+          include: {
+            ActivityName: true,
+            location: true,
+          },
+        },
+        day: true,
+      },
+    });
+  }
+
+  async getActivitiesBySupervisor(supervisorId: string | undefined) {
+    return db.dailyActivity.findMany({
+      where: {
+        Activity: {
+          supervisorId,
+        },
+      },
+      include: {
+        Unit: true,
+        day: {
+          include: {
+            week: true,
+          },
+        },
+        Student: true,
+        Activity: {
+          include: {
+            location: true,
+            ActivityName: true,
+          },
+        },
+      },
+    });
+  }
+
+  async postDailyActivity(
+    id: string,
+    dayId: string,
+    studentId: string,
+    unitId: string,
+    activityId: string,
+    payload: IPutDailyActivityActivity
+  ) {
+    return db.dailyActivity.create({
+      data: {
+        id,
+        dayId,
+        studentId,
+        unitId,
+        Activity: {
+          create: {
+            id: activityId,
+            activityLocationId: payload.locationId,
+            activityNameId: payload.activityNameId,
+            activityStatus: payload.activityStatus,
+            detail: payload.detail,
+            supervisorId: payload.supervisorId,
+          },
+        },
+      },
+    });
+  }
+
+  async getDailyActivityActivityByDayIdAndStudentIdAndUnitId(
+    dayId: string,
+    studentId: string,
+    unitId: string
+  ) {
+    return db.dailyActivity.findFirst({
+      where: {
+        dayId,
+        unitId,
+        studentId,
+      },
+    });
+  }
+
   async getActivitiesBySupervisorAndStudentId(
     supervisorId: string | undefined,
     studentId: string
@@ -44,17 +136,32 @@ export class DailyActivity {
     studentId: string,
     unitId: string
   ) {
-    return db.dailyActivity.findUnique({
+    return db.dailyActivity.findMany({
       where: {
-        // studentId_unitId: {
-        //   studentId: studentId,
-        //   unitId: unitId,
-        // },
+        studentId,
+        unitId,
       },
       include: {
         Unit: true,
         Student: true,
-        // weeks: true,
+        day: {
+          include: {
+            week: true,
+          },
+        },
+        Activity: {
+          include: {
+            location: true,
+            ActivityName: true,
+          },
+        },
+      },
+      orderBy: {
+        day: {
+          week: {
+            weekNum: "asc",
+          },
+        },
       },
     });
   }
@@ -64,16 +171,20 @@ export class DailyActivity {
     payload: IPutDailyActivityActivity
   ) {
     try {
-      return db.activity.update({
+      return db.dailyActivity.update({
         where: {
           id,
         },
         data: {
-          activityNameId: payload.activityNameId,
-          activityStatus: payload.activityStatus,
-          activityLocationId: payload.locationId,
-          detail: payload.detail,
-          supervisorId: payload.supervisorId,
+          Activity: {
+            update: {
+              activityLocationId: payload.locationId,
+              activityNameId: payload.activityNameId,
+              activityStatus: payload.activityStatus,
+              detail: payload.detail,
+              supervisorId: payload.supervisorId,
+            },
+          },
         },
       });
     } catch (error) {
@@ -104,15 +215,10 @@ export class DailyActivity {
       where: {
         id,
       },
-      // include: {
-      //   activities: {
-      //     include: {
-      //       ActivityName: true,
-      //       location: true,
-      //     },
-      //   },
-      //   Student: true,
-      // },
+      include: {
+        Activity: true,
+        day: { include: { week: true } },
+      },
     });
   }
 }

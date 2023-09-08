@@ -15,6 +15,14 @@ export class WeekService {
     this.dayModel = new Day();
   }
 
+  async getWeeks() {
+    return this.weekModel.getAllWeeks();
+  }
+
+  async getDaysByWeekId(id: string) {
+    return this.weekModel.getWeeksById(id);
+  }
+
   async getWeeksByUnitId(unitId: string | undefined) {
     return this.weekModel.getWeeksByUnitId(unitId);
   }

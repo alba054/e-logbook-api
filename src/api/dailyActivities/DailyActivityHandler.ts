@@ -7,6 +7,7 @@ import { StudentService } from "../../services/database/StudentService";
 import { constants, createResponse } from "../../utils";
 import {
   IActivitiesDetail,
+  IListActivities,
   IListActivitiesPerWeek,
   IStudentDailyActivities,
 } from "../../utils/dto/DailyActiveDTO";
@@ -39,6 +40,37 @@ export class DailyActivityHandler {
       this.putVerificationStatusOfDailyActivity.bind(this);
     this.putVerificationStatusOfDailyActivities =
       this.putVerificationStatusOfDailyActivities.bind(this);
+    this.getActivities = this.getActivities.bind(this);
+  }
+
+  async getActivities(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    const activities =
+      await this.dailyActivityService.getActivitiesBySupervisorId(
+        tokenPayload.supervisorId
+      );
+
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        activities.map((a) => {
+          return {
+            activityName: a.Activity?.ActivityName?.name,
+            activityStatus: a.Activity?.activityStatus,
+            id: a.id,
+            createdAt: a.createdAt,
+            location: a.Activity?.location?.name,
+            studentId: a.Student?.studentId,
+            studentName: a.Student?.fullName,
+            unitName: a.Unit?.name,
+            verificationStatus: a.verificationStatus,
+            weekNum: a.day?.week?.weekNum,
+            day: a.day?.day,
+          } as IListActivities;
+        })
+      )
+    );
   }
 
   async putVerificationStatusOfDailyActivities(
@@ -124,16 +156,16 @@ export class DailyActivityHandler {
         payload
       );
 
-      // if (result && "error" in result) {
-      //   switch (result.error) {
-      //     case 400:
-      //       throw new BadRequestError(result.message);
-      //     case 404:
-      //       throw new NotFoundError(result.message);
-      //     default:
-      //       throw new InternalServerError();
-      //   }
-      // }
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
 
       return res
         .status(200)
@@ -263,7 +295,7 @@ export class DailyActivityHandler {
     next: NextFunction
   ) {
     const tokenPayload: ITokenPayload = res.locals.user;
-    const { id } = req.params;
+    const { dayId } = req.params;
     const payload: IPutDailyActivityActivity = req.body;
 
     try {
@@ -278,7 +310,7 @@ export class DailyActivityHandler {
 
       const result = await this.dailyActivityService.editDailyActivityActivity(
         tokenPayload,
-        id,
+        dayId,
         payload
       );
 

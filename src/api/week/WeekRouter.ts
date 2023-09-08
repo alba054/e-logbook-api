@@ -23,6 +23,16 @@ export class WeekRouter {
           constants.ADMIN_ROLE,
         ]),
         this.handler.postWeek
+      )
+      .get(
+        AuthorizationBearer.authorize([
+          constants.ER_ROLE,
+          constants.ADMIN_ROLE,
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+          constants.STUDENT_ROLE,
+        ]),
+        this.handler.getWeeks
       );
 
     return this.router;
