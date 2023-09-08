@@ -38,6 +38,18 @@ export class CompetencyService {
     return skills;
   }
 
+  async getSkillsByStudentAndUnitIdBySupervisor(
+    studentId: string,
+    unitId: string
+  ) {
+    const skills = await this.competencyModel.getSkillsByStudentIdAndUnitId(
+      studentId,
+      unitId
+    );
+
+    return skills;
+  }
+
   async getCasesByStudentAndUnitId(tokenPayload: ITokenPayload) {
     const activeUnit = await this.studentService.getActiveUnit(
       tokenPayload.studentId ?? ""
@@ -46,6 +58,18 @@ export class CompetencyService {
     const cases = await this.competencyModel.getCasesByStudentIdAndUnitId(
       tokenPayload.studentId,
       activeUnit?.activeUnit.activeUnit?.id
+    );
+
+    return cases;
+  }
+
+  async getCasesByStudentAndUnitIdBySupervisor(
+    studentId: string,
+    unitId: string
+  ) {
+    const cases = await this.competencyModel.getCasesByStudentIdAndUnitId(
+      studentId,
+      unitId
     );
 
     return cases;

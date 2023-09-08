@@ -41,27 +41,21 @@ export class DailyActivity {
   }
 
   async getDailyActivitiesByStudentIdAndUnitId(
-    studentId: string | undefined,
-    unitId: string | undefined
+    studentId: string,
+    unitId: string
   ) {
-    return db.dailyActivity.findMany({
+    return db.dailyActivity.findUnique({
       where: {
-        studentId,
-        unitId,
+        // studentId_unitId: {
+        //   studentId: studentId,
+        //   unitId: unitId,
+        // },
       },
-      // include: {
-      //   Unit: true,
-      //   activities: {
-      //     include: {
-      //       ActivityName: true,
-      //       location: true,
-      //     },
-      //   },
-      //   Student: true,
-      // },
-      // orderBy: {
-      //   weekNum: "asc",
-      // },
+      include: {
+        Unit: true,
+        Student: true,
+        // weeks: true,
+      },
     });
   }
 

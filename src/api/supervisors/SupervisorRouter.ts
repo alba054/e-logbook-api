@@ -49,6 +49,17 @@ export class SupervisorRouter {
         this.supervisorHandler.getSupervisorStudents
       );
 
+    // * get supervisor's students statistics
+    this.router
+      .route(this.path + "/students/:studentId/statistics")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.supervisorHandler.getSupervisorStudentsStatistics
+      );
+
     return this.router;
   }
 }
