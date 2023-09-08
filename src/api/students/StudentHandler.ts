@@ -56,8 +56,8 @@ import { ProblemConsultationService } from "../../services/database/ProblemConsu
 import { IStudentProblemConsultations } from "../../utils/dto/ProblemConsultationDTO";
 import { IStudentProfileDTO } from "../../utils/dto/StudentProfileDTO";
 import { WeeklyAssesmentService } from "../../services/database/WeeklyAssesmentService";
-import { IStudentWeeklyAssesment } from "../../utils/dto/WeeklyAssesmentDTO";
 import { IStudentStastic } from "../../utils/dto/StudentDTO";
+import { WeekService } from "../../services/database/WeekService";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -80,6 +80,7 @@ export class StudentHandler {
   private cstService: CstService;
   private problemConsultationService: ProblemConsultationService;
   private weeklyAssesmentService: WeeklyAssesmentService;
+  private weekService: WeekService;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -102,6 +103,7 @@ export class StudentHandler {
     this.cstService = new CstService();
     this.problemConsultationService = new ProblemConsultationService();
     this.weeklyAssesmentService = new WeeklyAssesmentService();
+    this.weekService = new WeekService();
     this.validator = new Validator();
 
     this.postStudent = this.postStudent.bind(this);
@@ -631,46 +633,46 @@ export class StudentHandler {
 
   async getDailyActivities(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
-    const student = await this.studentService.getStudentById(
-      tokenPayload.studentId
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
     );
 
+    const weeks = await this.weekService.getWeeksByUnitId(
+      activeUnit?.activeUnit.activeUnit?.id
+    );
     const result =
       await this.dailyActivityService.getDailyActivitiesByStudentIdAndUnitId(
         tokenPayload
       );
 
-    // return res.status(200).json(
-    //   createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-    //     unitName: result[0]?.Unit?.name,
-    //     inprocessDailyActivity: result.filter(
-    //       (r) => r.verificationStatus === "INPROCESS"
-    //     ).length,
-    //     verifiedDailyActivity: result.filter(
-    //       (r) => r.verificationStatus === "VERIFIED"
-    //     ).length,
-    //     unverifiedDailyActivity: result.filter(
-    //       (r) => r.verificationStatus === "UNVERIFIED"
-    //     ).length,
-    //     dailyActivities: result.map((r) => {
-    //       return {
-    //         verificationStatus: r.verificationStatus,
-    //         weekName: r.weekNum,
-    //         dailyActivityId: r.id,
-    //         activitiesStatus: r.activities.map((a) => {
-    //           return {
-    //             activityStatus: a.activityStatus,
-    //             day: a.day,
-    //             verificationStatus: a.verificationStatus,
-    //             activityName: a.ActivityName?.name,
-    //             location: a.location?.name,
-    //             detail: a.detail,
-    //           } as IActivitiesDetail;
-    //         }),
-    //       };
-    //     }),
-    //   } as IStudentDailyActivities)
-    // );
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        weeks: weeks.map((w) => {
+          return {
+            endDate: Number(w.endDate),
+            startDate: Number(w.startDate),
+            unitId: w.unitId,
+            unitName: w.Unit?.name,
+            weekName: w.weekNum,
+          };
+        }),
+        // dailyActivities: result?.weeks.map((r) => {
+        //   return {
+        //     weekName: r.weekNum,
+        //     // activitiesStatus: r.days.map((a) => {
+        //     //   return {
+        //     //     activityStatus: a.activityStatus,
+        //     //     day: a.day,
+        //     //     verificationStatus: a.verificationStatus,
+        //     //     activityName: a.ActivityName?.name,
+        //     //     location: a.location?.name,
+        //     //     detail: a.detail,
+        //     //   } as IActivitiesDetail;
+        //     // }),
+        //   };
+        // }),
+      } as IStudentDailyActivities)
+    );
   }
 
   async putDailyActivityActivity(
@@ -1127,8 +1129,12 @@ export class StudentHandler {
   }
 
   async getAllCheckInsStudent(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+
     const studentCheckIns =
-      await this.checkInCheckOutService.getAllCheckInStudents();
+      await this.checkInCheckOutService.getAllCheckInStudents(
+        tokenPayload.supervisorId ?? ""
+      );
 
     return res.status(200).json(
       createResponse(
@@ -1152,9 +1158,12 @@ export class StudentHandler {
     res: Response,
     next: NextFunction
   ) {
-    const { userId } = res.locals.user as ITokenPayload;
+    const { userId, supervisorId } = res.locals.user as ITokenPayload;
     const studentCheckIns =
-      await this.checkInCheckOutService.getAllCheckOutStudents(userId);
+      await this.checkInCheckOutService.getAllCheckOutStudents(
+        userId,
+        supervisorId ?? ""
+      );
 
     return res.status(200).json(
       createResponse(

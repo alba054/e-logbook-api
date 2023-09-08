@@ -37,6 +37,7 @@ export class UserSupervisorRegistrationService {
                 placeOfBirth: payload.placeOfBirth,
                 dateOfBirth: payload.dateOfBirth,
                 gender: payload.gender,
+                unitId: payload.headDivUnit,
                 locations: {
                   connect: payload.location?.map((l) => {
                     return { id: l };
