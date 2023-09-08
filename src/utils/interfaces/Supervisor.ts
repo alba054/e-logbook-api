@@ -13,6 +13,7 @@ export interface IPostSupervisorPayload {
   readonly gender?: "MALE" | "FEMALE";
   readonly location?: number[];
   readonly units?: string[];
+  readonly headDivUnit?: string;
 }
 
 export interface IPostSupervisorBadgePayload {

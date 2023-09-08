@@ -1,3 +1,4 @@
+import db from "../../database";
 import { CheckInCheckOut } from "../../models/CheckInCheckOut";
 import { createErrorObject } from "../../utils";
 
@@ -8,12 +9,29 @@ export class CheckInCheckOutService {
     this.checkInCheckOutModel = new CheckInCheckOut();
   }
 
-  async getAllCheckInStudents() {
-    return this.checkInCheckOutModel.getStudentCheckIn();
+  async getAllCheckInStudents(supervisorId?: string) {
+    const supervisor = await db.supervisor.findFirst({
+      where: {
+        id: supervisorId,
+      },
+    });
+
+    return this.checkInCheckOutModel.getStudentCheckIn(
+      supervisor?.unitId ?? ""
+    );
   }
 
-  async getAllCheckOutStudents(userId: string) {
-    return this.checkInCheckOutModel.getStudentCheckOut(userId);
+  async getAllCheckOutStudents(userId: string, supervisorId?: string) {
+    const supervisor = await db.supervisor.findFirst({
+      where: {
+        id: supervisorId,
+      },
+    });
+
+    return this.checkInCheckOutModel.getStudentCheckOut(
+      userId,
+      supervisor?.unitId ?? ""
+    );
   }
 
   async getCheckInCheckOutByUnitIdAndStudentId(studentId: string, id?: string) {

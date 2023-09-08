@@ -16,6 +16,7 @@ export const SupervisorPayloadSchema = UserPayloadSchema.append({
   gender: Joi.string().valid("MALE", "FEMALE").optional(),
   location: Joi.array().items(Joi.number()).optional(),
   units: Joi.array().items(Joi.string()).optional(),
+  headDivUnit: Joi.string().optional(),
 });
 
 export const SupervisorBadgePayloadSchema = Joi.object({

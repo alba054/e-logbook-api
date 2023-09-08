@@ -134,11 +134,12 @@ export class CheckInCheckOut {
     }
   }
 
-  async getStudentCheckIn() {
+  async getStudentCheckIn(unitId?: string) {
     return db.checkInCheckOut.findMany({
       where: {
         checkIn: true,
         checkInStatus: "INPROCESS",
+        unitId,
       },
       include: {
         student: true,
@@ -147,12 +148,13 @@ export class CheckInCheckOut {
     });
   }
 
-  async getStudentCheckOut(userId: string) {
+  async getStudentCheckOut(userId: string, unitId?: string) {
     return db.checkInCheckOut.findMany({
       where: {
         checkOut: true,
         checkOutStatus: "INPROCESS",
         userId,
+        unitId,
       },
       include: {
         student: true,
