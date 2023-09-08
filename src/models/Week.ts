@@ -4,6 +4,27 @@ import { createErrorObject } from "../utils";
 import { IPostWeek } from "../utils/interfaces/Week";
 
 export class Week {
+  async getAllWeeks() {
+    return db.week.findMany({
+      include: {
+        Day: true,
+        Unit: true,
+      },
+    });
+  }
+
+  async getWeeksById(id: string) {
+    return db.week.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        Day: true,
+        Unit: true,
+      },
+    });
+  }
+
   async getWeeksByUnitId(unitId: string | undefined) {
     return db.week.findMany({
       where: {

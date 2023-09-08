@@ -8,14 +8,37 @@ import {
 } from "../../utils/interfaces/DailyActivity";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentService } from "./StudentService";
+import { v4 as uuidv4 } from "uuid";
+import { WeeklyAssesmentService } from "./WeeklyAssesmentService";
 
 export class DailyActivityService {
   private dailyActivityModel: DailyActivity;
   private studentService: StudentService;
+  private weeklyAssesmentService: WeeklyAssesmentService;
 
   constructor() {
     this.dailyActivityModel = new DailyActivity();
     this.studentService = new StudentService();
+    this.weeklyAssesmentService = new WeeklyAssesmentService();
+  }
+
+  async getActivitiesByWeekIdStudentIdUnitId(
+    weekId: string,
+    tokenPayload: ITokenPayload
+  ) {
+    const student = await this.studentService.getStudentById(
+      tokenPayload.studentId ?? ""
+    );
+
+    return this.dailyActivityModel.getActivitiesByWeekIdAndStudentIdAndUnitId(
+      weekId,
+      student?.id,
+      student?.unitId
+    );
+  }
+
+  async getActivitiesBySupervisorId(supervisorId: string | undefined) {
+    return this.dailyActivityModel.getActivitiesBySupervisor(supervisorId);
   }
 
   async getDailyActivitiesByStudentNimAndUnitId(
@@ -86,18 +109,34 @@ export class DailyActivityService {
       id
     );
 
-    // if (
-    //   dailyActivity?.Student?.examinerSupervisorId !==
-    //     tokenPayload.supervisorId &&
-    //   dailyActivity?.Student?.supervisingSupervisorId !==
-    //     tokenPayload.supervisorId &&
-    //   dailyActivity?.Student?.academicSupervisorId !== tokenPayload.supervisorId
-    // ) {
-    //   return createErrorObject(
-    //     400,
-    //     "you are not authorized to verify this self reflection"
-    //   );
-    // }
+    if (dailyActivity?.Activity?.supervisorId !== tokenPayload.supervisorId) {
+      return createErrorObject(
+        400,
+        "you are not authorized to verify this activity"
+      );
+    }
+
+    const weeklyAssesment =
+      await this.weeklyAssesmentService.getWeeklyAssesmentByStudentIdAndUnitIdAndWeekNum(
+        dailyActivity?.studentId,
+        dailyActivity?.unitId,
+        dailyActivity?.day?.week?.weekNum
+      );
+
+    let weekOp = [];
+    if (!weeklyAssesment) {
+      weekOp.push(
+        db.weekAssesment.create({
+          data: {
+            id: uuidv4(),
+            weekNum: dailyActivity?.day?.week?.weekNum ?? 0,
+            studentId: dailyActivity?.studentId,
+            unitId: dailyActivity?.unitId,
+            score: 0,
+          },
+        })
+      );
+    }
 
     return db.$transaction([
       db.dailyActivity.update({
@@ -117,6 +156,7 @@ export class DailyActivityService {
           dailyActiviyDone: payload.verified,
         },
       }),
+      ...weekOp,
     ]);
   }
 
@@ -146,23 +186,46 @@ export class DailyActivityService {
 
   async editDailyActivityActivity(
     tokenPayload: ITokenPayload,
-    id: string,
+    dayId: string,
     payload: IPutDailyActivityActivity
   ) {
+    const student = await this.studentService.getStudentById(
+      tokenPayload.studentId
+    );
+
     const dailyActivityActivity =
-      await this.dailyActivityModel.getDailyActivityActivityById(id);
+      await this.dailyActivityModel.getDailyActivityActivityByDayIdAndStudentIdAndUnitId(
+        dayId,
+        tokenPayload.studentId ?? "",
+        student?.unitId ?? ""
+      );
 
-    if (!dailyActivityActivity) {
-      return createErrorObject(404, "activity's not found");
-    }
-
-    // if (
-    //   dailyActivityActivity?.DailyActivity?.studentId !== tokenPayload.studentId
-    // ) {
-    //   return createErrorObject(400, "activity's not for you");
+    // if (!dailyActivityActivity) {
+    //   return createErrorObject(404, "activity's not found");
     // }
 
-    return this.dailyActivityModel.editDailyActivityActivityById(id, payload);
+    if (
+      dailyActivityActivity &&
+      dailyActivityActivity.studentId !== tokenPayload.studentId
+    ) {
+      return createErrorObject(400, "activity's not for you");
+    }
+
+    if (dailyActivityActivity) {
+      return this.dailyActivityModel.editDailyActivityActivityById(
+        dailyActivityActivity.id,
+        payload
+      );
+    }
+
+    return this.dailyActivityModel.postDailyActivity(
+      uuidv4(),
+      dayId,
+      student?.id ?? "",
+      student?.unitId ?? "",
+      uuidv4(),
+      payload
+    );
   }
 
   async getActivitiesByDailyActivityId(

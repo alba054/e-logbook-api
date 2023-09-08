@@ -4,6 +4,7 @@ import { InternalServerError } from "../../exceptions/httpError/InternalServerEr
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
 import { WeekService } from "../../services/database/WeekService";
 import { constants, createResponse } from "../../utils";
+import { IListWeek } from "../../utils/dto/WeekDTO";
 import { IPostWeek } from "../../utils/interfaces/Week";
 import { Validator } from "../../validator/Validator";
 import { WeekPayloadSchema } from "../../validator/week/WeekSchema";
@@ -17,10 +18,45 @@ export class WeekHandler {
     this.weekService = new WeekService();
 
     this.postWeek = this.postWeek.bind(this);
+    this.getWeeks = this.getWeeks.bind(this);
+  }
+
+  async getWeeks(req: Request, res: Response, next: NextFunction) {
+    const { unitId } = req.query;
+
+    let weeks;
+    if (unitId) {
+      weeks = await this.weekService.getWeeksByUnitId(String(unitId));
+    } else {
+      weeks = await this.weekService.getWeeks();
+    }
+
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        weeks.map((w) => {
+          return {
+            days: w.Day.map((d) => {
+              return {
+                day: d.day,
+                id: d.id,
+              };
+            }),
+            endDate: Number(w.endDate),
+            id: w.id,
+            startDate: Number(w.startDate),
+            unitId: w.unitId,
+            weekName: w.weekNum,
+            unitName: w.Unit?.name,
+          } as IListWeek;
+        })
+      )
+    );
   }
 
   async postWeek(req: Request, res: Response, next: NextFunction) {
     const payload: IPostWeek = req.body;
+
     try {
       const validationResult = this.validator.validate(
         WeekPayloadSchema,

@@ -8,6 +8,18 @@ export class WeeklyAssesmentService {
     this.weeklyAssesmentModel = new WeeklyAssesment();
   }
 
+  async getWeeklyAssesmentByStudentIdAndUnitIdAndWeekNum(
+    studentId: string | null | undefined,
+    unitId: string | null | undefined,
+    weekNum: number | undefined
+  ) {
+    return this.weeklyAssesmentModel.getWeeklyAssesmentByStudentIdAndUnitIdAndWeekNum(
+      studentId,
+      unitId,
+      weekNum
+    );
+  }
+
   async verifyWeeklyAssesmentByStudentIdAndUnitId(
     studentId: string,
     unitId: string

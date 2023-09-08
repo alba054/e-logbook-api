@@ -15,9 +15,20 @@ export class DailyActivityRouter {
   }
 
   register() {
+    // * get activity by supervisor or dpk opted
+    this.router
+      .route(this.path)
+      .get(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.getActivities
+      );
+
     // * fill daily activity
     this.router
-      .route(this.path + "/activities/:id")
+      .route(this.path + "/days/:dayId/")
       .put(
         AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
         this.handler.putDailyActivityActivity
