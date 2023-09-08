@@ -640,39 +640,39 @@ export class StudentHandler {
     const weeks = await this.weekService.getWeeksByUnitId(
       activeUnit?.activeUnit.activeUnit?.id
     );
-    const result =
-      await this.dailyActivityService.getDailyActivitiesByStudentIdAndUnitId(
-        tokenPayload
-      );
+    // const result =
+    //   await this.dailyActivityService.getDailyActivitiesByStudentIdAndUnitId(
+    //     tokenPayload
+    //   );
 
-    return res.status(200).json(
-      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-        weeks: weeks.map((w) => {
-          return {
-            endDate: Number(w.endDate),
-            startDate: Number(w.startDate),
-            unitId: w.unitId,
-            unitName: w.Unit?.name,
-            weekName: w.weekNum,
-          };
-        }),
-        // dailyActivities: result?.weeks.map((r) => {
-        //   return {
-        //     weekName: r.weekNum,
-        //     // activitiesStatus: r.days.map((a) => {
-        //     //   return {
-        //     //     activityStatus: a.activityStatus,
-        //     //     day: a.day,
-        //     //     verificationStatus: a.verificationStatus,
-        //     //     activityName: a.ActivityName?.name,
-        //     //     location: a.location?.name,
-        //     //     detail: a.detail,
-        //     //   } as IActivitiesDetail;
-        //     // }),
-        //   };
-        // }),
-      } as IStudentDailyActivities)
-    );
+    // return res.status(200).json(
+    //   createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+    //     weeks: weeks.map((w) => {
+    //       return {
+    //         endDate: Number(w.endDate),
+    //         startDate: Number(w.startDate),
+    //         unitId: w.unitId,
+    //         unitName: w.Unit?.name,
+    //         weekName: w.weekNum,
+    //       };
+    //     }),
+    //     // dailyActivities: result?.weeks.map((r) => {
+    //     //   return {
+    //     //     weekName: r.weekNum,
+    //     //     // activitiesStatus: r.days.map((a) => {
+    //     //     //   return {
+    //     //     //     activityStatus: a.activityStatus,
+    //     //     //     day: a.day,
+    //     //     //     verificationStatus: a.verificationStatus,
+    //     //     //     activityName: a.ActivityName?.name,
+    //     //     //     location: a.location?.name,
+    //     //     //     detail: a.detail,
+    //     //     //   } as IActivitiesDetail;
+    //     //     // }),
+    //     //   };
+    //     // }),
+    //   } as IStudentDailyActivities)
+    // );
   }
 
   async putDailyActivityActivity(

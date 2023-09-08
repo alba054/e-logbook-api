@@ -137,8 +137,8 @@ export class DailyActivityService {
 
     const dailyActivities =
       await this.dailyActivityModel.getDailyActivitiesByStudentIdAndUnitId(
-        tokenPayload.studentId,
-        activeUnit?.activeUnit.activeUnit?.id
+        tokenPayload.studentId ?? "",
+        activeUnit?.activeUnit.activeUnit?.id ?? ""
       );
 
     return dailyActivities;

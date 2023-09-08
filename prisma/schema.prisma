@@ -85,6 +85,7 @@ model Supervisor {
   User               User[]
   locations          ActivityLocation[]
   units              Unit[]
+  headDivUnit        Unit?               @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "headDiv")
   academinSupervisor Student[]           @relation("academicSupervisor")
   supervisingDPK     Student[]           @relation("supervisingDPK")
   examinerDPK        Student[]           @relation("examinerDPK")
@@ -97,6 +98,7 @@ model Supervisor {
   Case               Case[]
   Skill              Skill[]
   Competency         Competency[]
+  unitId             String?             @db.VarChar(100)
 
   @@map("supervisors")
 }
@@ -146,10 +148,10 @@ model Unit {
   Reference           Reference[]
   WeekAssesment       WeekAssesment[]
   History             History[]
-  Supervisor          Supervisor?           @relation(fields: [supervisorId], references: [id])
-  supervisorId        String?               @db.VarChar(100)
+  Supervisor          Supervisor[]
   Topic               Topic[]
   Week                Week[]
+  HeadDiv             Supervisor[]          @relation("headDiv")
 
   @@map("units")
 }
@@ -543,7 +545,9 @@ model DailyActivity {
   studentId          String?            @db.VarChar(100)
   Unit               Unit?              @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   unitId             String?            @db.VarChar(100)
-  weeks              Week[]
+  week               Week?              @relation(fields: [weekId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  weekId             String?            @db.VarChar(100)
+  activity           Activity[]
 
   @@map("daily_activities")
 }
@@ -563,6 +567,8 @@ model Activity {
   ActivityName       ActivityName?      @relation(fields: [activityNameId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   activityNameId     Int?
   dayId              String?            @db.VarChar(100)
+  DailyActivity      DailyActivity?     @relation(fields: [dailyActivityId], references: [id])
+  dailyActivityId    String?            @db.VarChar(100)
 
   @@map("activities")
 }
