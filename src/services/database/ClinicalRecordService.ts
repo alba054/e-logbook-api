@@ -242,15 +242,36 @@ export class ClinicalRecordService {
 
       // * diagnosis
       for (let i = 0; i < payload.diagnosiss?.length; i++) {
-        for (let j = 0; j < payload.diagnosiss[i].diagnosisTypeId.length; j++) {
-          diagnosiss.push(
-            db.clinicalRecordDiagnosis.create({
-              data: {
-                DiagnosisTypeId: payload.diagnosiss[i].diagnosisTypeId[j],
-                clinicalRecordId: clinicalRecordId,
-              },
-            })
-          );
+        if (payload.diagnosiss[i].diagnosisTypeId.length > 0) {
+          for (
+            let j = 0;
+            j < payload.diagnosiss[i].diagnosisTypeId.length;
+            j++
+          ) {
+            diagnosiss.push(
+              db.clinicalRecordDiagnosis.create({
+                data: {
+                  DiagnosisTypeId: payload.diagnosiss[i].diagnosisTypeId[j],
+                  clinicalRecordId: clinicalRecordId,
+                },
+              })
+            );
+          }
+        } else {
+          for (
+            let j = 0;
+            j < payload.diagnosiss[i].diagnosesTypeId.length;
+            j++
+          ) {
+            diagnosiss.push(
+              db.clinicalRecordDiagnosis.create({
+                data: {
+                  DiagnosisTypeId: payload.diagnosiss[i].diagnosesTypeId[j],
+                  clinicalRecordId: clinicalRecordId,
+                },
+              })
+            );
+          }
         }
       }
 

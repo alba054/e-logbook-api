@@ -56,6 +56,8 @@ export const generateDay = (startTime: number, endTime: number) => {
 
   const results = [];
 
+  startTime += 8 * 3600;
+  endTime += 8 * 3600;
   while (curTime <= endTime) {
     const day = new Date(curTime * 1000).getDay();
     results.push(DAYS[day]);

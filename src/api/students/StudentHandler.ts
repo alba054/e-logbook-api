@@ -58,6 +58,7 @@ import { IStudentProfileDTO } from "../../utils/dto/StudentProfileDTO";
 import { WeeklyAssesmentService } from "../../services/database/WeeklyAssesmentService";
 import { IStudentStastic } from "../../utils/dto/StudentDTO";
 import { WeekService } from "../../services/database/WeekService";
+import { IStudentWeeklyAssesment } from "../../utils/dto/WeeklyAssesmentDTO";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -269,30 +270,30 @@ export class StudentHandler {
         activeUnit?.activeUnit.activeUnit?.id ?? ""
       );
 
-    // return res.status(200).json(
-    //   createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-    //     studentName: weeklyAssesment[0]?.Student?.fullName,
-    //     studentId: weeklyAssesment[0]?.Student?.studentId,
-    //     assesments: weeklyAssesment.map((w) => {
-    //       return {
-    //         attendNum: dailyActivities
-    //           .find((a) => a.weekNum === w.weekNum)
-    //           ?.activities.filter((a) => a.activityStatus === "ATTEND").length,
-    //         notAttendNum: dailyActivities
-    //           .find((a) => a.weekNum === w.weekNum)
-    //           ?.activities.filter(
-    //             (a) =>
-    //               a.activityStatus === "NOT_ATTEND" ||
-    //               a.activityStatus === "SICK"
-    //           ).length,
-    //         score: w.score,
-    //         verificationStatus: w.verificationStatus,
-    //         weekNum: w.weekNum,
-    //         id: w.id,
-    //       };
-    //     }),
-    //   } as IStudentWeeklyAssesment)
-    // );
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        studentName: weeklyAssesment[0]?.Student?.fullName,
+        studentId: weeklyAssesment[0]?.Student?.studentId,
+        assesments: weeklyAssesment.map((w) => {
+          return {
+            attendNum: dailyActivities
+              .filter((a) => a.day?.week?.weekNum === w.weekNum)
+              .filter((a) => a.Activity?.activityStatus === "ATTEND").length,
+            notAttendNum: dailyActivities
+              .filter((a) => a.day?.week?.weekNum === w.weekNum)
+              .filter(
+                (a) =>
+                  a.Activity?.activityStatus === "NOT_ATTEND" ||
+                  a.Activity?.activityStatus === "SICK"
+              ).length,
+            score: w.score,
+            verificationStatus: w.verificationStatus,
+            weekNum: w.weekNum,
+            id: w.id,
+          };
+        }),
+      } as IStudentWeeklyAssesment)
+    );
   }
 
   async getStudentProfileByStudentId(
@@ -653,8 +654,9 @@ export class StudentHandler {
         const activities: any[] = weekNums.get(weekNum);
         activities.push(r);
         weekNums.set(weekNum, activities);
+      } else {
+        weekNums.set(weekNum, [r]);
       }
-      weekNums.set(weekNum, [r]);
     });
 
     const dailyActivities: { weekNum: number; activities: any }[] = [];
@@ -676,7 +678,7 @@ export class StudentHandler {
             unitId: w.unitId,
             unitName: w.Unit?.name,
             weekName: w.weekNum,
-            id: w.id
+            id: w.id,
           };
         }),
         dailyActivities: dailyActivities.map((d) => {

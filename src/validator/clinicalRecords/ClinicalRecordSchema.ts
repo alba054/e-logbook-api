@@ -14,7 +14,8 @@ export const ClinicalRecordPayloadSchema = Joi.object({
   ),
   diagnosiss: Joi.array().items(
     Joi.object({
-      diagnosisTypeId: Joi.array().items(Joi.string()).min(1),
+      diagnosisTypeId: Joi.array().items(Joi.string()).min(1).optional(),
+      diagnosesTypeId: Joi.array().items(Joi.string()).optional(), // !temp used
     })
   ),
   managements: Joi.array().items(
