@@ -28,6 +28,7 @@ interface ClinicalRecordExamination {
 
 interface ClinicalRecordDiagnosis {
   diagnosisTypeId: string[];
+  diagnosesTypeId: string[]; // !temp used
 }
 
 interface ClinicalRecordManagement {

@@ -108,23 +108,36 @@ export class CheckInCheckOut {
         return createErrorObject(404, "cannot find last check-out");
       }
 
-      await this.historyModel.insertHistory(
-        "CHECK_OUT",
-        getUnixTimestamp(),
-        lastCheckin?.studentId,
-        undefined,
-        lastCheckin?.id,
-        unitId
-      );
+      if (
+        lastCheckin.caseDone &&
+        lastCheckin.cstDone &&
+        lastCheckin.sglDone &&
+        lastCheckin.skillDone &&
+        lastCheckin.dailyActiviyDone &&
+        lastCheckin.clinicalRecordDone &&
+        lastCheckin.selfReflectionDone &&
+        lastCheckin.scientificSessionDone
+      ) {
+        await this.historyModel.insertHistory(
+          "CHECK_OUT",
+          getUnixTimestamp(),
+          lastCheckin?.studentId,
+          undefined,
+          lastCheckin?.id,
+          unitId
+        );
 
-      return db.checkInCheckOut.updateMany({
-        where: {
-          id: lastCheckin.id,
-        },
-        data: {
-          checkOutStatus: verified ? "VERIFIED" : "UNVERIFIED",
-        },
-      });
+        return db.checkInCheckOut.updateMany({
+          where: {
+            id: lastCheckin.id,
+          },
+          data: {
+            checkOutStatus: verified ? "VERIFIED" : "UNVERIFIED",
+          },
+        });
+      }
+
+      return createErrorObject(400, "cannot checkout finish all activities");
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to update in process checkout");
@@ -203,16 +216,32 @@ export class CheckInCheckOut {
         return createErrorObject(404, "cannot find last check-out");
       }
 
-      return db.checkInCheckOut.updateMany({
-        where: {
-          id: lastCheckin.id,
-        },
-        data: {
-          checkOut: true,
-          checkOutStatus: "INPROCESS",
-          checkOutTime: Math.floor(new Date().getTime() / 1000),
-        },
-      });
+      if (
+        lastCheckin.caseDone &&
+        lastCheckin.cstDone &&
+        lastCheckin.sglDone &&
+        lastCheckin.skillDone &&
+        lastCheckin.dailyActiviyDone &&
+        lastCheckin.clinicalRecordDone &&
+        lastCheckin.selfReflectionDone &&
+        lastCheckin.scientificSessionDone
+      ) {
+        return db.checkInCheckOut.updateMany({
+          where: {
+            id: lastCheckin.id,
+          },
+          data: {
+            checkOut: true,
+            checkOutStatus: "INPROCESS",
+            checkOutTime: Math.floor(new Date().getTime() / 1000),
+          },
+        });
+      }
+
+      return createErrorObject(
+        400,
+        "cannot checkout finish all activities first"
+      );
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to update in process checkout");
