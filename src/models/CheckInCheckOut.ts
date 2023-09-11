@@ -221,7 +221,6 @@ export class CheckInCheckOut {
         lastCheckin.cstDone &&
         lastCheckin.sglDone &&
         lastCheckin.skillDone &&
-        lastCheckin.dailyActiviyDone &&
         lastCheckin.clinicalRecordDone &&
         lastCheckin.selfReflectionDone &&
         lastCheckin.scientificSessionDone
@@ -273,7 +272,7 @@ export class CheckInCheckOut {
       where: {
         unitId,
         studentId,
-        userId,
+        // userId,
         checkInStatus,
       },
       orderBy: {
