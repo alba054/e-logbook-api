@@ -798,6 +798,8 @@ export class StudentHandler {
               detail: a.Activity?.detail,
               location: a.Activity?.location?.name,
               id: a.id,
+              supervisorId: a.Activity?.supervisorId,
+              supervisorName: a.Activity?.supervisor?.fullname,
             } as IActivitiesDetail;
           }),
         } as IListActivitiesPerWeek)
@@ -1003,6 +1005,8 @@ export class StudentHandler {
             patientName: c.patientName,
             supervisorName: c.supervisor.fullname,
             verificationStatus: c.verificationStatus,
+            rating: c.rating,
+            notes: c.notes
           };
         }),
       } as IStudentClinicalRecods)

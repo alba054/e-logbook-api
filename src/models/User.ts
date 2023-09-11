@@ -1,7 +1,8 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
-import { constants, createErrorObject } from "../utils";
+import { createErrorObject } from "../utils";
 import { IPutUserProfile } from "../utils/interfaces/User";
+import bcryptjs from "bcryptjs";
 
 export class User {
   constructor() {}
@@ -78,6 +79,7 @@ export class User {
           email: payload.email,
           profilePic: payload.pic,
           username: payload.username,
+          password: await bcryptjs.hash(payload.password ?? "", 10),
           student: {
             update: {
               studentId: payload.nim,
@@ -105,6 +107,7 @@ export class User {
           email: payload.email,
           profilePic: payload.pic,
           username: payload.username,
+          password: await bcryptjs.hash(payload.password ?? "", 10),
           supervisor: {
             update: {
               supervisorId: payload.nim,

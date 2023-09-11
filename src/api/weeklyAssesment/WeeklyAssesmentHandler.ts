@@ -119,6 +119,7 @@ export class WeeklyAssesmentHandler {
         createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
           studentName: weeklyAssesment[0]?.Student?.fullName,
           studentId: weeklyAssesment[0]?.Student?.studentId,
+          unitName: weeklyAssesment[0]?.Unit?.name,
           assesments: weeklyAssesment.map((w) => {
             return {
               attendNum: dailyActivities
@@ -129,7 +130,8 @@ export class WeeklyAssesmentHandler {
                 .filter(
                   (a) =>
                     a.Activity?.activityStatus === "NOT_ATTEND" ||
-                    a.Activity?.activityStatus === "SICK"
+                    a.Activity?.activityStatus === "SICK" ||
+                    a.Activity?.activityStatus === "HOLIDAY"
                 ).length,
               score: w.score,
               verificationStatus: w.verificationStatus,

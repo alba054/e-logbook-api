@@ -243,6 +243,8 @@ export class ClinicalRecordHandler {
           verificationStatus: clinicalRecord.verificationStatus,
           recordId: clinicalRecord.recordId,
           unit: clinicalRecord.Unit?.name,
+          rating: clinicalRecord.rating,
+          notes: clinicalRecord.notes,
         } as IClinicalRecordDetailDTO)
       );
     } catch (error) {
@@ -339,6 +341,8 @@ export class ClinicalRecordHandler {
               clinicalRecords.count / constants.HISTORY_ELEMENTS_PER_PAGE
             ),
             unitName: c.Unit?.name,
+            rating: c.rating,
+            notes: c.notes,
           } as IListClinicalRecordDTO;
         })
       )

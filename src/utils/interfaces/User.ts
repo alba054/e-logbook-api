@@ -10,4 +10,5 @@ export interface IPutUserProfile {
   readonly email?: string;
   readonly pic?: string;
   readonly fullname?: string;
+  readonly password?: string;
 }

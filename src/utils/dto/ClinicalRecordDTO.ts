@@ -8,6 +8,8 @@ export interface IListClinicalRecordDTO {
   status: "VERIFIED" | "UNVERIFIED" | "INPROCESS";
   pages?: number;
   unitName?: string;
+  rating: number;
+  notes?: string;
 }
 
 export interface IClinicalRecordDetailDTO {
@@ -25,6 +27,8 @@ export interface IClinicalRecordDetailDTO {
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
   recordId?: string;
   unit?: string;
+  rating: number;
+  notes?: string;
 }
 
 export interface IStudentClinicalRecods {
@@ -38,6 +42,8 @@ interface IListStudentClinicalRecordsDTO {
   patientName: string;
   verificationStatus: "VERIFIED" | "INPROCESS" | "UNVERIFIED";
   clinicalRecordId: string;
+  rating: number;
+  notes?: string;
 }
 
 interface IExaminationClinicalRecordDetail {
