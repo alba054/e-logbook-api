@@ -17,7 +17,9 @@ export class User {
       },
       data: {
         email: payload.email,
-        password: await bcryptjs.hash(payload.password, 10),
+        password: payload.password
+          ? await bcryptjs.hash(payload.password, 10)
+          : undefined,
         badges: {
           connect: payload.badges.map((b) => {
             return {
@@ -48,7 +50,9 @@ export class User {
       },
       data: {
         email: payload.email,
-        password: await bcryptjs.hash(payload.password, 10),
+        password: payload.password
+          ? await bcryptjs.hash(payload.password, 10)
+          : undefined,
         student: {
           update: {
             address: payload.address,
@@ -134,7 +138,9 @@ export class User {
           email: payload.email,
           profilePic: payload.pic,
           username: payload.username,
-          password: await bcryptjs.hash(payload.password ?? "", 10),
+          password: payload.password
+            ? await bcryptjs.hash(payload.password, 10)
+            : undefined,
           student: {
             update: {
               studentId: payload.nim,
