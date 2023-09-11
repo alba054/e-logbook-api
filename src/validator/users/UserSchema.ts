@@ -20,7 +20,7 @@ export const UserProfileSchema = Joi.object({
 
 export const UserProfileMasterSchema = Joi.object({
   email: Joi.string().email().optional(),
-  fullname: Joi.string().optional(),
+  fullName: Joi.string().optional(),
   password: Joi.string().optional(),
   address: Joi.string().optional(),
   gender: Joi.string().valid("MALE", "FEMALE").optional(),
