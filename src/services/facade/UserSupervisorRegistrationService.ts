@@ -32,7 +32,7 @@ export class UserSupervisorRegistrationService {
               create: {
                 id: uuidv4(),
                 supervisorId: payload.supervisorId,
-                fullname: payload.firstName + " " + payload.lastName,
+                fullname: payload.firstName + " " + (payload.lastName ?? ""),
                 address: payload.address,
                 placeOfBirth: payload.placeOfBirth,
                 dateOfBirth: payload.dateOfBirth,

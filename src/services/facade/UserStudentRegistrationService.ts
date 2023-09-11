@@ -24,7 +24,7 @@ export class UserStudentRegistrationService {
               create: {
                 id: uuidv4(),
                 studentId: payload.studentId,
-                fullName: payload.firstName + " " + payload.lastName,
+                fullName: payload.firstName + " " + (payload.lastName ?? ""),
                 address: payload.address,
                 placeOfBirth: payload.placeOfBirth,
                 dateOfBirth: payload.dateOfBirth,
