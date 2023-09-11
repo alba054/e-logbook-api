@@ -6,6 +6,7 @@ import { createErrorObject, getUnixTimestamp } from "../../utils";
 import { studentPersonalBehaviourService } from "./StudentPersonalBehaviourService";
 import { StudentOsceAndCBTService } from "./StudentOsceAndCBTService";
 import { History } from "../../models/History";
+import db from "../../database";
 
 export class StudentCheckInCheckOutService {
   private studentModel: Student;
@@ -109,6 +110,17 @@ export class StudentCheckInCheckOutService {
         studentActiveUnit?.activeUnit?.id ?? "",
         1
       );
+
+      await db.student.update({
+        where: {
+          id: student?.id,
+        },
+        data: {
+          supervisingSupervisorId: null,
+          examinerSupervisorId: null,
+          academicSupervisorId: null,
+        },
+      });
     }
 
     return checkIn;

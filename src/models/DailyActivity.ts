@@ -22,8 +22,10 @@ export class DailyActivity {
           include: {
             ActivityName: true,
             location: true,
+            supervisor: true,
           },
         },
+
         day: true,
       },
     });

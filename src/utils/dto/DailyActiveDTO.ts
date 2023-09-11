@@ -18,6 +18,8 @@ export interface IActivitiesDetail {
   activityStatus: "SICK" | "ATTEND" | "NOT_ATTEND" | "HOLIDAY";
   activityName?: string;
   verificationStatus?: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
+  supervisorId?: string;
+  supervisorName?: string;
 }
 
 export interface IStudentDailyActivities {

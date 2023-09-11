@@ -15,4 +15,5 @@ export const UserProfileSchema = Joi.object({
   email: Joi.string().email().optional(),
   pic: Joi.string().optional(),
   fullname: Joi.string().optional(),
+  password: Joi.string().optional(),
 });

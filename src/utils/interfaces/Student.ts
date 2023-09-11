@@ -4,7 +4,7 @@ export interface IPostStudentPayload {
   readonly studentId: string;
   readonly email: string;
   readonly firstName: string;
-  readonly lastName: string;
+  readonly lastName?: string;
   readonly address?: string;
   readonly dateOfBirth?: number;
   readonly placeOfBirth?: string;

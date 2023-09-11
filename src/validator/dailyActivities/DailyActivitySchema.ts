@@ -5,9 +5,9 @@ export const DailyActivityActivityPayloadSchema = Joi.object({
     .valid("SICK", "ATTEND", "NOT_ATTEND", "HOLIDAY")
     .required(),
   detail: Joi.string().optional(),
-  supervisorId: Joi.string().required(),
-  locationId: Joi.number().required(),
-  activityNameId: Joi.number().required(),
+  supervisorId: Joi.string().optional(),
+  locationId: Joi.number().optional(),
+  activityNameId: Joi.number().optional(),
 });
 
 export const DailyActivityVerificationStatusSchema = Joi.object({

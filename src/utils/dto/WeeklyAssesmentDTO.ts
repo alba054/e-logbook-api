@@ -1,6 +1,7 @@
 export interface IStudentWeeklyAssesment {
   studentName: string;
   studentId: string;
+  unitName: string;
   assesments: IWeeklyAssesment[];
 }
 
