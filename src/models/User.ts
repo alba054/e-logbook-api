@@ -20,13 +20,15 @@ export class User {
         password: payload.password
           ? await bcryptjs.hash(payload.password, 10)
           : undefined,
-        badges: {
-          connect: payload.badges.map((b) => {
-            return {
-              id: b,
-            };
-          }),
-        },
+        badges: payload.badges.length
+          ? {
+              connect: payload.badges.map((b) => {
+                return {
+                  id: b,
+                };
+              }),
+            }
+          : undefined,
         supervisor: {
           update: {
             address: payload.address,
