@@ -1,11 +1,66 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
 import { createErrorObject } from "../utils";
-import { IPutUserProfile } from "../utils/interfaces/User";
+import { IPutUserMasterData, IPutUserProfile } from "../utils/interfaces/User";
 import bcryptjs from "bcryptjs";
 
 export class User {
   constructor() {}
+
+  async updateUserSupervisorProfileMaster(
+    id: string,
+    payload: IPutUserMasterData
+  ) {
+    return db.user.update({
+      where: {
+        id,
+      },
+      data: {
+        email: payload.email,
+        password: await bcryptjs.hash(payload.password, 10),
+        badges: {
+          connect: payload.badges.map((b) => {
+            return {
+              id: b,
+            };
+          }),
+        },
+        supervisor: {
+          update: {
+            address: payload.address,
+            dateOfBirth: payload.dateOfBirth,
+            placeOfBirth: payload.placeOfBirth,
+            fullname: payload.fullName,
+            gender: payload.gender,
+          },
+        },
+      },
+    });
+  }
+
+  async updateUserStudentProfileMaster(
+    id: string,
+    payload: IPutUserMasterData
+  ) {
+    return db.user.update({
+      where: {
+        id,
+      },
+      data: {
+        email: payload.email,
+        password: await bcryptjs.hash(payload.password, 10),
+        student: {
+          update: {
+            address: payload.address,
+            fullName: payload.fullName,
+            gender: payload.gender,
+            dateOfBirth: payload.dateOfBirth,
+            placeOfBirth: payload.placeOfBirth,
+          },
+        },
+      },
+    });
+  }
 
   async getUserByRoleNameNimBadge(role: any, name: any, nim: any, badge: any) {
     return db.user.findMany({

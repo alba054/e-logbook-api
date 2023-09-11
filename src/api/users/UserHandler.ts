@@ -9,20 +9,30 @@ import { config } from "../../config/Config";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { UserService } from "../../services/database/UserService";
 import { IUserProfileDTO } from "../../utils/dto/UserProfileDTO";
-import { IPostUserPayload, IPutUserProfile } from "../../utils/interfaces/User";
+import {
+  IPostUserPayload,
+  IPutUserMasterData,
+  IPutUserProfile,
+} from "../../utils/interfaces/User";
 import { UserPayloadValidator } from "../../validator/users/UserValidator";
-import { UserProfileSchema } from "../../validator/users/UserSchema";
+import {
+  UserProfileMasterSchema,
+  UserProfileSchema,
+} from "../../validator/users/UserSchema";
 import { UploadFileHelper } from "../../utils/helper/UploadFileHelper";
+import { Validator } from "../../validator/Validator";
 
 export class UserHandler {
   private authenticationService: AuthenticationService;
   private userService: UserService;
   private userValidator: UserPayloadValidator;
+  private validator: Validator;
 
   constructor() {
     this.authenticationService = new AuthenticationService();
     this.userService = new UserService();
     this.userValidator = new UserPayloadValidator();
+    this.validator = new Validator();
 
     this.postRefreshToken = this.postRefreshToken.bind(this);
     this.postUserLogin = this.postUserLogin.bind(this);
@@ -36,6 +46,50 @@ export class UserHandler {
     this.getAllUsers = this.getAllUsers.bind(this);
     this.deleteUserById = this.deleteUserById.bind(this);
     this.deleteUserAccount = this.deleteUserAccount.bind(this);
+    this.updateUserById = this.updateUserById.bind(this);
+  }
+
+  async updateUserById(req: Request, res: Response, next: NextFunction) {
+    const payload: IPutUserMasterData = req.body;
+    const { id } = req.params;
+
+    try {
+      const validationResult = this.validator.validate(
+        UserProfileMasterSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        throw new BadRequestError(validationResult.message);
+      }
+
+      const testError = await this.userService.updateUserProfileMaster(
+        id,
+        payload
+      );
+
+      if (testError && "error" in testError) {
+        switch (testError.error) {
+          case 400:
+            throw new BadRequestError(testError.message);
+          case 404:
+            throw new NotFoundError(testError.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully update user profile"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async deleteUserAccount(req: Request, res: Response, next: NextFunction) {
