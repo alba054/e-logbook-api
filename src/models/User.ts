@@ -20,7 +20,7 @@ export class User {
         password: payload.password
           ? await bcryptjs.hash(payload.password, 10)
           : undefined,
-        badges: payload.badges.length
+        badges: payload.badges
           ? {
               connect: payload.badges.map((b) => {
                 return {
