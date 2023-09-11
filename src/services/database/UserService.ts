@@ -27,7 +27,7 @@ export class UserService {
   async updateUserProfileMaster(id: string, payload: IPutUserMasterData) {
     const user = await this.getUserById(id);
 
-    if (!user) {
+    if (!user || "error" in user) {
       return createErrorObject(404, "user's not found");
     }
 
@@ -159,7 +159,13 @@ export class UserService {
   }
 
   async getUserById(userId: string) {
-    return this.userModel.getUserById(userId);
+    const user = this.userModel.getUserById(userId);
+
+    if (!user) {
+      return createErrorObject(404, "user's not found");
+    }
+
+    return user;
   }
 
   async addNewAdmin(payload: IPostUserPayload) {

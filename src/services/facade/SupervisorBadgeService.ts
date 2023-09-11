@@ -15,7 +15,7 @@ export class SupervisorBadgeService {
     try {
       const user = await this.userService.getUserById(payload.supervisorId);
 
-      if (!user) {
+      if (!user || "error" in user) {
         return createErrorObject(404, "user's not found");
       }
 

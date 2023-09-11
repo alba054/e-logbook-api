@@ -128,6 +128,10 @@ export class UserRouter {
       .put(
         AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
         this.userHandler.updateUserById
+      )
+      .get(
+        AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+        this.userHandler.getUserById
       );
 
     return this.router;
