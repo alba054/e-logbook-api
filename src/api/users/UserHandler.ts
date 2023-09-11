@@ -47,6 +47,65 @@ export class UserHandler {
     this.deleteUserById = this.deleteUserById.bind(this);
     this.deleteUserAccount = this.deleteUserAccount.bind(this);
     this.updateUserById = this.updateUserById.bind(this);
+    this.getUserById = this.getUserById.bind(this);
+  }
+
+  async getUserById(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+    const user = await this.userService.getUserById(id);
+
+    if (user && "error" in user) {
+      switch (user.error) {
+        case 400:
+          throw new BadRequestError(user.message);
+        case 404:
+          throw new NotFoundError(user.message);
+        default:
+          throw new InternalServerError();
+      }
+    }
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        badges: user?.badges,
+        id: user?.id,
+        role: user?.role,
+        username: user?.username,
+        email: user?.email,
+        fullname: user?.student?.fullName ?? user?.supervisor?.fullname,
+        student: {
+          studentId: user?.student?.studentId,
+          address: user?.student?.address,
+          fullName: user?.student?.fullName,
+          clinicId: user?.student?.clinicId,
+          graduationDate: user?.student?.graduationDate,
+          phoneNumber: user?.student?.phoneNumber,
+          preClinicId: user?.student?.preClinicId,
+          checkInStatus: user?.student?.CheckInCheckOut.at(-1)?.checkInStatus,
+          checkOutStatus: user?.student?.CheckInCheckOut.at(-1)?.checkOutStatus,
+          academicSupervisorName: user?.student?.academicAdvisor?.fullname,
+          academicSupervisorId: user?.student?.academicAdvisor?.supervisorId,
+          academicSupervisorUserId: user?.student?.academicAdvisor?.id,
+          supervisingDPKName: user?.student?.supervisingDPK?.fullname,
+          supervisingDPKId: user?.student?.supervisingDPK?.supervisorId,
+          supervisingDPKUserId: user?.student?.supervisingDPK?.id,
+          examinerDPKName: user?.student?.examinerDPK?.fullname,
+          examinerDPKId: user?.student?.examinerDPK?.supervisorId,
+          examinerDPKUserId: user?.student?.examinerDPK?.id,
+          rsStation: user?.student?.rsStation,
+          pkmStation: user?.student?.pkmStation,
+          periodLengthStation: Number(user?.student?.periodLengthStation),
+        },
+        supervisor: {
+          userId: user?.id,
+          id: user?.supervisorId,
+          supervisorId: user?.supervisor?.supervisorId,
+          fullName: user?.supervisor?.fullname,
+          locations: user?.supervisor?.locations.map((l) => l.name),
+          units: user?.supervisor?.units.map((l) => l.name),
+        },
+      } as IUserProfileDTO)
+    );
   }
 
   async updateUserById(req: Request, res: Response, next: NextFunction) {

@@ -253,6 +253,23 @@ export class User {
       where: {
         id: userId,
       },
+      include: {
+        badges: true,
+        student: {
+          include: {
+            CheckInCheckOut: true,
+            academicAdvisor: true,
+            examinerDPK: true,
+            supervisingDPK: true,
+          },
+        },
+        supervisor: {
+          include: {
+            locations: true,
+            units: true,
+          },
+        },
+      },
     });
   }
 
