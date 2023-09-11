@@ -1,5 +1,9 @@
 import { User } from "../../models/User";
-import { IPostUserPayload, IPutUserProfile } from "../../utils/interfaces/User";
+import {
+  IPostUserPayload,
+  IPutUserMasterData,
+  IPutUserProfile,
+} from "../../utils/interfaces/User";
 import { v4 as uuidv4 } from "uuid";
 import bcryptjs from "bcryptjs";
 import { createErrorObject } from "../../utils";
@@ -18,6 +22,20 @@ export class UserService {
 
   constructor() {
     this.userModel = new User();
+  }
+
+  async updateUserProfileMaster(id: string, payload: IPutUserMasterData) {
+    const user = await this.getUserById(id);
+
+    if (!user) {
+      return createErrorObject(404, "user's not found");
+    }
+
+    if (user.role === "STUDENT") {
+      return this.userModel.updateUserStudentProfileMaster(id, payload);
+    }
+
+    return this.userModel.updateUserSupervisorProfileMaster(id, payload);
   }
 
   async getUserByFilter(role: any, name: any, nim: any, badge: any) {

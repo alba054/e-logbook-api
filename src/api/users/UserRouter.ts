@@ -124,6 +124,10 @@ export class UserRouter {
       .delete(
         AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
         this.userHandler.deleteUserById
+      )
+      .put(
+        AuthorizationBearer.authorize([constants.ADMIN_ROLE]),
+        this.userHandler.updateUserById
       );
 
     return this.router;
