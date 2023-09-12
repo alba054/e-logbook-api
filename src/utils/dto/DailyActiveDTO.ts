@@ -11,15 +11,15 @@ export interface IListActivitiesPerWeek {
 }
 
 export interface IActivitiesDetail {
-  id?: string;
-  day: string;
-  location?: string;
-  detail?: string;
-  activityStatus: "SICK" | "ATTEND" | "NOT_ATTEND" | "HOLIDAY";
-  activityName?: string;
-  verificationStatus?: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
-  supervisorId?: string;
-  supervisorName?: string;
+  id?: string | any;
+  day: string | any;
+  location?: string | any;
+  detail?: string | any;
+  activityStatus: "SICK" | "ATTEND" | "NOT_ATTEND" | "HOLIDAY" | any;
+  activityName?: string | any;
+  verificationStatus?: "INPROCESS" | "VERIFIED" | "UNVERIFIED" | any;
+  supervisorId?: string | any;
+  supervisorName?: string | any;
 }
 
 export interface IStudentDailyActivities {
@@ -36,7 +36,6 @@ export interface IStudentDailyActivities {
     endDate: number;
   }[];
   dailyActivities: IDailyActivities[];
-  temp: any;
 }
 
 export interface ISubmittedActivities {
@@ -60,11 +59,11 @@ export interface IListActivities {
 }
 
 interface IDailyActivities {
-  attendNum?: number;
-  notAttendNum?: number;
-  sickNum?: number;
-  dailyActivityId: string;
-  verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
-  weekName: number;
+  attendNum?: number | any;
+  notAttendNum?: number | any;
+  sickNum?: number | any;
+  dailyActivityId: string | any;
+  verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED" | any;
+  weekName: number | any;
   activitiesStatus: IActivitiesDetail[];
 }

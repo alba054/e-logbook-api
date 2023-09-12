@@ -668,46 +668,69 @@ export class StudentHandler {
       });
     });
 
-    return res.status(200).json(
-      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+    let response = {
+      unitName: result[0]?.Unit?.name,
+      weeks: weeks.map((w) => {
+        return {
+          endDate: Number(w.endDate),
+          startDate: Number(w.startDate),
+          unitId: w.unitId,
+          unitName: w.Unit?.name,
+          weekName: w.weekNum,
+          id: w.id,
+        };
+      }),
+      dailyActivities: [],
+    } as IStudentDailyActivities;
+
+    if (dailyActivities !== null) {
+      response = {
         unitName: result[0]?.Unit?.name,
         weeks: weeks.map((w) => {
           return {
             endDate: Number(w.endDate),
             startDate: Number(w.startDate),
-            unitId: w.unitId,
-            unitName: w.Unit?.name,
+            unitId: w.unitId ?? "",
+            unitName: w.Unit?.name ?? "",
             weekName: w.weekNum,
             id: w.id,
           };
         }),
-        dailyActivities: dailyActivities.map((d) => {
-          return {
-            weekName: d.weekNum,
-            attendNum: d.activities.filter(
-              (a: any) => a.Activity.activityStatus === "ATTEND"
-            ).length,
-            notAttendNum: d.activities.filter(
-              (a: any) => a.Activity.activityStatus === "NOT_ATTEND"
-            ).length,
-            sickNum: d.activities.filter(
-              (a: any) => a.Activity.activityStatus === "SICK"
-            ).length,
-            activitiesStatus: d.activities.map((d: any) => {
+        dailyActivities: Array.isArray(dailyActivities)
+          ? dailyActivities.map((d) => {
               return {
-                id: d.id,
-                day: d.day.day,
-                location: d.Activity.location.name,
-                detail: d.Activity.detail,
-                activityStatus: d.Activity.activityStatus,
-                activityName: d.Activity.ActivityName.name,
-                verificationStatus: d.verificationStatus,
+                weekName: d.weekNum,
+                attendNum: d.activities.filter(
+                  (a: any) => a.Activity.activityStatus === "ATTEND"
+                ).length,
+                notAttendNum: d.activities.filter(
+                  (a: any) => a.Activity.activityStatus === "NOT_ATTEND"
+                ).length,
+                sickNum: d.activities.filter(
+                  (a: any) => a.Activity.activityStatus === "SICK"
+                ).length,
+                activitiesStatus: d.activities.map((d: any) => {
+                  return {
+                    id: d.id,
+                    day: d.day.day,
+                    location: d.Activity.location.name,
+                    detail: d.Activity.detail,
+                    activityStatus: d.Activity.activityStatus,
+                    activityName: d.Activity.ActivityName.name,
+                    verificationStatus: d.verificationStatus,
+                  };
+                }),
+                dailyActivityId: "",
+                verificationStatus: "",
               };
-            }),
-          };
-        }),
-      } as IStudentDailyActivities)
-    );
+            })
+          : [],
+      };
+    }
+
+    return res
+      .status(200)
+      .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, response));
   }
 
   async putDailyActivityActivity(
@@ -1006,7 +1029,7 @@ export class StudentHandler {
             supervisorName: c.supervisor.fullname,
             verificationStatus: c.verificationStatus,
             rating: c.rating,
-            notes: c.notes
+            notes: c.notes,
           };
         }),
       } as IStudentClinicalRecods)
