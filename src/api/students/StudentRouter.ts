@@ -183,7 +183,11 @@ export class StudentRouter {
     this.router
       .route(this.path + "/daily-activities/weeks/:id")
       .get(
-        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        AuthorizationBearer.authorize([
+          constants.STUDENT_ROLE,
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
         this.studentHandler.getDailyActivitiesPerWeek
       );
 

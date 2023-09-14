@@ -170,6 +170,19 @@ export class DailyActivityService {
     );
   }
 
+  async getDailyActivitiesByStudentIdAndUnitId_(
+    studentId: string,
+    unitId: string
+  ) {
+    const dailyActivities =
+      await this.dailyActivityModel.getDailyActivitiesByStudentIdAndUnitId(
+        studentId,
+        unitId
+      );
+
+    return dailyActivities;
+  }
+
   async getDailyActivitiesByStudentIdAndUnitId(tokenPayload: ITokenPayload) {
     const activeUnit = await this.studentService.getActiveUnit(
       tokenPayload.studentId ?? ""
