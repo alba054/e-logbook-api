@@ -18,8 +18,8 @@ export class Competency {
   ) {
     return db.competency.findMany({
       where: {
-        studentId,
-        unitId,
+        studentId: studentId === null ? undefined : studentId,
+        unitId: unitId === null ? undefined : unitId,
         type: "SKILL",
       },
       include: {
@@ -35,8 +35,8 @@ export class Competency {
   ) {
     return db.competency.findMany({
       where: {
-        studentId,
-        unitId,
+        studentId: studentId === null ? undefined : studentId,
+        unitId: unitId === null ? undefined : unitId,
         type: "CASE",
       },
       include: {

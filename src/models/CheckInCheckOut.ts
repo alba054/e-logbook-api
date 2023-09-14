@@ -46,9 +46,9 @@ export class CheckInCheckOut {
       const result = await db.checkInCheckOut.updateMany({
         where: {
           student: {
-            studentId,
+            studentId: studentId === null ? undefined : studentId,
           },
-          unitId,
+          unitId: unitId === null ? undefined : unitId,
         },
         data: {
           checkInStatus: verified ? "VERIFIED" : "UNVERIFIED",
@@ -59,9 +59,9 @@ export class CheckInCheckOut {
       const checkIn = await db.checkInCheckOut.findFirst({
         where: {
           student: {
-            studentId,
+            studentId: studentId === null ? undefined : studentId,
           },
-          unitId,
+          unitId: unitId === null ? undefined : unitId,
         },
       });
 
@@ -152,7 +152,7 @@ export class CheckInCheckOut {
       where: {
         checkIn: true,
         checkInStatus: "INPROCESS",
-        unitId,
+        unitId: unitId === null ? undefined : unitId,
       },
       include: {
         student: true,
@@ -167,7 +167,7 @@ export class CheckInCheckOut {
         checkOut: true,
         checkOutStatus: "INPROCESS",
         userId,
-        unitId,
+        unitId: unitId === null ? undefined : unitId,
       },
       include: {
         student: true,

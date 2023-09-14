@@ -49,8 +49,9 @@ export class ClinicalRecord {
   ) {
     return db.clinicalRecord.findMany({
       where: {
-        studentId: tokenPayload.studentId,
-        unitId,
+        studentId:
+          tokenPayload.studentId === null ? undefined : tokenPayload.studentId,
+        unitId: unitId === null ? undefined : unitId,
       },
       include: {
         supervisor: true,
@@ -117,7 +118,7 @@ export class ClinicalRecord {
   async getClinicalRecordsBySupervisorId(supervisorId?: string) {
     return db.clinicalRecord.findMany({
       where: {
-        supervisorId,
+        supervisorId: supervisorId === null ? undefined : supervisorId,
       },
       include: {
         Student: true,
@@ -145,7 +146,7 @@ export class ClinicalRecord {
           studentId: nim,
         },
         patientName: patient,
-        supervisorId,
+        supervisorId: supervisorId === null ? undefined : supervisorId,
       },
       include: {
         Student: true,
