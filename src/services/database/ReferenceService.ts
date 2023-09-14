@@ -12,6 +12,26 @@ export class ReferenceService {
     this.unitService = new UnitService();
   }
 
+  async uploadReferenceUrl(url: string) {
+    const units = await this.unitService.getAllUnits();
+
+    return db.$transaction(
+      units.map((u) => {
+        return db.reference.create({
+          data: {
+            file: url,
+            unitId: u.id,
+            type: "URL",
+          },
+        });
+      })
+    );
+  }
+
+  async uploadReferenceByUnitIdUrl(url: string, unitId: string) {
+    return this.referenceModel.insertReferenceByUnitUrl(url, unitId);
+  }
+
   async deleteReferenceById(id: number) {
     const reference = await this.referenceModel.getReferenceById(id);
 

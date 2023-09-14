@@ -744,10 +744,11 @@ model History {
 }
 
 model Reference {
-  id     Int     @id @default(autoincrement())
-  file   String? @db.VarChar(255)
-  Unit   Unit?   @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  unitId String? @db.VarChar(100)
+  id     Int           @id @default(autoincrement())
+  file   String?       @db.VarChar(255)
+  type   ReferenceType @default(FILE)
+  Unit   Unit?         @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId String?       @db.VarChar(100)
 
   @@map("references")
 }
@@ -849,4 +850,9 @@ enum HistoryType {
   PROBLEM_CONSULTATION // "attachment" is null (for now)
   CHECK_IN // "attachment" is null (for now)
   CHECK_OUT // "attachment" is null (for now)
+}
+
+enum ReferenceType {
+  URL
+  FILE
 }
