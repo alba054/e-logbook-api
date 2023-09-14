@@ -95,9 +95,20 @@ export class ReferenceHandler {
 
     const references = await this.referenceService.getReferencesByUnit(unitId);
 
-    return res
-      .status(200)
-      .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, references));
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        references.map((r) => {
+          return {
+            id: r.id,
+            file: r.file,
+            filename: r.fileName,
+            type: r.type,
+            unitId: r.unitId,
+          };
+        })
+      )
+    );
   }
 
   async getReferenceFile(req: Request, res: Response, next: NextFunction) {
@@ -128,9 +139,20 @@ export class ReferenceHandler {
   async getAllReferences(req: Request, res: Response, next: NextFunction) {
     const references = await this.referenceService.getAllReferences();
 
-    return res
-      .status(200)
-      .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, references));
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        references.map((r) => {
+          return {
+            id: r.id,
+            file: r.file,
+            filename: r.fileName,
+            type: r.type,
+            unitId: r.unitId,
+          };
+        })
+      )
+    );
   }
 
   async postUploadedFileReference(
