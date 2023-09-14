@@ -4,6 +4,7 @@ import { InternalServerError } from "../../exceptions/httpError/InternalServerEr
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
 import { DailyActivityService } from "../../services/database/DailyActivityService";
 import { StudentService } from "../../services/database/StudentService";
+import { WeekService } from "../../services/database/WeekService";
 import { constants, createResponse } from "../../utils";
 import {
   IActivitiesDetail,
@@ -26,10 +27,12 @@ export class DailyActivityHandler {
   private dailyActivityService: DailyActivityService;
   private validator: Validator;
   private studentService: StudentService;
+  private weekService: WeekService;
 
   constructor() {
     this.dailyActivityService = new DailyActivityService();
     this.studentService = new StudentService();
+    this.weekService = new WeekService();
     this.validator = new Validator();
 
     this.putDailyActivityActivity = this.putDailyActivityActivity.bind(this);
@@ -235,15 +238,10 @@ export class DailyActivityHandler {
     const { studentId } = req.params;
 
     try {
-      const activities =
-        await this.dailyActivityService.getActivitiesByStudentId(
-          tokenPayload,
-          studentId
-        );
-
       const student = await this.studentService.getStudentByStudentId(
         studentId
       );
+
       if (student && "error" in student) {
         switch (student.error) {
           case 400:
@@ -254,36 +252,102 @@ export class DailyActivityHandler {
             throw new InternalServerError();
         }
       }
-      // return res.status(200).json(
-      //   createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-      //     unitName: activities[0]?.Unit?.name,
-      //     dailyActivities: activities.map((r) => {
-      //       return {
-      //         verificationStatus: r.verificationStatus,
-      //         weekName: r.weekNum,
-      //         dailyActivityId: r.id,
-      //         attendNum: r.activities.filter(
-      //           (a) => a.activityStatus === "ATTEND"
-      //         ).length,
-      //         notAttendNum: r.activities.filter(
-      //           (a) => a.activityStatus === "NOT_ATTEND"
-      //         ).length,
-      //         sickNum: r.activities.filter((a) => a.activityStatus === "SICK")
-      //           .length,
-      //         activitiesStatus: r.activities.map((a) => {
-      //           return {
-      //             activityStatus: a.activityStatus,
-      //             day: a.day,
-      //             verificationStatus: a.verificationStatus,
-      //             activityName: a.ActivityName?.name,
-      //             location: a.location?.name,
-      //             detail: a.detail,
-      //           } as IActivitiesDetail;
-      //         }),
-      //       };
-      //     }),
-      //   } as IStudentDailyActivities)
-      // );
+
+      const weeks = await this.weekService.getWeeksByUnitId(
+        student.unitId ?? ""
+      );
+
+      const result =
+        await this.dailyActivityService.getDailyActivitiesByStudentIdAndUnitId_(
+          student.id,
+          student.unitId ?? ""
+        );
+
+      const weekNums = new Map();
+
+      result.forEach((r) => {
+        const weekNum = r.day?.week?.weekNum;
+        if (weekNums.has(weekNum)) {
+          const activities: any[] = weekNums.get(weekNum);
+          activities.push(r);
+          weekNums.set(weekNum, activities);
+        } else {
+          weekNums.set(weekNum, [r]);
+        }
+      });
+
+      const dailyActivities: { weekNum: number; activities: any }[] = [];
+
+      weekNums.forEach((v, k) => {
+        dailyActivities.push({
+          weekNum: k,
+          activities: v,
+        });
+      });
+
+      let response = {
+        unitName: result[0]?.Unit?.name,
+        weeks: weeks.map((w) => {
+          return {
+            endDate: Number(w.endDate),
+            startDate: Number(w.startDate),
+            unitId: w.unitId,
+            unitName: w.Unit?.name,
+            weekName: w.weekNum,
+            id: w.id,
+          };
+        }),
+        dailyActivities: [],
+      } as IStudentDailyActivities;
+
+      if (dailyActivities !== null) {
+        response = {
+          unitName: result[0]?.Unit?.name,
+          weeks: weeks.map((w) => {
+            return {
+              endDate: Number(w.endDate),
+              startDate: Number(w.startDate),
+              unitId: w.unitId ?? "",
+              unitName: w.Unit?.name ?? "",
+              weekName: w.weekNum,
+              id: w.id,
+            };
+          }),
+          dailyActivities: Array.isArray(dailyActivities)
+            ? dailyActivities.map((d) => {
+                return {
+                  weekName: d.weekNum,
+                  attendNum: d.activities.filter(
+                    (a: any) => a.Activity.activityStatus === "ATTEND"
+                  ).length,
+                  notAttendNum: d.activities.filter(
+                    (a: any) => a.Activity.activityStatus === "NOT_ATTEND"
+                  ).length,
+                  sickNum: d.activities.filter(
+                    (a: any) => a.Activity.activityStatus === "SICK"
+                  ).length,
+                  activitiesStatus: d.activities.map((d: any) => {
+                    return {
+                      id: d.id,
+                      day: d.day.day,
+                      location: d.Activity.location.name,
+                      detail: d.Activity.detail,
+                      activityStatus: d.Activity.activityStatus,
+                      activityName: d.Activity.ActivityName.name,
+                      verificationStatus: d.verificationStatus,
+                    };
+                  }),
+                  dailyActivityId: "",
+                  verificationStatus: "",
+                };
+              })
+            : [],
+        };
+      }
+
+      return res
+        .status(200)
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, response));
     } catch (error) {
       return next(error);
     }
