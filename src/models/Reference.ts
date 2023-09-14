@@ -1,9 +1,14 @@
 import db from "../database";
 
 export class Reference {
-  async insertReferenceByUnitUrl(url: string, unitId: string) {
+  async insertReferenceByUnitUrl(
+    url: string,
+    unitId: string,
+    filename?: string
+  ) {
     return db.reference.create({
       data: {
+        fileName: filename,
         file: url,
         type: "URL",
         unitId,

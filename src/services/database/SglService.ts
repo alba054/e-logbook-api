@@ -36,8 +36,8 @@ export class SglService {
       );
     }
 
-    return db.$transaction(
-      sgl.topics.map((t) => {
+    return db.$transaction([
+      ...sgl.topics.map((t) => {
         return db.sglTopic.update({
           where: {
             id: t.id,
@@ -46,8 +46,17 @@ export class SglService {
             verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
           },
         });
-      })
-    );
+      }),
+      db.checkInCheckOut.updateMany({
+        where: {
+          unitId: sgl?.unitId ?? "",
+          studentId: sgl?.studentId ?? "",
+        },
+        data: {
+          sglDone: payload.verified,
+        },
+      }),
+    ]);
   }
 
   async getSglsByStudentIdAndUnitId(tokenPayload: ITokenPayload) {
@@ -136,7 +145,27 @@ export class SglService {
       );
     }
 
-    return this.sglModel.verifySglTopicById(topicId, payload);
+    return db.$transaction([
+      db.sglTopic.update({
+        where: {
+          id: topicId,
+        },
+        data: {
+          verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
+        },
+      }),
+      db.checkInCheckOut.updateMany({
+        where: {
+          unitId: sglTopic?.SGL?.unitId ?? "",
+          studentId: sglTopic?.SGL?.studentId ?? "",
+        },
+        data: {
+          sglDone: payload.verified,
+        },
+      }),
+    ]);
+
+    // return this.sglModel.verifySglTopicById(topicId, payload);
   }
 
   async getSglsBySupervisorAndStudentId(
