@@ -177,7 +177,7 @@ export class Sgl {
         Student: {
           studentId,
         },
-        supervisorId,
+        supervisorId: supervisorId === null ? undefined : supervisorId,
         unitId: activeUnit,
         verificationStatus: "INPROCESS",
       },
@@ -203,7 +203,7 @@ export class Sgl {
   ) {
     return db.sGL.findMany({
       where: {
-        supervisorId,
+        supervisorId: supervisorId === null ? undefined : supervisorId,
         Student: {
           fullName: { contains: name },
           studentId: nim,

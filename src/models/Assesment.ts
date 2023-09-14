@@ -34,7 +34,7 @@ export class Assesment {
     return db.assesment.findFirst({
       where: {
         Student: {
-          studentId,
+          studentId: studentId === null ? undefined : studentId,
         },
         unitId,
         type,
@@ -165,9 +165,18 @@ export class Assesment {
         Student: {
           studentId,
           OR: [
-            { academicSupervisorId: supervisorId },
-            { examinerSupervisorId: supervisorId },
-            { supervisingSupervisorId: supervisorId },
+            {
+              academicSupervisorId:
+                supervisorId === null ? undefined : supervisorId,
+            },
+            {
+              examinerSupervisorId:
+                supervisorId === null ? undefined : supervisorId,
+            },
+            {
+              supervisingSupervisorId:
+                supervisorId === null ? undefined : supervisorId,
+            },
           ],
         },
         type: "PERSONAL_BEHAVIOUR",
@@ -192,8 +201,8 @@ export class Assesment {
   ) {
     return db.assesment.findMany({
       where: {
-        studentId,
-        unitId,
+        studentId: studentId === null ? undefined : studentId,
+        unitId: unitId === null ? undefined : unitId,
         type: "PERSONAL_BEHAVIOUR",
       },
     });
@@ -205,8 +214,8 @@ export class Assesment {
   ) {
     return db.assesment.findMany({
       where: {
-        studentId,
-        unitId,
+        studentId: studentId === null ? undefined : studentId,
+        unitId: unitId === null ? undefined : unitId,
         type: "SCIENTIFIC_ASSESMENT",
       },
       include: {
@@ -250,8 +259,8 @@ export class Assesment {
   ) {
     return db.assesment.findMany({
       where: {
-        studentId,
-        unitId,
+        studentId: studentId === null ? undefined : studentId,
+        unitId: unitId === null ? undefined : unitId,
         type: "SCIENTIFIC_ASSESMENT",
       },
     });
@@ -263,8 +272,8 @@ export class Assesment {
   ) {
     return db.assesment.findMany({
       where: {
-        studentId,
-        unitId,
+        studentId: studentId === null ? undefined : studentId,
+        unitId: unitId === null ? undefined : unitId,
         type: "MINI_CEX",
       },
       include: {
@@ -322,9 +331,18 @@ export class Assesment {
         Student: {
           studentId,
           OR: [
-            { academicSupervisorId: supervisorId },
-            { examinerSupervisorId: supervisorId },
-            { supervisingSupervisorId: supervisorId },
+            {
+              academicSupervisorId:
+                supervisorId === null ? undefined : supervisorId,
+            },
+            {
+              examinerSupervisorId:
+                supervisorId === null ? undefined : supervisorId,
+            },
+            {
+              supervisingSupervisorId:
+                supervisorId === null ? undefined : supervisorId,
+            },
           ],
         },
         type: "SCIENTIFIC_ASSESMENT",
@@ -349,9 +367,18 @@ export class Assesment {
         Student: {
           studentId,
           OR: [
-            { academicSupervisorId: supervisorId },
-            { examinerSupervisorId: supervisorId },
-            { supervisingSupervisorId: supervisorId },
+            {
+              academicSupervisorId:
+                supervisorId === null ? undefined : supervisorId,
+            },
+            {
+              examinerSupervisorId:
+                supervisorId === null ? undefined : supervisorId,
+            },
+            {
+              supervisingSupervisorId:
+                supervisorId === null ? undefined : supervisorId,
+            },
           ],
         },
         type: "MINI_CEX",

@@ -180,7 +180,7 @@ export class Cst {
         Student: {
           studentId,
         },
-        supervisorId,
+        supervisorId: supervisorId === null ? undefined : supervisorId,
         unitId: activeUnit,
         verificationStatus: "INPROCESS",
       },
@@ -205,7 +205,7 @@ export class Cst {
   ) {
     return db.cST.findMany({
       where: {
-        supervisorId,
+        supervisorId: supervisorId === null ? undefined : supervisorId,
         Student: {
           fullName: { contains: name },
           studentId: nim,

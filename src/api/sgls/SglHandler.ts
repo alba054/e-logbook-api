@@ -279,7 +279,7 @@ export class SglHandler {
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
         studentId: student.studentId,
         studentName: student.fullName,
-        unitName: result[0].Unit?.name,
+        unitName: result[0]?.Unit?.name,
         sgls: result.map(
           (r) =>
             ({
