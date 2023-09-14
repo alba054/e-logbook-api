@@ -701,22 +701,22 @@ export class StudentHandler {
               return {
                 weekName: d.weekNum,
                 attendNum: d.activities.filter(
-                  (a: any) => a.Activity.activityStatus === "ATTEND"
+                  (a: any) => a.Activity?.activityStatus === "ATTEND"
                 ).length,
                 notAttendNum: d.activities.filter(
-                  (a: any) => a.Activity.activityStatus === "NOT_ATTEND"
+                  (a: any) => a.Activity?.activityStatus === "NOT_ATTEND"
                 ).length,
                 sickNum: d.activities.filter(
-                  (a: any) => a.Activity.activityStatus === "SICK"
+                  (a: any) => a.Activity?.activityStatus === "SICK"
                 ).length,
-                activitiesStatus: d.activities.map((d: any) => {
+                activitiesStatus: d.activities?.map((d: any) => {
                   return {
                     id: d.id,
-                    day: d.day.day,
-                    location: d.Activity.location.name,
-                    detail: d.Activity.detail,
-                    activityStatus: d.Activity.activityStatus,
-                    activityName: d.Activity.ActivityName.name,
+                    day: d.day?.day,
+                    location: d.Activity?.location?.name,
+                    detail: d.Activity?.detail,
+                    activityStatus: d.Activity?.activityStatus,
+                    activityName: d.Activity?.ActivityName?.name,
                     verificationStatus: d.verificationStatus,
                   };
                 }),
