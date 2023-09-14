@@ -37,8 +37,8 @@ export class CstService {
       );
     }
 
-    return db.$transaction(
-      cst.topics.map((t) => {
+    return db.$transaction([
+      ...cst.topics.map((t) => {
         return db.cstTopic.update({
           where: {
             id: t.id,
@@ -47,8 +47,17 @@ export class CstService {
             verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
           },
         });
-      })
-    );
+      }),
+      db.checkInCheckOut.updateMany({
+        where: {
+          unitId: cst.unitId ?? "",
+          studentId: cst.studentId ?? "",
+        },
+        data: {
+          cstDone: payload.verified,
+        },
+      }),
+    ]);
   }
 
   async getCstsByStudentIdAndUnitId(tokenPayload: ITokenPayload) {
@@ -137,7 +146,26 @@ export class CstService {
       );
     }
 
-    return this.cstModel.verifyCstTopicById(topicId, payload);
+    return db.$transaction([
+      db.cstTopic.update({
+        where: {
+          id: topicId,
+        },
+        data: {
+          verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
+        },
+      }),
+      db.checkInCheckOut.updateMany({
+        where: {
+          unitId: CstTopic.CST[0]?.unitId ?? "",
+          studentId: CstTopic.CST[0]?.studentId ?? "",
+        },
+        data: {
+          cstDone: payload.verified,
+        },
+      }),
+    ]);
+    // return this.cstModel.verifyCstTopicById(topicId, payload);
   }
 
   async getCstsBySupervisorAndStudentId(

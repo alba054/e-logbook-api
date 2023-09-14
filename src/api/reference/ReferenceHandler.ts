@@ -1,6 +1,4 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
-import { ParamsDictionary } from "express-serve-static-core";
-import { ParsedQs } from "qs";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
@@ -60,11 +58,11 @@ export class ReferenceHandler {
     res: Response,
     next: NextFunction
   ) {
-    const { url } = req.body;
+    const { url, filename } = req.body;
 
     try {
       if (url) {
-        await this.referenceService.uploadReferenceUrl(url);
+        await this.referenceService.uploadReferenceUrl(url, filename);
 
         return res
           .status(201)
@@ -97,9 +95,20 @@ export class ReferenceHandler {
 
     const references = await this.referenceService.getReferencesByUnit(unitId);
 
-    return res
-      .status(200)
-      .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, references));
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        references.map((r) => {
+          return {
+            id: r.id,
+            file: r.file,
+            filename: r.fileName,
+            type: r.type,
+            unitId: r.unitId,
+          };
+        })
+      )
+    );
   }
 
   async getReferenceFile(req: Request, res: Response, next: NextFunction) {
@@ -130,9 +139,20 @@ export class ReferenceHandler {
   async getAllReferences(req: Request, res: Response, next: NextFunction) {
     const references = await this.referenceService.getAllReferences();
 
-    return res
-      .status(200)
-      .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, references));
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        references.map((r) => {
+          return {
+            id: r.id,
+            file: r.file,
+            filename: r.fileName,
+            type: r.type,
+            unitId: r.unitId,
+          };
+        })
+      )
+    );
   }
 
   async postUploadedFileReference(
@@ -141,11 +161,15 @@ export class ReferenceHandler {
     next: NextFunction
   ) {
     const { unitId } = req.params;
-    const { url } = req.body;
+    const { url, filename } = req.body;
 
     try {
       if (url) {
-        await this.referenceService.uploadReferenceByUnitIdUrl(url, unitId);
+        await this.referenceService.uploadReferenceByUnitIdUrl(
+          url,
+          unitId,
+          filename
+        );
 
         return res
           .status(201)

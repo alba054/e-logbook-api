@@ -12,13 +12,14 @@ export class ReferenceService {
     this.unitService = new UnitService();
   }
 
-  async uploadReferenceUrl(url: string) {
+  async uploadReferenceUrl(url: string, filename?: string) {
     const units = await this.unitService.getAllUnits();
 
     return db.$transaction(
       units.map((u) => {
         return db.reference.create({
           data: {
+            fileName: filename,
             file: url,
             unitId: u.id,
             type: "URL",
@@ -28,8 +29,12 @@ export class ReferenceService {
     );
   }
 
-  async uploadReferenceByUnitIdUrl(url: string, unitId: string) {
-    return this.referenceModel.insertReferenceByUnitUrl(url, unitId);
+  async uploadReferenceByUnitIdUrl(
+    url: string,
+    unitId: string,
+    filename?: string
+  ) {
+    return this.referenceModel.insertReferenceByUnitUrl(url, unitId, filename);
   }
 
   async deleteReferenceById(id: number) {
