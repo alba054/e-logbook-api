@@ -295,6 +295,12 @@ export class DailyActivityHandler {
             unitName: w.Unit?.name,
             weekName: w.weekNum,
             id: w.id,
+            days: w.Day.map((d) => {
+              return {
+                day: d.day,
+                id: d.id,
+              };
+            }),
           };
         }),
         dailyActivities: [],
@@ -311,6 +317,12 @@ export class DailyActivityHandler {
               unitName: w.Unit?.name ?? "",
               weekName: w.weekNum,
               id: w.id,
+              days: w.Day.map((d) => {
+                return {
+                  day: d.day,
+                  id: d.id,
+                };
+              }),
             };
           }),
           dailyActivities: Array.isArray(dailyActivities)

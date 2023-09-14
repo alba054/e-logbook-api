@@ -1,6 +1,16 @@
 import db from "../database";
 
 export class Reference {
+  async insertReferenceByUnitUrl(url: string, unitId: string) {
+    return db.reference.create({
+      data: {
+        file: url,
+        type: "URL",
+        unitId,
+      },
+    });
+  }
+
   async deleteReferenceByFile(file: string | null) {
     return db.reference.deleteMany({
       where: {

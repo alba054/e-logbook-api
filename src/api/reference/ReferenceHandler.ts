@@ -60,7 +60,17 @@ export class ReferenceHandler {
     res: Response,
     next: NextFunction
   ) {
+    const { url } = req.body;
+
     try {
+      if (url) {
+        await this.referenceService.uploadReferenceUrl(url);
+
+        return res
+          .status(201)
+          .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, url));
+      }
+
       if (!req.file?.buffer) {
         throw new BadRequestError("upload file with fieldname file");
       }
@@ -131,8 +141,17 @@ export class ReferenceHandler {
     next: NextFunction
   ) {
     const { unitId } = req.params;
+    const { url } = req.body;
 
     try {
+      if (url) {
+        await this.referenceService.uploadReferenceByUnitIdUrl(url, unitId);
+
+        return res
+          .status(201)
+          .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, url));
+      }
+
       if (!req.file?.buffer) {
         throw new BadRequestError("upload file with fieldname file");
       }

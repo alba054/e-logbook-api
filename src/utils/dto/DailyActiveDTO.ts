@@ -34,6 +34,10 @@ export interface IStudentDailyActivities {
     unitName: string;
     startDate: number;
     endDate: number;
+    days: {
+      day: string;
+      id: string;
+    }[];
   }[];
   dailyActivities: IDailyActivities[];
 }
