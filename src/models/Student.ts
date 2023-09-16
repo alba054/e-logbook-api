@@ -4,17 +4,105 @@ import {
   IPutStudentActiveUnit,
   IPutStudentData,
 } from "../utils/interfaces/Student";
-import { createErrorObject } from "../utils";
+import { constants, createErrorObject } from "../utils";
 
 export class Student {
   constructor() {}
 
-  async getAllStudents() {
+  async getAllStudentsWithoutPageBySupervisorId(
+    supervisorId: string | undefined
+  ) {
+    return db.student.count({
+      where: {
+        supervisingSupervisorId: supervisorId,
+        academicSupervisorId: supervisorId,
+        examinerSupervisorId: supervisorId,
+      },
+    });
+  }
+
+  async getAllStudentsWithoutPage() {
+    return db.student.count();
+  }
+
+  async getAllStudentsBySearchFullNameOrNIMAndSupervisorId(
+    supervisorId: string | undefined,
+    page: any,
+    take: any,
+    search: any
+  ) {
+    return db.student.findMany({
+      where: {
+        AND: [
+          {
+            OR: [
+              { supervisingSupervisorId: supervisorId },
+              { academicSupervisorId: supervisorId },
+              { examinerSupervisorId: supervisorId },
+            ],
+          },
+          {
+            OR: [
+              {
+                studentId: {
+                  contains: search,
+                },
+              },
+              {
+                fullName: {
+                  contains: search,
+                },
+              },
+            ],
+          },
+        ],
+      },
+      include: {
+        activeUnit: true,
+        User: true,
+      },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
+    });
+  }
+
+  async getAllStudentsBySearchFullNameOrNIM(page: any, take: any, search: any) {
+    return db.student.findMany({
+      where: {
+        OR: [
+          {
+            studentId: {
+              contains: search,
+            },
+          },
+          {
+            fullName: {
+              contains: search,
+            },
+          },
+        ],
+      },
+      include: {
+        activeUnit: true,
+        User: true,
+      },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
+    });
+  }
+
+  async getAllStudents(
+    page: number | undefined,
+    take: number | undefined,
+    search: string | undefined
+  ) {
     return db.student.findMany({
       include: {
         activeUnit: true,
         User: true,
       },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
     });
   }
 

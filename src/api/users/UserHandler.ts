@@ -1,4 +1,3 @@
-import { NextFunction, Request, Response } from "express";
 import { constants, createResponse } from "../../utils";
 import { AuthenticationService } from "../../services/facade/AuthenticationService";
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
@@ -21,6 +20,7 @@ import {
 } from "../../validator/users/UserSchema";
 import { UploadFileHelper } from "../../utils/helper/UploadFileHelper";
 import { Validator } from "../../validator/Validator";
+import { NextFunction, Request, Response } from "express";
 
 export class UserHandler {
   private authenticationService: AuthenticationService;

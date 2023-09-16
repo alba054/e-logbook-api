@@ -17,14 +17,51 @@ export class StudentService {
     this.checkInCheckoutModel = new CheckInCheckOut();
   }
 
-  async getStudentBySupervisorId(tokenPayload: ITokenPayload, ceu: any) {
+  async getStudentBySupervisorId(
+    tokenPayload: ITokenPayload,
+    ceu: any,
+    page: any,
+    take: any,
+    search: any
+  ) {
     if (ceu) {
-      return this.studentModel.getAllStudents();
+      if (search) {
+        return {
+          data: await this.studentModel.getAllStudentsBySearchFullNameOrNIM(
+            page,
+            take,
+            search
+          ),
+          count: await this.studentModel.getAllStudentsWithoutPage(),
+        };
+      }
+      return {
+        data: await this.studentModel.getAllStudents(page, take, search),
+        count: await this.studentModel.getAllStudentsWithoutPage(),
+      };
     }
 
-    return this.studentModel.getStudentBySupervisorId(
-      tokenPayload.supervisorId
-    );
+    if (search) {
+      return {
+        data: await this.studentModel.getAllStudentsBySearchFullNameOrNIMAndSupervisorId(
+          tokenPayload.supervisorId,
+          page,
+          take,
+          search
+        ),
+        count: await this.studentModel.getAllStudentsWithoutPageBySupervisorId(
+          tokenPayload.supervisorId ?? ""
+        ),
+      };
+    }
+    return {
+      data: await this.studentModel.getStudentBySupervisorId(
+        tokenPayload.supervisorId
+      ),
+      count: await this.studentModel.getAllStudentsWithoutPageBySupervisorId(
+        tokenPayload.supervisorId ?? ""
+      ),
+    };
   }
 
   async getStudentByStudentId(studentId: string) {
