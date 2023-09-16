@@ -164,17 +164,20 @@ export class SupervisorHandler {
 
   async getSupervisorStudents(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
-    const { ceu } = req.query;
+    const { ceu, page, search } = req.query;
 
     const students = await this.studentService.getStudentBySupervisorId(
       tokenPayload,
-      ceu
+      ceu,
+      parseInt(String(page ?? "1")),
+      constants.HISTORY_ELEMENTS_PER_PAGE,
+      search
     );
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        students.map((s) => {
+        students.data.map((s) => {
           return {
             id: s.id,
             studentId: s.studentId,
@@ -182,6 +185,9 @@ export class SupervisorHandler {
             activeUnitId: s.activeUnit?.id,
             activeUnitName: s.activeUnit?.name,
             userId: s.User[0]?.id,
+            pages: Math.ceil(
+              students.count / constants.HISTORY_ELEMENTS_PER_PAGE
+            ),
           } as IListSupervisorStudent;
         })
       )
