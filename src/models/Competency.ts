@@ -1,6 +1,6 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
-import { createErrorObject, getUnixTimestamp } from "../utils";
+import { constants, createErrorObject, getUnixTimestamp } from "../utils";
 import { IPostCase } from "../utils/interfaces/Case";
 import { IPostSkill } from "../utils/interfaces/Skill";
 import { History } from "./History";
@@ -10,6 +10,173 @@ export class Competency {
 
   constructor() {
     this.historyModel = new History();
+  }
+
+  async getCasesBySupervisorWithoutPage(supervisorId: string | undefined) {
+    return db.competency.count({
+      where: {
+        supervisorId,
+      },
+    });
+  }
+
+  async getCasesBySupervisorAndNameOrStudentId(
+    supervisorId: string | undefined,
+    page: any,
+    take: any,
+    search: any
+  ) {
+    return db.competency.findMany({
+      where: {
+        supervisorId,
+        verificationStatus: "INPROCESS",
+        type: "CASE",
+        Student: {
+          OR: [
+            {
+              fullName: { contains: search },
+            },
+            {
+              studentId: { contains: search },
+            },
+          ],
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      distinct: ["studentId"],
+      include: {
+        Student: true,
+        Unit: true,
+      },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
+    });
+  }
+
+  async getSkillsBySupervisorWithoutPage(supervisorId: string | undefined) {
+    return db.competency.count({
+      where: {
+        supervisorId,
+      },
+    });
+  }
+
+  async getSkillsBySupervisorAndNameOrStudentId(
+    supervisorId: string | undefined,
+    page: any,
+    take: any,
+    search: any
+  ) {
+    return db.competency.findMany({
+      where: {
+        supervisorId,
+        verificationStatus: "INPROCESS",
+        type: "SKILL",
+        Student: {
+          OR: [
+            {
+              fullName: { contains: search },
+            },
+            {
+              studentId: { contains: search },
+            },
+          ],
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      distinct: ["studentId"],
+      include: {
+        Student: true,
+        Unit: true,
+      },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
+    });
+  }
+
+  async getCompetenciesBySupervisorAndNameAndStudentIdAndType(
+    supervisorId: string | undefined,
+    page: any,
+    take: any,
+    name: any,
+    nim: any,
+    type?: "CASE" | "SKILL"
+  ) {
+    return db.competency.findMany({
+      where: {
+        supervisorId,
+        verificationStatus: "INPROCESS",
+        Student: {
+          AND: [
+            {
+              fullName: { contains: name },
+            },
+            {
+              studentId: { contains: nim },
+            },
+          ],
+        },
+        type,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      distinct: ["studentId", "type"],
+      include: {
+        Student: true,
+        Unit: true,
+      },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
+    });
+  }
+
+  async getCompetenciesBySupervisorWithoutPage(
+    supervisorId: string | undefined
+  ) {
+    return db.competency.count({
+      where: {
+        supervisorId,
+      },
+    });
+  }
+
+  async getCompetenciesBySupervisorAndNameOrStudentId(
+    supervisorId: string | undefined,
+    page: any,
+    take: any,
+    search: any
+  ) {
+    return db.competency.findMany({
+      where: {
+        supervisorId,
+        verificationStatus: "INPROCESS",
+        Student: {
+          OR: [
+            {
+              fullName: { contains: search },
+            },
+            {
+              studentId: { contains: search },
+            },
+          ],
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      distinct: ["studentId", "type"],
+      include: {
+        Student: true,
+        Unit: true,
+      },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
+    });
   }
 
   async getSkillsByStudentIdAndUnitId(
@@ -180,7 +347,11 @@ export class Competency {
     }
   }
 
-  async getSkillsBySupervisor(supervisorId?: string) {
+  async getSkillsBySupervisor(
+    supervisorId?: string,
+    page?: number,
+    take?: number
+  ) {
     return db.competency.findMany({
       where: {
         supervisorId,
@@ -195,6 +366,8 @@ export class Competency {
         Student: true,
         Unit: true,
       },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
     });
   }
 

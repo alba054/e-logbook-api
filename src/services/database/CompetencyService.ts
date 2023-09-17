@@ -2,7 +2,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { v4 as uuidv4 } from "uuid";
 import db from "../../database";
 import { Competency } from "../../models/Competency";
-import { createErrorObject } from "../../utils";
+import { constants, createErrorObject } from "../../utils";
 import {
   IPostCase,
   IPutCasesVerificationStatus,
@@ -75,10 +75,55 @@ export class CompetencyService {
     return cases;
   }
 
-  async getCompetenciesBySupervisor(tokenPayload: ITokenPayload) {
-    return this.competencyModel.getCompetenciesBySupervisor(
-      tokenPayload.supervisorId
-    );
+  async getCompetenciesBySupervisor(
+    tokenPayload: ITokenPayload,
+    page: any,
+    take: any,
+    search: any,
+    name: any,
+    nim: any,
+    type: any
+  ) {
+    if (search) {
+      return {
+        data: await this.competencyModel.getCompetenciesBySupervisorAndNameOrStudentId(
+          tokenPayload.supervisorId,
+          page,
+          take,
+          search
+        ),
+        count:
+          await this.competencyModel.getCompetenciesBySupervisorWithoutPage(
+            tokenPayload.supervisorId
+          ),
+      };
+    }
+
+    if (name || nim || type) {
+      return {
+        data: await this.competencyModel.getCompetenciesBySupervisorAndNameAndStudentIdAndType(
+          tokenPayload.supervisorId,
+          page,
+          take,
+          name,
+          nim,
+          type
+        ),
+        count:
+          await this.competencyModel.getCompetenciesBySupervisorWithoutPage(
+            tokenPayload.supervisorId
+          ),
+      };
+    }
+
+    return {
+      data: await this.competencyModel.getCompetenciesBySupervisor(
+        tokenPayload.supervisorId
+      ),
+      count: await this.competencyModel.getCompetenciesBySupervisorWithoutPage(
+        tokenPayload.supervisorId
+      ),
+    };
   }
 
   async verifyCase(
@@ -141,10 +186,34 @@ export class CompetencyService {
     );
   }
 
-  async getSkillsBySupervisor(tokenPayload: ITokenPayload) {
-    return this.competencyModel.getSkillsBySupervisor(
-      tokenPayload.supervisorId
-    );
+  async getSkillsBySupervisor(
+    tokenPayload: ITokenPayload,
+    page: any,
+    take: any,
+    search: any
+  ) {
+    if (search) {
+      return {
+        data: await this.competencyModel.getSkillsBySupervisorAndNameOrStudentId(
+          tokenPayload.supervisorId,
+          page,
+          take,
+          search
+        ),
+        count: await this.competencyModel.getSkillsBySupervisorWithoutPage(
+          tokenPayload.supervisorId
+        ),
+      };
+    }
+
+    return {
+      data: await this.competencyModel.getSkillsBySupervisor(
+        tokenPayload.supervisorId
+      ),
+      count: await this.competencyModel.getSkillsBySupervisorWithoutPage(
+        tokenPayload.supervisorId
+      ),
+    };
   }
 
   async insertNewCase(tokenPayload: ITokenPayload, payload: IPostCase) {
@@ -160,8 +229,34 @@ export class CompetencyService {
     );
   }
 
-  async getCasesBySupervisor(tokenPayload: ITokenPayload) {
-    return this.competencyModel.getCasesBySupervisor(tokenPayload.supervisorId);
+  async getCasesBySupervisor(
+    tokenPayload: ITokenPayload,
+    page: any,
+    take: any,
+    search: any
+  ) {
+    if (search) {
+      return {
+        data: await this.competencyModel.getCasesBySupervisorAndNameOrStudentId(
+          tokenPayload.supervisorId,
+          page,
+          take,
+          search
+        ),
+        count: await this.competencyModel.getCasesBySupervisorWithoutPage(
+          tokenPayload.supervisorId
+        ),
+      };
+    }
+
+    return {
+      data: await this.competencyModel.getCasesBySupervisor(
+        tokenPayload.supervisorId
+      ),
+      count: await this.competencyModel.getCasesBySupervisorWithoutPage(
+        tokenPayload.supervisorId
+      ),
+    };
   }
 
   async getSkillsByStudentId(tokenPayload: ITokenPayload, studentId: string) {
