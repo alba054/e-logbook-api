@@ -208,7 +208,7 @@ export class UserHandler {
   }
 
   async getAllUsers(req: Request, res: Response, next: NextFunction) {
-    let { role, name, nim, badge } = req.query;
+    let { role, name, nim, badge, page } = req.query;
 
     if (
       role === "" &&
@@ -228,18 +228,29 @@ export class UserHandler {
       badge = undefined;
     }
 
-    let users;
+    let users: { data: any; count: number };
     if (role || name || nim || badge) {
-      users = await this.userService.getUserByFilter(role, name, nim, badge);
+      users = await this.userService.getUserByFilter(
+        role,
+        name,
+        nim,
+        badge,
+        parseInt(String(page ?? "1")),
+        constants.HISTORY_ELEMENTS_PER_PAGE
+      );
     } else {
-      users = await this.userService.getAllUsers();
+      users = await this.userService.getAllUsers(
+        parseInt(String(page ?? "1")),
+        constants.HISTORY_ELEMENTS_PER_PAGE
+      );
     }
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        users.map((u) => {
+        users.data.map((u: any) => {
           return {
+            pages: Math.ceil(users.count / constants.HISTORY_ELEMENTS_PER_PAGE),
             id: u.id,
             badges: u.badges,
             role: u.role,
@@ -250,8 +261,8 @@ export class UserHandler {
               id: u.supervisor?.id,
               userId: u.id,
               fullName: u.supervisor?.fullname,
-              locations: u.supervisor?.locations.map((l) => l.name),
-              units: u.supervisor?.units.map((l) => l.name),
+              locations: u.supervisor?.locations.map((l: any) => l.name),
+              units: u.supervisor?.units.map((l: any) => l.name),
               supervisorId: u.supervisor?.supervisorId,
             },
             student: {

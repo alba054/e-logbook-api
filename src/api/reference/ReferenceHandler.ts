@@ -116,7 +116,7 @@ export class ReferenceHandler {
 
     try {
       const fileToSend = await this.referenceService.getReferenceFileById(
-        Number(id)
+        parseInt(id)
       );
 
       if (typeof fileToSend === "string") {

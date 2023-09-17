@@ -197,7 +197,11 @@ export class ProblemConsultation {
     });
   }
 
-  async getProblemConsultationsBySupervisor(supervisorId?: string) {
+  async getProblemConsultationsBySupervisor(
+    supervisorId: string | undefined,
+    page: number | undefined,
+    take: number | undefined
+  ) {
     return db.problemConsultation.findMany({
       where: {
         Student: {
@@ -223,6 +227,8 @@ export class ProblemConsultation {
         Student: true,
         Unit: true,
       },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
     });
   }
 

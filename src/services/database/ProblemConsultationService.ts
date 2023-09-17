@@ -159,7 +159,9 @@ export class ProblemConsultationService {
 
     return {
       data: await this.ProblemConsultationModel.getProblemConsultationsBySupervisor(
-        tokenPayload.supervisorId
+        tokenPayload.supervisorId,
+        page,
+        take
       ),
       count:
         await this.ProblemConsultationModel.getProblemConsultationsBySupervisorWithoutPage(

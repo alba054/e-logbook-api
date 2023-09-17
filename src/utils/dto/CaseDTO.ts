@@ -17,4 +17,5 @@ export interface IListCaseDTO {
   caseName: string;
   caseType: "DISCUSSED" | "OBTAINED";
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";
+  pages?: number;
 }
