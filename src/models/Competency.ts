@@ -193,6 +193,9 @@ export class Competency {
         Student: true,
         skill: true,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
   }
 
@@ -209,6 +212,9 @@ export class Competency {
       include: {
         Student: true,
         case: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
       },
     });
   }
@@ -268,6 +274,9 @@ export class Competency {
         skill: true,
         case: true,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
   }
 
@@ -286,6 +295,9 @@ export class Competency {
       include: {
         case: true,
         skill: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
       },
     });
   }

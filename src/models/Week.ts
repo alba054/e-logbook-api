@@ -34,6 +34,10 @@ export class Week {
         Day: true,
         Unit: true,
       },
+      orderBy: {
+        weekNum: "asc",
+        updatedAt: "desc",
+      },
     });
   }
 
