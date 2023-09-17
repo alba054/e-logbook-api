@@ -60,20 +60,32 @@ export class CompetencyHandler {
 
   async getCompetencies(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
+    const { page, search, name, nim, type } = req.query;
 
     const competencies =
-      await this.competencyService.getCompetenciesBySupervisor(tokenPayload);
+      await this.competencyService.getCompetenciesBySupervisor(
+        tokenPayload,
+        parseInt(String(page ?? "1")),
+        constants.HISTORY_ELEMENTS_PER_PAGE,
+        search,
+        name,
+        nim,
+        type
+      );
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        competencies.map((c) => {
+        competencies.data.map((c) => {
           return {
             competencyType: c.type,
             latest: c.createdAt,
             studentName: c.Student?.fullName,
             studentId: c.Student?.studentId,
             unitName: c.Unit?.name,
+            pages: Math.ceil(
+              competencies.count / constants.HISTORY_ELEMENTS_PER_PAGE
+            ),
           } as ICompetencySubmitted;
         })
       )
@@ -351,20 +363,25 @@ export class CompetencyHandler {
 
   async getCases(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
+    const { page, search } = req.query;
 
     const cases = await this.competencyService.getCasesBySupervisor(
-      tokenPayload
+      tokenPayload,
+      parseInt(String(page ?? "1")),
+      constants.HISTORY_ELEMENTS_PER_PAGE,
+      search
     );
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        cases.map((s) => {
+        cases.data.map((s) => {
           return {
             latest: s.createdAt,
             studentId: s.Student?.studentId,
             studentName: s.Student?.fullName,
             unitName: s.Unit?.name,
+            pages: Math.ceil(cases.count / constants.HISTORY_ELEMENTS_PER_PAGE),
           } as ISubmittedCase;
         })
       )
@@ -373,20 +390,27 @@ export class CompetencyHandler {
 
   async getSkills(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
+    const { page, search } = req.query;
 
     const skills = await this.competencyService.getSkillsBySupervisor(
-      tokenPayload
+      tokenPayload,
+      parseInt(String(page ?? "1")),
+      constants.HISTORY_ELEMENTS_PER_PAGE,
+      search
     );
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        skills.map((s) => {
+        skills.data.map((s) => {
           return {
             latest: s.createdAt,
             studentId: s.Student?.studentId,
             studentName: s.Student?.fullName,
             unitName: s.Unit?.name,
+            pages: Math.ceil(
+              skills.count / constants.HISTORY_ELEMENTS_PER_PAGE
+            ),
           } as ISubmittedSkill;
         })
       )

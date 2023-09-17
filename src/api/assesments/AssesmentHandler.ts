@@ -256,7 +256,7 @@ export class AssesmentHandler {
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
         finalScore,
         verified:
-          assesments.filter((a) => a.osce !== null)[0].osce?.verified ?? null,
+          assesments.filter((a) => a.osce !== null)[0]?.osce?.verified ?? null,
         assesments: responses,
       })
     );
