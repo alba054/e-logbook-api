@@ -1,10 +1,9 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
-import { createErrorObject, getUnixTimestamp } from "../utils";
+import { constants, createErrorObject, getUnixTimestamp } from "../utils";
 import {
   IPostSelfReflection,
   IPutSelfReflection,
-  IPutSelfReflectionVerificationStatus,
 } from "../utils/interfaces/SelfReflection";
 import { History } from "./History";
 
@@ -13,6 +12,139 @@ export class SelfReflection {
 
   constructor() {
     this.historyModel = new History();
+  }
+
+  async getSelfReflectionsBySupervisorAndNameAndStudentId(
+    supervisorId: string | undefined,
+    page: any,
+    take: any,
+    name: any,
+    nim: any
+  ) {
+    return db.selfReflection.findMany({
+      where: {
+        Student: {
+          AND: [
+            {
+              OR: [
+                {
+                  academicSupervisorId: supervisorId,
+                },
+                {
+                  supervisingSupervisorId: supervisorId,
+                },
+                {
+                  examinerSupervisorId: supervisorId,
+                },
+              ],
+            },
+            {
+              AND: [
+                {
+                  studentId: {
+                    contains: nim,
+                  },
+                },
+
+                {
+                  fullName: {
+                    contains: name,
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        verificationStatus: "INPROCESS",
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      distinct: ["studentId"],
+      include: {
+        Student: true,
+        Unit: true,
+      },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
+    });
+  }
+
+  async getSelfReflectionsBySupervisorWithoutPage(
+    supervisorId: string | undefined
+  ) {
+    return db.selfReflection.count({
+      where: {
+        Student: {
+          OR: [
+            {
+              academicSupervisorId: supervisorId,
+            },
+            {
+              supervisingSupervisorId: supervisorId,
+            },
+            {
+              examinerSupervisorId: supervisorId,
+            },
+          ],
+        },
+      },
+    });
+  }
+
+  async getSelfReflectionsBySupervisorAndNameOrStudentId(
+    supervisorId: string | undefined,
+    page: any,
+    take: any,
+    search: any
+  ) {
+    return db.selfReflection.findMany({
+      where: {
+        Student: {
+          AND: [
+            {
+              OR: [
+                {
+                  academicSupervisorId: supervisorId,
+                },
+                {
+                  supervisingSupervisorId: supervisorId,
+                },
+                {
+                  examinerSupervisorId: supervisorId,
+                },
+              ],
+            },
+            {
+              OR: [
+                {
+                  studentId: {
+                    contains: search,
+                  },
+                },
+
+                {
+                  fullName: {
+                    contains: search,
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        verificationStatus: "INPROCESS",
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      distinct: ["studentId"],
+      include: {
+        Student: true,
+        Unit: true,
+      },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
+    });
   }
 
   async updateSelfReflectionById(id: string, payload: IPutSelfReflection) {

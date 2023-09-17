@@ -244,21 +244,30 @@ export class SelfReflectionHandler {
     next: NextFunction
   ) {
     const tokenPayload: ITokenPayload = res.locals.user;
+    const { page, search, name, nim } = req.query;
 
     const selfReflections =
       await this.selfReflectionService.getSelfReflectionsBySupervisor(
-        tokenPayload
+        tokenPayload,
+        parseInt(String(page ?? "1")),
+        constants.HISTORY_ELEMENTS_PER_PAGE,
+        search,
+        name,
+        nim
       );
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        selfReflections.map((s) => {
+        selfReflections.data.map((s) => {
           return {
             latest: s.createdAt,
             studentId: s.Student?.studentId,
             studentName: s.Student?.fullName,
             unitName: s.Unit?.name,
+            pages: Math.ceil(
+              selfReflections.count / constants.HISTORY_ELEMENTS_PER_PAGE
+            ),
           } as ISubmittedSelfReflections;
         })
       )

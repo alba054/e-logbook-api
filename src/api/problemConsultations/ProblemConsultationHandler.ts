@@ -249,21 +249,30 @@ export class ProblemConsultationHandler {
     next: NextFunction
   ) {
     const tokenPayload: ITokenPayload = res.locals.user;
+    const { page, search, name, nim } = req.query;
 
     const ProblemConsultations =
       await this.problemConsultationService.getProblemConsultationsBySupervisor(
-        tokenPayload
+        tokenPayload,
+        parseInt(String(page ?? "1")),
+        constants.HISTORY_ELEMENTS_PER_PAGE,
+        search,
+        name,
+        nim
       );
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        ProblemConsultations.map((p) => {
+        ProblemConsultations.data.map((p) => {
           return {
             studentName: p.Student?.fullName,
             studentId: p.Student?.studentId,
             latest: p.createdAt,
             unitName: p.Unit?.name,
+            pages: Math.ceil(
+              ProblemConsultations.count / constants.HISTORY_ELEMENTS_PER_PAGE
+            ),
           } as ISubmittedProblemConsultations;
         })
       )
