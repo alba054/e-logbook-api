@@ -85,6 +85,9 @@ export class Cst {
         Student: true,
         supervisor: true,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
   }
 
@@ -101,6 +104,9 @@ export class Cst {
         topics: true,
         Student: true,
         Unit: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
       },
       skip: (page - 1) * take,
       take,
@@ -193,6 +199,9 @@ export class Cst {
         Student: true,
         supervisor: true,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
   }
 
@@ -216,6 +225,9 @@ export class Cst {
         topics: true,
         Student: true,
         Unit: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
       },
       skip: (page - 1) * take,
       take,

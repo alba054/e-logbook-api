@@ -53,6 +53,9 @@ export class DailyActivity {
           },
         },
       },
+      orderBy: {
+        updatedAt: "asc",
+      },
     });
   }
 

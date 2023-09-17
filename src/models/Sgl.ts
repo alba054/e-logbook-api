@@ -82,6 +82,9 @@ export class Sgl {
         supervisor: true,
         Unit: true,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
   }
 
@@ -98,6 +101,9 @@ export class Sgl {
         topics: true,
         Student: true,
         Unit: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
       },
       skip: (page - 1) * take,
       take,
@@ -191,6 +197,9 @@ export class Sgl {
         Student: true,
         Unit: true,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
   }
 
@@ -213,6 +222,9 @@ export class Sgl {
         topics: true,
         Student: true,
         Unit: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
       },
       skip: (page - 1) * take,
       take,
