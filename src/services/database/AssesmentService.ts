@@ -250,6 +250,30 @@ export class AssesmentService {
     );
   }
 
+  async getScientificAssesmentByUnitId(
+    tokenPayload: ITokenPayload,
+    id: string
+  ) {
+    const miniCex = await this.assesmentModel.getScientificAssesmentByUnitId(
+      id
+    );
+
+    if (!miniCex) {
+      return createErrorObject(404, "scientific assesment's not found");
+    }
+
+    if (
+      miniCex.studentId !== tokenPayload.studentId &&
+      miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.academicSupervisorId !== tokenPayload.supervisorId
+    ) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return miniCex;
+  }
+
   async getScientificAssesmentById(tokenPayload: ITokenPayload, id: string) {
     const miniCex = await this.assesmentModel.getScientificAssesmentById(id);
 
@@ -366,6 +390,25 @@ export class AssesmentService {
     }
 
     return this.assesmentModel.insertGradeItemMiniCex(id, payload);
+  }
+
+  async getMiniCexsByUnitId(tokenPayload: ITokenPayload, id: string) {
+    const miniCex = await this.assesmentModel.getMiniCexByUnitId(id);
+
+    if (!miniCex) {
+      return createErrorObject(404, "mini cex's not found");
+    }
+
+    if (
+      miniCex.studentId !== tokenPayload.studentId &&
+      miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
+      miniCex?.Student?.academicSupervisorId !== tokenPayload.supervisorId
+    ) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return miniCex;
   }
 
   async getMiniCexsById(tokenPayload: ITokenPayload, id: string) {
