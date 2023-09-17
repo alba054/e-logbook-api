@@ -17,4 +17,5 @@ export interface IListSkillDTO {
   skillTypeId: number;
   skillType: "OBSERVER" | "PERFORM";
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERFIED";
+  pages?: number;
 }

@@ -167,7 +167,9 @@ export class SelfReflectionService {
 
     return {
       data: await this.selfReflectionModel.getSelfReflectionsBySupervisor(
-        tokenPayload.supervisorId
+        tokenPayload.supervisorId,
+        page,
+        take
       ),
       count:
         await this.selfReflectionModel.getSelfReflectionsBySupervisorWithoutPage(

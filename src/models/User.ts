@@ -1,6 +1,6 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
-import { createErrorObject } from "../utils";
+import { constants, createErrorObject } from "../utils";
 import { IPutUserMasterData, IPutUserProfile } from "../utils/interfaces/User";
 import bcryptjs from "bcryptjs";
 
@@ -68,7 +68,42 @@ export class User {
     });
   }
 
-  async getUserByRoleNameNimBadge(role: any, name: any, nim: any, badge: any) {
+  async getUserByRoleNameNimBadgeCount(
+    role: any,
+    name: any,
+    nim: any,
+    badge: any
+  ) {
+    return db.user.count({
+      where: {
+        role,
+        badges: { some: badge },
+        OR: [
+          {
+            student: {
+              fullName: { contains: name },
+              studentId: nim,
+            },
+          },
+          {
+            supervisor: {
+              fullname: { contains: name },
+              supervisorId: nim,
+            },
+          },
+        ],
+      },
+    });
+  }
+
+  async getUserByRoleNameNimBadge(
+    role: any,
+    name: any,
+    nim: any,
+    badge: any,
+    page: number | undefined,
+    take: number | undefined
+  ) {
     return db.user.findMany({
       where: {
         role,
@@ -97,6 +132,8 @@ export class User {
         username: true,
         role: true,
       },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
     });
   }
 
@@ -116,7 +153,11 @@ export class User {
     });
   }
 
-  async getAllUsers() {
+  async getAllUsersCount() {
+    return db.user.count({});
+  }
+
+  async getAllUsers(page: number | undefined, take: number | undefined) {
     return db.user.findMany({
       select: {
         id: true,
@@ -127,6 +168,8 @@ export class User {
         username: true,
         role: true,
       },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
     });
   }
 

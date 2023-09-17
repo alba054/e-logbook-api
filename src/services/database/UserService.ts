@@ -6,7 +6,7 @@ import {
 } from "../../utils/interfaces/User";
 import { v4 as uuidv4 } from "uuid";
 import bcryptjs from "bcryptjs";
-import { createErrorObject } from "../../utils";
+import { constants, createErrorObject } from "../../utils";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import db from "../../database";
 
@@ -38,8 +38,30 @@ export class UserService {
     return this.userModel.updateUserSupervisorProfileMaster(id, payload);
   }
 
-  async getUserByFilter(role: any, name: any, nim: any, badge: any) {
-    return this.userModel.getUserByRoleNameNimBadge(role, name, nim, badge);
+  async getUserByFilter(
+    role: any,
+    name: any,
+    nim: any,
+    badge: any,
+    page: any,
+    take: any
+  ) {
+    return {
+      data: await this.userModel.getUserByRoleNameNimBadge(
+        role,
+        name,
+        nim,
+        badge,
+        page,
+        take
+      ),
+      count: await this.userModel.getUserByRoleNameNimBadgeCount(
+        role,
+        name,
+        nim,
+        badge
+      ),
+    };
   }
 
   async deleteUserByUsername(username: string) {
@@ -100,8 +122,11 @@ export class UserService {
     ]);
   }
 
-  async getAllUsers() {
-    return this.userModel.getAllUsers();
+  async getAllUsers(page: any, take: any) {
+    return {
+      data: await this.userModel.getAllUsers(page, take),
+      count: await this.userModel.getAllUsersCount(),
+    };
   }
 
   async getUserProfilePictureByUserId(userId: string) {

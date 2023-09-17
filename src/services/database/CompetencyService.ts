@@ -118,7 +118,9 @@ export class CompetencyService {
 
     return {
       data: await this.competencyModel.getCompetenciesBySupervisor(
-        tokenPayload.supervisorId
+        tokenPayload.supervisorId,
+        page,
+        take
       ),
       count: await this.competencyModel.getCompetenciesBySupervisorWithoutPage(
         tokenPayload.supervisorId
@@ -208,7 +210,9 @@ export class CompetencyService {
 
     return {
       data: await this.competencyModel.getSkillsBySupervisor(
-        tokenPayload.supervisorId
+        tokenPayload.supervisorId,
+        page,
+        take
       ),
       count: await this.competencyModel.getSkillsBySupervisorWithoutPage(
         tokenPayload.supervisorId
@@ -251,7 +255,9 @@ export class CompetencyService {
 
     return {
       data: await this.competencyModel.getCasesBySupervisor(
-        tokenPayload.supervisorId
+        tokenPayload.supervisorId,
+        page,
+        take
       ),
       count: await this.competencyModel.getCasesBySupervisorWithoutPage(
         tokenPayload.supervisorId
@@ -259,11 +265,43 @@ export class CompetencyService {
     };
   }
 
-  async getSkillsByStudentId(tokenPayload: ITokenPayload, studentId: string) {
-    return this.competencyModel.getSkillsBySupervisorAndStudentId(
-      tokenPayload.supervisorId,
-      studentId
-    );
+  async getSkillsByStudentId(
+    tokenPayload: ITokenPayload,
+    studentId: string,
+    page: any,
+    take: any,
+    search: any
+  ) {
+    if (search) {
+      return {
+        data: await this.competencyModel.getSkillsBySupervisorAndStudentIdAndTitle(
+          tokenPayload.supervisorId,
+          studentId,
+          page,
+          take,
+          search
+        ),
+        count:
+          await this.competencyModel.getSkillsBySupervisorAndStudentIdWithoutPage(
+            tokenPayload.supervisorId,
+            studentId
+          ),
+      };
+    }
+
+    return {
+      data: await this.competencyModel.getSkillsBySupervisorAndStudentId(
+        tokenPayload.supervisorId,
+        studentId,
+        page,
+        take
+      ),
+      count:
+        await this.competencyModel.getSkillsBySupervisorAndStudentIdWithoutPage(
+          tokenPayload.supervisorId,
+          studentId
+        ),
+    };
   }
 
   async verifyAllStudentSkills(
@@ -312,11 +350,43 @@ export class CompetencyService {
     }
   }
 
-  async getCaseByStudentId(tokenPayload: ITokenPayload, studentId: string) {
-    return this.competencyModel.getCasesBySupervisorAndStudentId(
-      tokenPayload.supervisorId,
-      studentId
-    );
+  async getCaseByStudentId(
+    tokenPayload: ITokenPayload,
+    studentId: string,
+    page: any,
+    take: any,
+    search: any
+  ) {
+    if (search) {
+      return {
+        data: await this.competencyModel.getCasesBySupervisorAndStudentIdAndTitle(
+          tokenPayload.supervisorId,
+          studentId,
+          page,
+          take,
+          search
+        ),
+        count:
+          await this.competencyModel.getCasesBySupervisorAndStudentIdWithoutPage(
+            tokenPayload.supervisorId,
+            studentId
+          ),
+      };
+    }
+
+    return {
+      data: await this.competencyModel.getCasesBySupervisorAndStudentId(
+        tokenPayload.supervisorId,
+        studentId,
+        page,
+        take
+      ),
+      count:
+        await this.competencyModel.getCasesBySupervisorAndStudentIdWithoutPage(
+          tokenPayload.supervisorId,
+          studentId
+        ),
+    };
   }
 
   async verifyAllStudentCases(

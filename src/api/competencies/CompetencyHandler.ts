@@ -277,10 +277,14 @@ export class CompetencyHandler {
   async getStudentCases(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { studentId } = req.params;
+    const { page, search } = req.query;
 
     const cases = await this.competencyService.getCaseByStudentId(
       tokenPayload,
-      studentId
+      studentId,
+      parseInt(String(page ?? "1")),
+      constants.HISTORY_ELEMENTS_PER_PAGE,
+      search
     );
 
     try {
@@ -302,12 +306,15 @@ export class CompetencyHandler {
         createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
           studentName: student?.fullName,
           studentId: studentId,
-          listCases: cases.map((s) => {
+          listCases: cases.data.map((s) => {
             return {
               caseId: s.id,
               caseType: s.competencyType,
               caseName: s.case?.name,
               verificationStatus: s.verificationStatus,
+              pages: Math.ceil(
+                cases.count / constants.HISTORY_ELEMENTS_PER_PAGE
+              ),
             };
           }),
         } as IStudentCases)
@@ -320,10 +327,14 @@ export class CompetencyHandler {
   async getStudentSkills(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { studentId } = req.params;
+    const { page, search } = req.query;
 
     const skills = await this.competencyService.getSkillsByStudentId(
       tokenPayload,
-      studentId
+      studentId,
+      parseInt(String(page ?? "1")),
+      constants.HISTORY_ELEMENTS_PER_PAGE,
+      search
     );
 
     try {
@@ -346,12 +357,15 @@ export class CompetencyHandler {
         createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
           studentName: student?.fullName,
           studentId: studentId,
-          listSkills: skills.map((s) => {
+          listSkills: skills.data.map((s) => {
             return {
               skillId: s.id,
               skillType: s.competencyType,
               skillName: s.skill?.name,
               verificationStatus: s.verificationStatus,
+              pages: Math.ceil(
+                skills.count / constants.HISTORY_ELEMENTS_PER_PAGE
+              ),
             };
           }),
         } as IStudentSkills)

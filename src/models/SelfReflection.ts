@@ -195,7 +195,11 @@ export class SelfReflection {
     });
   }
 
-  async getSelfReflectionsBySupervisor(supervisorId?: string) {
+  async getSelfReflectionsBySupervisor(
+    supervisorId: string | undefined,
+    page: number | undefined,
+    take: number | undefined
+  ) {
     return db.selfReflection.findMany({
       where: {
         Student: {
@@ -221,6 +225,8 @@ export class SelfReflection {
         Student: true,
         Unit: true,
       },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
     });
   }
 

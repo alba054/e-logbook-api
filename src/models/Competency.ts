@@ -12,6 +12,96 @@ export class Competency {
     this.historyModel = new History();
   }
 
+  async getCasesBySupervisorAndStudentIdWithoutPage(
+    supervisorId: string | undefined,
+    studentId: string
+  ) {
+    return db.competency.count({
+      where: {
+        supervisorId,
+        Student: {
+          studentId,
+        },
+        type: "CASE",
+      },
+    });
+  }
+
+  async getCasesBySupervisorAndStudentIdAndTitle(
+    supervisorId: string | undefined,
+    studentId: string,
+    page: any,
+    take: any,
+    search: any
+  ) {
+    return db.competency.findMany({
+      where: {
+        supervisorId,
+        Student: {
+          studentId,
+        },
+        skill: {
+          name: { contains: search },
+        },
+        type: "CASE",
+      },
+      include: {
+        case: true,
+        skill: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
+    });
+  }
+
+  async getSkillsBySupervisorAndStudentIdWithoutPage(
+    supervisorId: string | undefined,
+    studentId: string | undefined
+  ) {
+    return db.competency.count({
+      where: {
+        supervisorId,
+        Student: {
+          studentId,
+        },
+        type: "SKILL",
+      },
+    });
+  }
+
+  async getSkillsBySupervisorAndStudentIdAndTitle(
+    supervisorId: string | undefined,
+    studentId: string,
+    page: any,
+    take: any,
+    search: any
+  ) {
+    return db.competency.findMany({
+      where: {
+        supervisorId,
+        Student: {
+          studentId,
+        },
+        skill: {
+          name: { contains: search },
+        },
+        type: "SKILL",
+      },
+      include: {
+        case: true,
+        skill: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
+    });
+  }
+
   async getCasesBySupervisorWithoutPage(supervisorId: string | undefined) {
     return db.competency.count({
       where: {
@@ -142,6 +232,7 @@ export class Competency {
       where: {
         supervisorId,
       },
+      distinct: ["studentId", "type"],
     });
   }
 
@@ -219,7 +310,11 @@ export class Competency {
     });
   }
 
-  async getCompetenciesBySupervisor(supervisorId: string | undefined) {
+  async getCompetenciesBySupervisor(
+    supervisorId: string | undefined,
+    page: number | undefined,
+    take: number | undefined
+  ) {
     return db.competency.findMany({
       where: {
         supervisorId,
@@ -233,6 +328,8 @@ export class Competency {
         Student: true,
         Unit: true,
       },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
     });
   }
 
@@ -260,7 +357,9 @@ export class Competency {
 
   async getCasesBySupervisorAndStudentId(
     supervisorId: string | undefined,
-    studentId: string
+    studentId: string,
+    page: number | undefined,
+    take: number | undefined
   ) {
     return db.competency.findMany({
       where: {
@@ -277,12 +376,16 @@ export class Competency {
       orderBy: {
         updatedAt: "desc",
       },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
     });
   }
 
   async getSkillsBySupervisorAndStudentId(
     supervisorId: string | undefined,
-    studentId: string
+    studentId: string,
+    page: number | undefined,
+    take: number | undefined
   ) {
     return db.competency.findMany({
       where: {
@@ -299,10 +402,16 @@ export class Competency {
       orderBy: {
         updatedAt: "desc",
       },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
     });
   }
 
-  async getCasesBySupervisor(supervisorId?: string) {
+  async getCasesBySupervisor(
+    supervisorId: string | undefined,
+    page: number | undefined,
+    take: number | undefined
+  ) {
     return db.competency.findMany({
       where: {
         supervisorId,
