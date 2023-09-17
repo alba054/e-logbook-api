@@ -138,6 +138,12 @@ export class Student {
       where: {
         id: studentId,
       },
+      include: {
+        CheckInCheckOut: true,
+        supervisingDPK: true,
+        academicAdvisor: true,
+        examinerDPK: true,
+      },
     });
   }
 

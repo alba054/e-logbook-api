@@ -5,6 +5,28 @@ import {
 } from "../utils/interfaces/Assesment";
 
 export class Assesment {
+  async getMiniCexByUnitId(id: string) {
+    return db.assesment.findFirst({
+      where: {
+        unitId: id,
+        NOT: { OR: [{ miniCexId: null }, { miniCexId: undefined }] },
+      },
+      include: {
+        Student: true,
+        MiniCex: {
+          include: {
+            location: true,
+            MiniCexGrade: {
+              include: {
+                gradeItem: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   async verifiedOsce(studentId: string, unitId: string, verified: boolean) {
     return db.oSCE.updateMany({
       where: {
@@ -222,6 +244,37 @@ export class Assesment {
         ScientificAssesment: {
           include: {
             location: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getScientificAssesmentByUnitId(id: string) {
+    return db.assesment.findFirst({
+      where: {
+        unitId: id,
+        NOT: {
+          OR: [
+            { scientificAssesmentId: null },
+            { scientificAssesmentId: undefined },
+          ],
+        },
+      },
+      include: {
+        Student: true,
+        ScientificAssesment: {
+          include: {
+            location: {
+              include: {
+                Activity: true,
+              },
+            },
+            grades: {
+              include: {
+                gradeItem: true,
+              },
+            },
           },
         },
       },

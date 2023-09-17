@@ -59,6 +59,8 @@ import { WeeklyAssesmentService } from "../../services/database/WeeklyAssesmentS
 import { IStudentStastic } from "../../utils/dto/StudentDTO";
 import { WeekService } from "../../services/database/WeekService";
 import { IStudentWeeklyAssesment } from "../../utils/dto/WeeklyAssesmentDTO";
+import { CaseTypes } from "../../models/CaseTypes";
+import { SkillTypes } from "../../models/SkillTypes";
 
 export class StudentHandler {
   private studentPayloadValidator: StudentPayloadValidator;
@@ -82,6 +84,8 @@ export class StudentHandler {
   private problemConsultationService: ProblemConsultationService;
   private weeklyAssesmentService: WeeklyAssesmentService;
   private weekService: WeekService;
+  private caseTypeService: CaseTypes;
+  private skillTypeService: SkillTypes;
 
   constructor() {
     this.studentPayloadValidator = new StudentPayloadValidator();
@@ -102,6 +106,8 @@ export class StudentHandler {
     this.assesmentService = new AssesmentService();
     this.sglService = new SglService();
     this.cstService = new CstService();
+    this.caseTypeService = new CaseTypes();
+    this.skillTypeService = new SkillTypes();
     this.problemConsultationService = new ProblemConsultationService();
     this.weeklyAssesmentService = new WeeklyAssesmentService();
     this.weekService = new WeekService();
@@ -159,6 +165,13 @@ export class StudentHandler {
     const activeUnit = await this.studentService.getActiveUnit(
       tokenPayload.studentId ?? ""
     );
+    const caseTypes = await this.caseTypeService.getCaseTypesByUnitId(
+      activeUnit?.activeUnit.activeUnit?.id ?? ""
+    );
+
+    const skillTypes = await this.skillTypeService.getSkillTypesByUnitId(
+      activeUnit?.activeUnit.activeUnit?.id ?? ""
+    );
 
     const cases = await this.competencyService.getCasesByStudentAndUnitId(
       tokenPayload
@@ -171,6 +184,70 @@ export class StudentHandler {
         student?.studentId ?? "",
         activeUnit?.activeUnit.activeUnit?.id ?? ""
       );
+
+    const weeklyAssesment =
+      await this.weeklyAssesmentService.getWeeklyAssesmentByStudentIdAndUnitId(
+        student?.studentId ?? "",
+        activeUnit?.activeUnit.activeUnit?.id ?? ""
+      );
+
+    const dailyActivities =
+      await this.dailyActivityService.getDailyActivitiesByStudentNimAndUnitId(
+        student?.id ?? "",
+        activeUnit?.activeUnit.activeUnit?.id ?? ""
+      );
+
+    const miniCex = await this.assesmentService.getMiniCexsByUnitId(
+      tokenPayload,
+      activeUnit?.activeUnit.activeUnit?.id ?? ""
+    );
+
+    if (miniCex && "error" in miniCex) {
+      switch (miniCex.error) {
+        case 400:
+          throw new BadRequestError(miniCex.message);
+        case 404:
+          throw new NotFoundError(miniCex.message);
+        default:
+          throw new InternalServerError();
+      }
+    }
+
+    // * grade will be zero if no minicexgrade
+    let miniCexGrade = 0;
+    if (miniCex.MiniCex?.MiniCexGrade) {
+      miniCex.MiniCex?.MiniCexGrade.forEach((g) => {
+        miniCexGrade += g.score ?? 0;
+      });
+      miniCexGrade = miniCexGrade / miniCex.MiniCex?.MiniCexGrade.length;
+    }
+
+    const scientificAssesment =
+      await this.assesmentService.getScientificAssesmentByUnitId(
+        tokenPayload,
+        activeUnit?.activeUnit.activeUnit?.id ?? ""
+      );
+
+    if (scientificAssesment && "error" in scientificAssesment) {
+      switch (scientificAssesment.error) {
+        case 400:
+          throw new BadRequestError(scientificAssesment.message);
+        case 404:
+          throw new NotFoundError(scientificAssesment.message);
+        default:
+          throw new InternalServerError();
+      }
+    }
+
+    // * grade will be zero if no scientificAssesmentgrade
+    let saGrade = 0;
+    if (scientificAssesment.ScientificAssesment?.grades) {
+      scientificAssesment.ScientificAssesment?.grades.forEach((g) => {
+        saGrade += g.score ?? 0;
+      });
+      saGrade =
+        saGrade / scientificAssesment.ScientificAssesment?.grades.length;
+    }
 
     let finalScore = 0;
 
@@ -211,8 +288,8 @@ export class StudentHandler {
 
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-        totalCases: cases.length,
-        totalSkills: skills.length,
+        totalCases: caseTypes?.length ?? 0,
+        totalSkills: skillTypes?.length ?? 0,
         verifiedCases: cases.filter((c) => c.verificationStatus === "VERIFIED")
           .length,
         verifiedSkills: skills.filter(
@@ -240,6 +317,90 @@ export class StudentHandler {
               verificationStatus: c.verificationStatus,
             };
           }),
+        student: {
+          studentId: student?.studentId,
+          address: student?.address,
+          fullName: student?.fullName,
+          clinicId: student?.clinicId,
+          graduationDate: student?.graduationDate,
+          phoneNumber: student?.phoneNumber,
+          preClinicId: student?.preClinicId,
+          checkInStatus: student?.CheckInCheckOut.at(-1)?.checkInStatus,
+          checkOutStatus: student?.CheckInCheckOut.at(-1)?.checkOutStatus,
+          academicSupervisorName: student?.academicAdvisor?.fullname,
+          academicSupervisorId: student?.academicAdvisor?.supervisorId,
+          academicSupervisorUserId: student?.academicAdvisor?.id,
+          supervisingDPKName: student?.supervisingDPK?.fullname,
+          supervisingDPKId: student?.supervisingDPK?.supervisorId,
+          supervisingDPKUserId: student?.supervisingDPK?.id,
+          examinerDPKName: student?.examinerDPK?.fullname,
+          examinerDPKId: student?.examinerDPK?.supervisorId,
+          examinerDPKUserId: student?.examinerDPK?.id,
+          rsStation: student?.rsStation,
+          pkmStation: student?.pkmStation,
+          periodLengthStation: Number(student?.periodLengthStation),
+        },
+        weeklyAssesment: {
+          studentName: weeklyAssesment[0]?.Student?.fullName,
+          studentId: weeklyAssesment[0]?.Student?.studentId,
+          unitName: weeklyAssesment[0]?.Unit?.name,
+          assesments: weeklyAssesment.map((w) => {
+            return {
+              attendNum: dailyActivities
+                .filter((a) => a.day?.week?.weekNum === w.weekNum)
+                .filter((a) => a.Activity?.activityStatus === "ATTEND").length,
+              notAttendNum: dailyActivities
+                .filter((a) => a.day?.week?.weekNum === w.weekNum)
+                .filter(
+                  (a) =>
+                    a.Activity?.activityStatus === "NOT_ATTEND" ||
+                    a.Activity?.activityStatus === "SICK" ||
+                    a.Activity?.activityStatus === "HOLIDAY"
+                ).length,
+              score: w.score,
+              verificationStatus: w.verificationStatus,
+              weekNum: w.weekNum,
+              id: w.id,
+            };
+          }),
+        },
+        miniCex: {
+          case: miniCex.MiniCex?.case,
+          id: miniCex.miniCexId,
+          location: miniCex.MiniCex?.location?.name,
+          studentId: miniCex.Student?.studentId,
+          studentName: miniCex.Student?.fullName,
+          scores: miniCex.MiniCex?.MiniCexGrade.map((g) => {
+            return {
+              name: g.name,
+              score: g.score,
+              id: g.id,
+            };
+          }),
+          miniCexGrade,
+          academicSupervisorId: miniCex.Student?.academicSupervisorId,
+          examinerDPKId: miniCex.Student?.examinerSupervisorId,
+          supervisingDPKId: miniCex.Student?.supervisingSupervisorId,
+        },
+        scientificAssesement: {
+          id: scientificAssesment.scientificAssesmentId,
+          studentId: scientificAssesment.Student?.studentId,
+          studentName: scientificAssesment.Student?.fullName,
+          case: scientificAssesment.ScientificAssesment?.title,
+          location: scientificAssesment.ScientificAssesment?.location?.name,
+          scores: scientificAssesment.ScientificAssesment?.grades.map((g) => {
+            return {
+              name: g.gradeItem.name,
+              score: g.score,
+              id: g.id,
+              type: g.gradeItem.scientificGradeType,
+            };
+          }),
+          saGrade,
+          academicSupervisorId: miniCex.Student?.academicSupervisorId,
+          examinerDPKId: miniCex.Student?.examinerSupervisorId,
+          supervisingDPKId: miniCex.Student?.supervisingSupervisorId,
+        },
         finalScore,
       } as IStudentStastic)
     );
