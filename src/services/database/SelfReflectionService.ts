@@ -126,10 +126,54 @@ export class SelfReflectionService {
     );
   }
 
-  async getSelfReflectionsBySupervisor(tokenPayload: ITokenPayload) {
-    return this.selfReflectionModel.getSelfReflectionsBySupervisor(
-      tokenPayload.supervisorId
-    );
+  async getSelfReflectionsBySupervisor(
+    tokenPayload: ITokenPayload,
+    page: any,
+    take: any,
+    search: any,
+    name: any,
+    nim: any
+  ) {
+    if (search) {
+      return {
+        data: await this.selfReflectionModel.getSelfReflectionsBySupervisorAndNameOrStudentId(
+          tokenPayload.supervisorId,
+          page,
+          take,
+          search
+        ),
+        count:
+          await this.selfReflectionModel.getSelfReflectionsBySupervisorWithoutPage(
+            tokenPayload.supervisorId
+          ),
+      };
+    }
+
+    if (name || nim) {
+      return {
+        data: await this.selfReflectionModel.getSelfReflectionsBySupervisorAndNameAndStudentId(
+          tokenPayload.supervisorId,
+          page,
+          take,
+          name,
+          nim
+        ),
+        count:
+          await this.selfReflectionModel.getSelfReflectionsBySupervisorWithoutPage(
+            tokenPayload.supervisorId
+          ),
+      };
+    }
+
+    return {
+      data: await this.selfReflectionModel.getSelfReflectionsBySupervisor(
+        tokenPayload.supervisorId
+      ),
+      count:
+        await this.selfReflectionModel.getSelfReflectionsBySupervisorWithoutPage(
+          tokenPayload.supervisorId
+        ),
+    };
   }
 
   async getSelfReflectionsByStudentAndUnitId(tokenPayload: ITokenPayload) {

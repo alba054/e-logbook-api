@@ -1,6 +1,6 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import db from "../database";
-import { createErrorObject, getUnixTimestamp } from "../utils";
+import { constants, createErrorObject, getUnixTimestamp } from "../utils";
 import {
   IPostProblemConsultation,
   IPutProblemConsultation,
@@ -12,6 +12,139 @@ export class ProblemConsultation {
 
   constructor() {
     this.historyModel = new History();
+  }
+
+  async getProblemConsultationsBySupervisorAndNameAndStudentId(
+    supervisorId: string | undefined,
+    page: any,
+    take: any,
+    name: any,
+    nim: any
+  ) {
+    return db.problemConsultation.findMany({
+      where: {
+        Student: {
+          AND: [
+            {
+              OR: [
+                {
+                  academicSupervisorId: supervisorId,
+                },
+                {
+                  supervisingSupervisorId: supervisorId,
+                },
+                {
+                  examinerSupervisorId: supervisorId,
+                },
+              ],
+            },
+            {
+              AND: [
+                {
+                  studentId: {
+                    contains: nim,
+                  },
+                },
+
+                {
+                  fullName: {
+                    contains: name,
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        verificationStatus: "INPROCESS",
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      distinct: ["studentId"],
+      include: {
+        Student: true,
+        Unit: true,
+      },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
+    });
+  }
+
+  async getProblemConsultationsBySupervisorWithoutPage(
+    supervisorId: string | undefined
+  ) {
+    return db.problemConsultation.count({
+      where: {
+        Student: {
+          OR: [
+            {
+              academicSupervisorId: supervisorId,
+            },
+            {
+              supervisingSupervisorId: supervisorId,
+            },
+            {
+              examinerSupervisorId: supervisorId,
+            },
+          ],
+        },
+      },
+    });
+  }
+
+  async getProblemConsultationsBySupervisorAndNameOrStudentId(
+    supervisorId: string | undefined,
+    page: any,
+    take: any,
+    search: any
+  ) {
+    return db.problemConsultation.findMany({
+      where: {
+        Student: {
+          AND: [
+            {
+              OR: [
+                {
+                  academicSupervisorId: supervisorId,
+                },
+                {
+                  supervisingSupervisorId: supervisorId,
+                },
+                {
+                  examinerSupervisorId: supervisorId,
+                },
+              ],
+            },
+            {
+              OR: [
+                {
+                  studentId: {
+                    contains: search,
+                  },
+                },
+
+                {
+                  fullName: {
+                    contains: search,
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        verificationStatus: "INPROCESS",
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      distinct: ["studentId"],
+      include: {
+        Student: true,
+        Unit: true,
+      },
+      skip: ((page ?? 1) - 1) * (take ?? constants.HISTORY_ELEMENTS_PER_PAGE),
+      take: take ?? constants.HISTORY_ELEMENTS_PER_PAGE,
+    });
   }
 
   async updateProblemConsultationById(

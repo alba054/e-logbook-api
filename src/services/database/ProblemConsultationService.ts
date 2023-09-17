@@ -118,10 +118,54 @@ export class ProblemConsultationService {
     );
   }
 
-  async getProblemConsultationsBySupervisor(tokenPayload: ITokenPayload) {
-    return this.ProblemConsultationModel.getProblemConsultationsBySupervisor(
-      tokenPayload.supervisorId
-    );
+  async getProblemConsultationsBySupervisor(
+    tokenPayload: ITokenPayload,
+    page: any,
+    take: any,
+    search: any,
+    name: any,
+    nim: any
+  ) {
+    if (search) {
+      return {
+        data: await this.ProblemConsultationModel.getProblemConsultationsBySupervisorAndNameOrStudentId(
+          tokenPayload.supervisorId,
+          page,
+          take,
+          search
+        ),
+        count:
+          await this.ProblemConsultationModel.getProblemConsultationsBySupervisorWithoutPage(
+            tokenPayload.supervisorId
+          ),
+      };
+    }
+
+    if (name || nim) {
+      return {
+        data: await this.ProblemConsultationModel.getProblemConsultationsBySupervisorAndNameAndStudentId(
+          tokenPayload.supervisorId,
+          page,
+          take,
+          name,
+          nim
+        ),
+        count:
+          await this.ProblemConsultationModel.getProblemConsultationsBySupervisorWithoutPage(
+            tokenPayload.supervisorId
+          ),
+      };
+    }
+
+    return {
+      data: await this.ProblemConsultationModel.getProblemConsultationsBySupervisor(
+        tokenPayload.supervisorId
+      ),
+      count:
+        await this.ProblemConsultationModel.getProblemConsultationsBySupervisorWithoutPage(
+          tokenPayload.supervisorId
+        ),
+    };
   }
 
   async getProblemConsultationsByStudentAndUnitId(tokenPayload: ITokenPayload) {
