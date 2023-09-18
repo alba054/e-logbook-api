@@ -80,6 +80,10 @@ export class UserHandler {
         birthdate:
           Number(user?.student?.dateOfBirth ?? user?.supervisor?.dateOfBirth) ??
           0,
+        locations: user?.supervisor?.locations.map((l) => l.id),
+        units: user?.supervisor?.units.map((l) => l.id),
+        headDivUnit: user?.supervisor?.unitId,
+        nip: user?.student?.studentId ?? user?.supervisor?.supervisorId,
         student: {
           studentId: user?.student?.studentId,
           address: user?.student?.address,
@@ -110,6 +114,10 @@ export class UserHandler {
           fullName: user?.supervisor?.fullname,
           locations: user?.supervisor?.locations.map((l) => l.id),
           units: user?.supervisor?.units.map((l) => l.id),
+          headDivUnit: user?.supervisor?.unitId,
+          badges: user?.badges.map((b) => {
+            return { id: b.id };
+          }),
         },
       } as IUserProfileDTO)
     );
