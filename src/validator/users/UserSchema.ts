@@ -27,4 +27,9 @@ export const UserProfileMasterSchema = Joi.object({
   placeOfBirth: Joi.string().optional(),
   dateOfBirth: Joi.number().optional(),
   badges: Joi.array().items(Joi.number()).optional(),
+  nip: Joi.string().optional(),
+  username: Joi.string().optional(),
+  location: Joi.array().items(Joi.number()).optional(),
+  units: Joi.array().items(Joi.string()).optional(),
+  headDivUnit: Joi.string().optional(),
 });

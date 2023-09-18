@@ -22,4 +22,9 @@ export interface IPutUserMasterData {
   readonly gender: "MALE" | "FEMALE";
   readonly placeOfBirth: string;
   readonly dateOfBirth: number;
+  readonly nip: string;
+  readonly username: string;
+  readonly location: number[];
+  readonly unit: string[];
+  readonly headDivUnit: string;
 }

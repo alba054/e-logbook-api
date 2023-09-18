@@ -29,6 +29,7 @@ export class User {
               }),
             }
           : undefined,
+        username: payload.username,
         supervisor: {
           update: {
             address: payload.address,
@@ -36,6 +37,30 @@ export class User {
             placeOfBirth: payload.placeOfBirth,
             fullname: payload.fullName,
             gender: payload.gender,
+            supervisorId: payload.nip,
+            headDivUnit: {
+              connect: {
+                id: payload.headDivUnit,
+              },
+            },
+            locations: payload.location
+              ? {
+                  connect: payload.location.map((b) => {
+                    return {
+                      id: b,
+                    };
+                  }),
+                }
+              : undefined,
+            units: payload.unit
+              ? {
+                  connect: payload.unit.map((b) => {
+                    return {
+                      id: b,
+                    };
+                  }),
+                }
+              : undefined,
           },
         },
       },
@@ -55,6 +80,7 @@ export class User {
         password: payload.password
           ? await bcryptjs.hash(payload.password, 10)
           : undefined,
+        username: payload.username,
         student: {
           update: {
             address: payload.address,
@@ -62,6 +88,7 @@ export class User {
             gender: payload.gender,
             dateOfBirth: payload.dateOfBirth,
             placeOfBirth: payload.placeOfBirth,
+            studentId: payload.nip,
           },
         },
       },
