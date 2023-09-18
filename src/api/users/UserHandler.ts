@@ -73,6 +73,13 @@ export class UserHandler {
         username: user?.username,
         email: user?.email,
         fullname: user?.student?.fullName ?? user?.supervisor?.fullname,
+        gender: user?.student?.gender ?? user?.supervisor?.gender,
+        address: user?.student?.address ?? user?.supervisor?.address,
+        birthplace:
+          user?.student?.placeOfBirth ?? user?.supervisor?.placeOfBirth,
+        birthdate:
+          Number(user?.student?.dateOfBirth ?? user?.supervisor?.dateOfBirth) ??
+          0,
         student: {
           studentId: user?.student?.studentId,
           address: user?.student?.address,
@@ -101,8 +108,8 @@ export class UserHandler {
           id: user?.supervisorId,
           supervisorId: user?.supervisor?.supervisorId,
           fullName: user?.supervisor?.fullname,
-          locations: user?.supervisor?.locations.map((l) => l.name),
-          units: user?.supervisor?.units.map((l) => l.name),
+          locations: user?.supervisor?.locations.map((l) => l.id),
+          units: user?.supervisor?.units.map((l) => l.id),
         },
       } as IUserProfileDTO)
     );

@@ -45,7 +45,11 @@ export class ReferenceService {
     }
 
     this.referenceModel.deleteReferenceByFile(reference.file);
-    await deleteFileByPath(constants.ABS_PATH + "/" + (reference.file ?? ""));
+    const removed = await deleteFileByPath(
+      constants.ABS_PATH + "/" + (reference.file ?? "")
+    );
+
+    return removed;
   }
 
   async uploadReferenceToAllUnits(savedFile: string) {

@@ -3,6 +3,6 @@ export interface ISupervisorProfileDTO {
   id: string;
   supervisorId?: string;
   fullName?: string;
-  locations?: string[];
-  units?: string[];
+  locations?: string[] | number[];
+  units?: string[] | number[];
 }
