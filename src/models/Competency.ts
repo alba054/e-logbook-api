@@ -228,7 +228,7 @@ export class Competency {
   async getCompetenciesBySupervisorWithoutPage(
     supervisorId: string | undefined
   ) {
-    return db.competency.count({
+    return db.competency.findMany({
       where: {
         supervisorId,
       },
