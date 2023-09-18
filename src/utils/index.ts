@@ -37,7 +37,11 @@ export const generateRandomString = (length: number) => {
 export const getUnixTimestamp = () => Math.floor(new Date().getTime() / 1000);
 
 export const deleteFileByPath = (path: string) => {
-  return fs.unlink(path);
+  try {
+    return fs.unlink(path);
+  } catch (error) {
+    return createErrorObject(400, "file's not found");
+  }
 };
 
 // generate day from startTime to endTime

@@ -26,7 +26,7 @@ export class ReferenceHandler {
 
     try {
       const result = await this.referenceService.deleteReferenceById(
-        Number(id)
+        parseInt(id)
       );
 
       if (result && "error" in result) {
