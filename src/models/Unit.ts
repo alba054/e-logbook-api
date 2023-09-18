@@ -6,6 +6,22 @@ import { IPostUnit } from "../utils/interfaces/Unit";
 export class Unit {
   constructor() {}
 
+  async deleteById(id: string) {
+    return db.unit.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async getUnitById(id: string) {
+    return db.unit.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
+
   async insertNewUnit(id: string, payload: IPostUnit) {
     try {
       return db.unit.create({

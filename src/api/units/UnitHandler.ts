@@ -17,6 +17,36 @@ export class UnitHandler {
 
     this.getAllUnits = this.getAllUnits.bind(this);
     this.postUnit = this.postUnit.bind(this);
+    this.deleteUnit = this.deleteUnit.bind(this);
+  }
+  async deleteUnit(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+
+    try {
+      const unit = await this.unitService.deleteUnitById(id);
+
+      if (unit && "error" in unit) {
+        switch (unit.error) {
+          case 400:
+            throw new BadRequestError(unit.message);
+          case 404:
+            throw new NotFoundError(unit.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully delete unit"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async postUnit(req: Request, res: Response, next: NextFunction) {
