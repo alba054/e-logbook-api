@@ -92,10 +92,11 @@ export class CompetencyService {
           take,
           search
         ),
-        count:
+        count: (
           await this.competencyModel.getCompetenciesBySupervisorWithoutPage(
             tokenPayload.supervisorId
-          ),
+          )
+        ).length,
       };
     }
 
@@ -109,10 +110,11 @@ export class CompetencyService {
           nim,
           type
         ),
-        count:
+        count: (
           await this.competencyModel.getCompetenciesBySupervisorWithoutPage(
             tokenPayload.supervisorId
-          ),
+          )
+        ).length,
       };
     }
 
@@ -122,9 +124,11 @@ export class CompetencyService {
         page,
         take
       ),
-      count: await this.competencyModel.getCompetenciesBySupervisorWithoutPage(
-        tokenPayload.supervisorId
-      ),
+      count: (
+        await this.competencyModel.getCompetenciesBySupervisorWithoutPage(
+          tokenPayload.supervisorId
+        )
+      ).length,
     };
   }
 
