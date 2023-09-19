@@ -265,7 +265,10 @@ export class UserHandler {
         constants.SUCCESS_RESPONSE_MESSAGE,
         users.data.map((u: any) => {
           return {
-            pages: Math.ceil(users.count / constants.HISTORY_ELEMENTS_PER_PAGE),
+            pages:
+              Math.ceil(users.count / constants.HISTORY_ELEMENTS_PER_PAGE) === 0
+                ? 1
+                : Math.ceil(users.count / constants.HISTORY_ELEMENTS_PER_PAGE),
             id: u.id,
             badges: u.badges,
             role: u.role,

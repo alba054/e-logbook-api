@@ -265,9 +265,14 @@ export class SelfReflectionHandler {
             studentId: s.Student?.studentId,
             studentName: s.Student?.fullName,
             unitName: s.Unit?.name,
-            pages: Math.ceil(
-              selfReflections.count / constants.HISTORY_ELEMENTS_PER_PAGE
-            ),
+            pages:
+              Math.ceil(
+                selfReflections.count / constants.HISTORY_ELEMENTS_PER_PAGE
+              ) === 0
+                ? 1
+                : Math.ceil(
+                    selfReflections.count / constants.HISTORY_ELEMENTS_PER_PAGE
+                  ),
           } as ISubmittedSelfReflections;
         })
       )

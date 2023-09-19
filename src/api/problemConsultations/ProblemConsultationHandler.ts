@@ -270,9 +270,15 @@ export class ProblemConsultationHandler {
             studentId: p.Student?.studentId,
             latest: p.createdAt,
             unitName: p.Unit?.name,
-            pages: Math.ceil(
-              ProblemConsultations.count / constants.HISTORY_ELEMENTS_PER_PAGE
-            ),
+            pages:
+              Math.ceil(
+                ProblemConsultations.count / constants.HISTORY_ELEMENTS_PER_PAGE
+              ) === 0
+                ? 1
+                : Math.ceil(
+                    ProblemConsultations.count /
+                      constants.HISTORY_ELEMENTS_PER_PAGE
+                  ),
           } as ISubmittedProblemConsultations;
         })
       )

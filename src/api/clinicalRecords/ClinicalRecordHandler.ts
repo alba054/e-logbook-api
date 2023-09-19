@@ -337,9 +337,14 @@ export class ClinicalRecordHandler {
             attachment: c.attachment,
             id: c.id,
             status: c.verificationStatus,
-            pages: Math.ceil(
-              clinicalRecords.count / constants.HISTORY_ELEMENTS_PER_PAGE
-            ),
+            pages:
+              Math.ceil(
+                clinicalRecords.count / constants.HISTORY_ELEMENTS_PER_PAGE
+              ) === 0
+                ? 1
+                : Math.ceil(
+                    clinicalRecords.count / constants.HISTORY_ELEMENTS_PER_PAGE
+                  ),
             unitName: c.Unit?.name,
             rating: c.rating,
             notes: c.notes,
