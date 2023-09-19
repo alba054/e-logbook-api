@@ -185,9 +185,14 @@ export class SupervisorHandler {
             activeUnitId: s.activeUnit?.id,
             activeUnitName: s.activeUnit?.name,
             userId: s.User[0]?.id,
-            pages: Math.ceil(
-              students.count / constants.HISTORY_ELEMENTS_PER_PAGE
-            ),
+            pages:
+              Math.ceil(
+                students.count / constants.HISTORY_ELEMENTS_PER_PAGE
+              ) === 0
+                ? 1
+                : Math.ceil(
+                    students.count / constants.HISTORY_ELEMENTS_PER_PAGE
+                  ),
           } as IListSupervisorStudent;
         })
       )

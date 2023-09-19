@@ -147,9 +147,15 @@ export class ScientificSessionHandler {
             attachment: c.attachment,
             id: c.id,
             status: c.verificationStatus,
-            pages: Math.ceil(
-              scientificSessions.count / constants.HISTORY_ELEMENTS_PER_PAGE
-            ),
+            pages:
+              Math.ceil(
+                scientificSessions.count / constants.HISTORY_ELEMENTS_PER_PAGE
+              ) === 0
+                ? 1
+                : Math.ceil(
+                    scientificSessions.count /
+                      constants.HISTORY_ELEMENTS_PER_PAGE
+                  ),
             unitName: c.Unit?.name,
           } as IListScientificSessionDTO;
         })

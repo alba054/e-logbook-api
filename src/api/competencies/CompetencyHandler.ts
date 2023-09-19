@@ -83,9 +83,14 @@ export class CompetencyHandler {
             studentName: c.Student?.fullName,
             studentId: c.Student?.studentId,
             unitName: c.Unit?.name,
-            pages: Math.ceil(
-              competencies.count / constants.HISTORY_ELEMENTS_PER_PAGE
-            ),
+            pages:
+              Math.ceil(
+                competencies.count / constants.HISTORY_ELEMENTS_PER_PAGE
+              ) === 0
+                ? 1
+                : Math.ceil(
+                    competencies.count / constants.HISTORY_ELEMENTS_PER_PAGE
+                  ),
           } as ICompetencySubmitted;
         })
       )
@@ -312,9 +317,13 @@ export class CompetencyHandler {
               caseType: s.competencyType,
               caseName: s.case?.name,
               verificationStatus: s.verificationStatus,
-              pages: Math.ceil(
-                cases.count / constants.HISTORY_ELEMENTS_PER_PAGE
-              ),
+              pages:
+                Math.ceil(cases.count / constants.HISTORY_ELEMENTS_PER_PAGE) ===
+                0
+                  ? 1
+                  : Math.ceil(
+                      cases.count / constants.HISTORY_ELEMENTS_PER_PAGE
+                    ),
             };
           }),
         } as IStudentCases)
@@ -363,9 +372,14 @@ export class CompetencyHandler {
               skillType: s.competencyType,
               skillName: s.skill?.name,
               verificationStatus: s.verificationStatus,
-              pages: Math.ceil(
-                skills.count / constants.HISTORY_ELEMENTS_PER_PAGE
-              ),
+              pages:
+                Math.ceil(
+                  skills.count / constants.HISTORY_ELEMENTS_PER_PAGE
+                ) === 0
+                  ? 1
+                  : Math.ceil(
+                      skills.count / constants.HISTORY_ELEMENTS_PER_PAGE
+                    ),
             };
           }),
         } as IStudentSkills)
@@ -395,7 +409,10 @@ export class CompetencyHandler {
             studentId: s.Student?.studentId,
             studentName: s.Student?.fullName,
             unitName: s.Unit?.name,
-            pages: Math.ceil(cases.count / constants.HISTORY_ELEMENTS_PER_PAGE),
+            pages:
+              Math.ceil(cases.count / constants.HISTORY_ELEMENTS_PER_PAGE) === 0
+                ? 1
+                : Math.ceil(cases.count / constants.HISTORY_ELEMENTS_PER_PAGE),
           } as ISubmittedCase;
         })
       )
