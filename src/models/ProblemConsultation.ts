@@ -14,6 +14,37 @@ export class ProblemConsultation {
     this.historyModel = new History();
   }
 
+  async getProblemConsultationsBySupervisorWithoutPage_(
+    supervisorId: string | undefined
+  ) {
+    return db.problemConsultation.findMany({
+      where: {
+        Student: {
+          OR: [
+            {
+              academicSupervisorId: supervisorId,
+            },
+            {
+              supervisingSupervisorId: supervisorId,
+            },
+            {
+              examinerSupervisorId: supervisorId,
+            },
+          ],
+        },
+        verificationStatus: "INPROCESS",
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      distinct: ["studentId"],
+      include: {
+        Student: true,
+        Unit: true,
+      },
+    });
+  }
+
   async getProblemConsultationsBySupervisorAndNameAndStudentId(
     supervisorId: string | undefined,
     page: any,

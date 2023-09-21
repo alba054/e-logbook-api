@@ -312,7 +312,16 @@ export class ClinicalRecordHandler {
 
     const tokenPayload: ITokenPayload = res.locals.user;
 
-    const clinicalRecords =
+    let clinicalRecords: any;
+
+    if (!page) {
+      clinicalRecords =
+        await this.clinicalRecordService.getSubmittedClinicalRecordsWithoutPage(
+          tokenPayload.supervisorId
+        );
+    }
+
+    clinicalRecords =
       await this.clinicalRecordService.getSubmittedClinicalRecords(
         status,
         parseInt(String(page ?? "1")),
@@ -328,7 +337,7 @@ export class ClinicalRecordHandler {
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        clinicalRecords.data.map((c) => {
+        clinicalRecords.data.map((c: any) => {
           return {
             patientName: c.patientName,
             studentId: c.Student?.studentId,

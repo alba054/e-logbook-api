@@ -25,6 +25,75 @@ export class CompetencyService {
     this.studentService = new StudentService();
   }
 
+  async getSkillsBySupervisorWithoutPage(tokenPayload: ITokenPayload) {
+    return {
+      data: await this.competencyModel.getSkillsBySupervisorWithoutPage_(
+        tokenPayload.supervisorId
+      ),
+      count: await this.competencyModel.getSkillsBySupervisorWithoutPage(
+        tokenPayload.supervisorId
+      ),
+    };
+  }
+
+  async getCasesBySupervisorWithoutPage(tokenPayload: ITokenPayload) {
+    return {
+      data: await this.competencyModel.getCasesBySupervisorWithoutPage_(
+        tokenPayload.supervisorId
+      ),
+      count: await this.competencyModel.getCasesBySupervisorWithoutPage(
+        tokenPayload.supervisorId
+      ),
+    };
+  }
+
+  async getSkillsByStudentIdWithoutPage(
+    tokenPayload: ITokenPayload,
+    studentId: string
+  ) {
+    return {
+      data: await this.competencyModel.getSkillsBySupervisorAndStudentIdWithoutPage_(
+        tokenPayload.supervisorId,
+        studentId
+      ),
+      count:
+        await this.competencyModel.getSkillsBySupervisorAndStudentIdWithoutPage(
+          tokenPayload.supervisorId,
+          studentId
+        ),
+    };
+  }
+
+  async getCaseByStudentIdWithoutPage(
+    tokenPayload: ITokenPayload,
+    studentId: string
+  ) {
+    return {
+      data: await this.competencyModel.getCasesBySupervisorAndStudentIdWithoutPage_(
+        tokenPayload.supervisorId,
+        studentId
+      ),
+      count:
+        await this.competencyModel.getCasesBySupervisorAndStudentIdWithoutPage(
+          tokenPayload.supervisorId,
+          studentId
+        ),
+    };
+  }
+
+  async getCompetenciesBySupervisorWithoutPage(tokenPayload: ITokenPayload) {
+    return {
+      data: await this.competencyModel.getCompetenciesBySupervisorWithoutPage(
+        tokenPayload.supervisorId
+      ),
+      count: (
+        await this.competencyModel.getCompetenciesBySupervisorWithoutPage(
+          tokenPayload.supervisorId
+        )
+      ).length,
+    };
+  }
+
   async getSkillsByStudentAndUnitId(tokenPayload: ITokenPayload) {
     const activeUnit = await this.studentService.getActiveUnit(
       tokenPayload.studentId ?? ""

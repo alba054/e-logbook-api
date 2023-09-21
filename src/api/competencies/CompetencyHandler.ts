@@ -62,8 +62,14 @@ export class CompetencyHandler {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { page, search, name, nim, type } = req.query;
 
-    const competencies =
-      await this.competencyService.getCompetenciesBySupervisor(
+    let competencies: any;
+    if (!page) {
+      competencies =
+        await this.competencyService.getCompetenciesBySupervisorWithoutPage(
+          tokenPayload
+        );
+    } else {
+      competencies = await this.competencyService.getCompetenciesBySupervisor(
         tokenPayload,
         parseInt(String(page ?? "1")),
         constants.HISTORY_ELEMENTS_PER_PAGE,
@@ -72,11 +78,12 @@ export class CompetencyHandler {
         nim,
         type
       );
+    }
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        competencies.data.map((c) => {
+        competencies.data.map((c: any) => {
           return {
             competencyType: c.type,
             latest: c.createdAt,
@@ -284,13 +291,22 @@ export class CompetencyHandler {
     const { studentId } = req.params;
     const { page, search } = req.query;
 
-    const cases = await this.competencyService.getCaseByStudentId(
-      tokenPayload,
-      studentId,
-      parseInt(String(page ?? "1")),
-      constants.HISTORY_ELEMENTS_PER_PAGE,
-      search
-    );
+    let cases: any;
+
+    if (!page) {
+      cases = await this.competencyService.getCaseByStudentIdWithoutPage(
+        tokenPayload,
+        studentId
+      );
+    } else {
+      cases = await this.competencyService.getCaseByStudentId(
+        tokenPayload,
+        studentId,
+        parseInt(String(page ?? "1")),
+        constants.HISTORY_ELEMENTS_PER_PAGE,
+        search
+      );
+    }
 
     try {
       const student = await this.studentService.getStudentByStudentId(
@@ -311,7 +327,7 @@ export class CompetencyHandler {
         createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
           studentName: student?.fullName,
           studentId: studentId,
-          listCases: cases.data.map((s) => {
+          listCases: cases.data.map((s: any) => {
             return {
               caseId: s.id,
               caseType: s.competencyType,
@@ -338,13 +354,22 @@ export class CompetencyHandler {
     const { studentId } = req.params;
     const { page, search } = req.query;
 
-    const skills = await this.competencyService.getSkillsByStudentId(
-      tokenPayload,
-      studentId,
-      parseInt(String(page ?? "1")),
-      constants.HISTORY_ELEMENTS_PER_PAGE,
-      search
-    );
+    let skills: any;
+
+    if (!page) {
+      skills = await this.competencyService.getSkillsByStudentIdWithoutPage(
+        tokenPayload,
+        studentId
+      );
+    } else {
+      skills = await this.competencyService.getSkillsByStudentId(
+        tokenPayload,
+        studentId,
+        parseInt(String(page ?? "1")),
+        constants.HISTORY_ELEMENTS_PER_PAGE,
+        search
+      );
+    }
 
     try {
       const student = await this.studentService.getStudentByStudentId(
@@ -366,7 +391,7 @@ export class CompetencyHandler {
         createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
           studentName: student?.fullName,
           studentId: studentId,
-          listSkills: skills.data.map((s) => {
+          listSkills: skills.data.map((s: any) => {
             return {
               skillId: s.id,
               skillType: s.competencyType,
@@ -393,17 +418,25 @@ export class CompetencyHandler {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { page, search } = req.query;
 
-    const cases = await this.competencyService.getCasesBySupervisor(
-      tokenPayload,
-      parseInt(String(page ?? "1")),
-      constants.HISTORY_ELEMENTS_PER_PAGE,
-      search
-    );
+    let cases: any;
+
+    if (!page) {
+      cases = await this.competencyService.getCasesBySupervisorWithoutPage(
+        tokenPayload
+      );
+    } else {
+      cases = await this.competencyService.getCasesBySupervisor(
+        tokenPayload,
+        parseInt(String(page ?? "1")),
+        constants.HISTORY_ELEMENTS_PER_PAGE,
+        search
+      );
+    }
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        cases.data.map((s) => {
+        cases.data.map((s: any) => {
           return {
             latest: s.createdAt,
             studentId: s.Student?.studentId,
@@ -423,17 +456,25 @@ export class CompetencyHandler {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { page, search } = req.query;
 
-    const skills = await this.competencyService.getSkillsBySupervisor(
-      tokenPayload,
-      parseInt(String(page ?? "1")),
-      constants.HISTORY_ELEMENTS_PER_PAGE,
-      search
-    );
+    let skills: any;
+
+    if (!page) {
+      skills = await this.competencyService.getSkillsBySupervisorWithoutPage(
+        tokenPayload
+      );
+    } else {
+      skills = await this.competencyService.getSkillsBySupervisor(
+        tokenPayload,
+        parseInt(String(page ?? "1")),
+        constants.HISTORY_ELEMENTS_PER_PAGE,
+        search
+      );
+    }
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        skills.data.map((s) => {
+        skills.data.map((s: any) => {
           return {
             latest: s.createdAt,
             studentId: s.Student?.studentId,

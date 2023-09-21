@@ -15,6 +15,38 @@ export class Sgl {
     this.historyModel = new History();
   }
 
+  async getSglsWithoutPage() {
+    return db.sGL.findMany({
+      where: {
+        verificationStatus: "INPROCESS",
+      },
+      include: {
+        topics: true,
+        Student: true,
+        Unit: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+  }
+
+  async getSglsBySupervisorIdWithoutPage(supervisorId: string | undefined) {
+    return db.sGL.findMany({
+      where: {
+        supervisorId: supervisorId === null ? undefined : supervisorId,
+      },
+      include: {
+        topics: true,
+        Student: true,
+        Unit: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+  }
+
   async getSglsByStudentIdAndUnitId(
     studentId: string | undefined,
     unitId: string | undefined

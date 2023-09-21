@@ -30,6 +30,21 @@ export class ScientificSessionService {
     this.historyModel = new History();
   }
 
+  async getSubmittedScientificSessionsWithoutPage(
+    supervisorId: string | undefined
+  ) {
+    return {
+      data: await this.scientificSessionModel.getScientificSessionsBySupervisorId(
+        supervisorId
+      ),
+      count: (
+        await this.scientificSessionModel.getScientificSessionsBySupervisorId(
+          supervisorId
+        )
+      ).length,
+    };
+  }
+
   async giveFeedbackToScientificSession(
     id: string,
     tokenPayload: ITokenPayload,

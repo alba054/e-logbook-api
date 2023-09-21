@@ -19,6 +19,20 @@ export class ProblemConsultationService {
     this.studentService = new StudentService();
   }
 
+  async getProblemConsultationsBySupervisorWithoutPage(
+    tokenPayload: ITokenPayload
+  ) {
+    return {
+      data: await this.ProblemConsultationModel.getProblemConsultationsBySupervisorWithoutPage_(
+        tokenPayload.supervisorId
+      ),
+      count:
+        await this.ProblemConsultationModel.getProblemConsultationsBySupervisorWithoutPage(
+          tokenPayload.supervisorId
+        ),
+    };
+  }
+
   async updateProblemConsultation(
     tokenPayload: ITokenPayload,
     id: string,

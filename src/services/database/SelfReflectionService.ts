@@ -19,6 +19,18 @@ export class SelfReflectionService {
     this.studentService = new StudentService();
   }
 
+  async getSelfReflectionsBySupervisorWithoutPage(tokenPayload: ITokenPayload) {
+    return {
+      data: await this.selfReflectionModel.getSelfReflectionsBySupervisorWithoutPage_(
+        tokenPayload.supervisorId
+      ),
+      count:
+        await this.selfReflectionModel.getSelfReflectionsBySupervisorWithoutPage(
+          tokenPayload.supervisorId
+        ),
+    };
+  }
+
   async updateSelfReflection(
     tokenPayload: ITokenPayload,
     id: string,

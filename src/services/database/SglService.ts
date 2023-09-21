@@ -18,6 +18,16 @@ export class SglService {
     this.studentService = new StudentService();
     this.sglModel = new Sgl();
   }
+
+  async getSglsBySupervisorWithoutPage(tokenPayload: ITokenPayload) {
+    if (tokenPayload.badges?.includes(constants.CEU_BADGE)) {
+      return this.sglModel.getSglsWithoutPage();
+    }
+    return this.sglModel.getSglsBySupervisorIdWithoutPage(
+      tokenPayload.supervisorId
+    );
+  }
+
   async verifyAllSglTopics(
     id: string,
     tokenPayload: ITokenPayload,

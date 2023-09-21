@@ -251,20 +251,29 @@ export class ProblemConsultationHandler {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { page, search, name, nim } = req.query;
 
-    const ProblemConsultations =
-      await this.problemConsultationService.getProblemConsultationsBySupervisor(
-        tokenPayload,
-        parseInt(String(page ?? "1")),
-        constants.HISTORY_ELEMENTS_PER_PAGE,
-        search,
-        name,
-        nim
-      );
+    let ProblemConsultations: any;
+
+    if (!page) {
+      ProblemConsultations =
+        await this.problemConsultationService.getProblemConsultationsBySupervisorWithoutPage(
+          tokenPayload
+        );
+    } else {
+      ProblemConsultations =
+        await this.problemConsultationService.getProblemConsultationsBySupervisor(
+          tokenPayload,
+          parseInt(String(page ?? "1")),
+          constants.HISTORY_ELEMENTS_PER_PAGE,
+          search,
+          name,
+          nim
+        );
+    }
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        ProblemConsultations.data.map((p) => {
+        ProblemConsultations.data.map((p: any) => {
           return {
             studentName: p.Student?.fullName,
             studentId: p.Student?.studentId,

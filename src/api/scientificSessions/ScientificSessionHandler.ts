@@ -123,23 +123,32 @@ export class ScientificSessionHandler {
     res: Response,
     next: NextFunction
   ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
     const { status, name, nim, page } = req.query;
 
-    const tokenPayload: ITokenPayload = res.locals.user;
-    const scientificSessions =
-      await this.scientificSessionService.getSubmittedScientificSessions(
-        status,
-        parseInt(String(page ?? "1")),
-        constants.HISTORY_ELEMENTS_PER_PAGE,
-        name,
-        nim,
-        tokenPayload.supervisorId
-      );
+    let scientificSessions: any;
+
+    if (!page) {
+      scientificSessions =
+        await this.scientificSessionService.getSubmittedScientificSessionsWithoutPage(
+          tokenPayload.supervisorId
+        );
+    } else {
+      scientificSessions =
+        await this.scientificSessionService.getSubmittedScientificSessions(
+          status,
+          parseInt(String(page ?? "1")),
+          constants.HISTORY_ELEMENTS_PER_PAGE,
+          name,
+          nim,
+          tokenPayload.supervisorId
+        );
+    }
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        scientificSessions.data.map((c) => {
+        scientificSessions.data.map((c: any) => {
           return {
             studentId: c.Student?.studentId,
             studentName: c.Student?.fullName,
