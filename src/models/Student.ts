@@ -9,6 +9,31 @@ import { constants, createErrorObject } from "../utils";
 export class Student {
   constructor() {}
 
+  async getStudentBySupervisorIdWithoutPage_(supervisorId: string | undefined) {
+    return db.student.findMany({
+      where: {
+        OR: [
+          { supervisingSupervisorId: supervisorId },
+          { academicSupervisorId: supervisorId },
+          { examinerSupervisorId: supervisorId },
+        ],
+      },
+      include: {
+        activeUnit: true,
+        User: true,
+      },
+    });
+  }
+
+  async getAllStudentsWithoutPage_() {
+    return db.student.findMany({
+      include: {
+        activeUnit: true,
+        User: true,
+      },
+    });
+  }
+
   async getAllStudentsWithoutPageBySupervisorId(
     supervisorId: string | undefined
   ) {

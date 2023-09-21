@@ -1710,7 +1710,7 @@ export class StudentHandler {
       }
 
       return res
-        .status(201)
+        .status(200)
         .json(
           createResponse(
             constants.SUCCESS_RESPONSE_MESSAGE,

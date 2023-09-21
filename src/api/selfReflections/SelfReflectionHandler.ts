@@ -246,20 +246,29 @@ export class SelfReflectionHandler {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { page, search, name, nim } = req.query;
 
-    const selfReflections =
-      await this.selfReflectionService.getSelfReflectionsBySupervisor(
-        tokenPayload,
-        parseInt(String(page ?? "1")),
-        constants.HISTORY_ELEMENTS_PER_PAGE,
-        search,
-        name,
-        nim
-      );
+    let selfReflections: any;
+
+    if (!page) {
+      selfReflections =
+        await this.selfReflectionService.getSelfReflectionsBySupervisorWithoutPage(
+          tokenPayload
+        );
+    } else {
+      selfReflections =
+        await this.selfReflectionService.getSelfReflectionsBySupervisor(
+          tokenPayload,
+          parseInt(String(page ?? "1")),
+          constants.HISTORY_ELEMENTS_PER_PAGE,
+          search,
+          name,
+          nim
+        );
+    }
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        selfReflections.data.map((s) => {
+        selfReflections.data.map((s: any) => {
           return {
             latest: s.createdAt,
             studentId: s.Student?.studentId,

@@ -15,6 +15,39 @@ export class Cst {
     this.historyModel = new History();
   }
 
+  async getCstsWithoutPage() {
+    return db.cST.findMany({
+      where: {
+        verificationStatus: "INPROCESS",
+      },
+      include: {
+        topics: true,
+        Student: true,
+        Unit: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+  }
+
+  async getCstsBySupervisorIdWithoutPage(supervisorId: string | undefined) {
+    return db.cST.findMany({
+      where: {
+        supervisorId: supervisorId === null ? undefined : supervisorId,
+        verificationStatus: "INPROCESS",
+      },
+      include: {
+        topics: true,
+        Student: true,
+        Unit: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+  }
+
   async getCstByStudentIdAndUnitId(
     studentId: string | undefined,
     unitId: string | undefined

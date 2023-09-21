@@ -14,6 +14,37 @@ export class SelfReflection {
     this.historyModel = new History();
   }
 
+  async getSelfReflectionsBySupervisorWithoutPage_(
+    supervisorId: string | undefined
+  ) {
+    return db.selfReflection.findMany({
+      where: {
+        Student: {
+          OR: [
+            {
+              academicSupervisorId: supervisorId,
+            },
+            {
+              supervisingSupervisorId: supervisorId,
+            },
+            {
+              examinerSupervisorId: supervisorId,
+            },
+          ],
+        },
+        verificationStatus: "INPROCESS",
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      distinct: ["studentId"],
+      include: {
+        Student: true,
+        Unit: true,
+      },
+    });
+  }
+
   async getSelfReflectionsBySupervisorAndNameAndStudentId(
     supervisorId: string | undefined,
     page: any,

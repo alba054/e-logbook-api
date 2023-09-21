@@ -19,6 +19,15 @@ export class CstService {
     this.cstModel = new Cst();
   }
 
+  async getCstsBySupervisorWithoutPage(tokenPayload: ITokenPayload) {
+    if (tokenPayload.badges?.includes(constants.CEU_BADGE)) {
+      return this.cstModel.getCstsWithoutPage();
+    }
+    return this.cstModel.getCstsBySupervisorIdWithoutPage(
+      tokenPayload.supervisorId
+    );
+  }
+
   async verifyAllCstTopics(
     id: string,
     tokenPayload: ITokenPayload,

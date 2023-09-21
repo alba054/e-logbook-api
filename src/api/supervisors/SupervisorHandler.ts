@@ -166,18 +166,27 @@ export class SupervisorHandler {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { ceu, page, search } = req.query;
 
-    const students = await this.studentService.getStudentBySupervisorId(
-      tokenPayload,
-      ceu,
-      parseInt(String(page ?? "1")),
-      constants.HISTORY_ELEMENTS_PER_PAGE,
-      search
-    );
+    let students: any;
+
+    if (!page) {
+      students = await this.studentService.getStudentBySupervisorIdWithoutPage(
+        tokenPayload,
+        ceu
+      );
+    } else {
+      students = await this.studentService.getStudentBySupervisorId(
+        tokenPayload,
+        ceu,
+        parseInt(String(page ?? "1")),
+        constants.HISTORY_ELEMENTS_PER_PAGE,
+        search
+      );
+    }
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        students.data.map((s) => {
+        students.data.map((s: any) => {
           return {
             id: s.id,
             studentId: s.studentId,

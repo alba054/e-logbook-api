@@ -12,6 +12,86 @@ export class Competency {
     this.historyModel = new History();
   }
 
+  async getSkillsBySupervisorWithoutPage_(supervisorId: string | undefined) {
+    return db.competency.findMany({
+      where: {
+        supervisorId,
+        verificationStatus: "INPROCESS",
+        type: "SKILL",
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      distinct: ["studentId"],
+      include: {
+        Student: true,
+        Unit: true,
+      },
+    });
+  }
+
+  async getCasesBySupervisorWithoutPage_(supervisorId: string | undefined) {
+    return db.competency.findMany({
+      where: {
+        supervisorId,
+        verificationStatus: "INPROCESS",
+        type: "CASE",
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      distinct: ["studentId"],
+      include: {
+        Student: true,
+        Unit: true,
+      },
+    });
+  }
+
+  async getSkillsBySupervisorAndStudentIdWithoutPage_(
+    supervisorId: string | undefined,
+    studentId: string
+  ) {
+    return db.competency.findMany({
+      where: {
+        supervisorId,
+        Student: {
+          studentId,
+        },
+        type: "SKILL",
+      },
+      include: {
+        case: true,
+        skill: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+  }
+
+  async getCasesBySupervisorAndStudentIdWithoutPage_(
+    supervisorId: string | undefined,
+    studentId: string
+  ) {
+    return db.competency.findMany({
+      where: {
+        supervisorId,
+        Student: {
+          studentId,
+        },
+        type: "CASE",
+      },
+      include: {
+        skill: true,
+        case: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+  }
+
   async getCasesBySupervisorAndStudentIdWithoutPage(
     supervisorId: string | undefined,
     studentId: string
@@ -232,7 +312,14 @@ export class Competency {
       where: {
         supervisorId,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
       distinct: ["studentId", "type"],
+      include: {
+        Student: true,
+        Unit: true,
+      },
     });
   }
 

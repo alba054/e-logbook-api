@@ -23,6 +23,21 @@ export class ClinicalRecordService {
     this.historyModel = new History();
   }
 
+  async getSubmittedClinicalRecordsWithoutPage(
+    supervisorId: string | undefined
+  ) {
+    return {
+      data: await this.clinicalRecordModel.getClinicalRecordsBySupervisorId(
+        supervisorId
+      ),
+      count: (
+        await this.clinicalRecordModel.getClinicalRecordsBySupervisorId(
+          supervisorId
+        )
+      ).length,
+    };
+  }
+
   async giveFeedbackToClinicalRecord(
     id: string,
     tokenPayload: ITokenPayload,

@@ -304,18 +304,24 @@ export class CstHandler {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { name, nim, page } = req.query;
 
-    const result = await this.cstService.getCstsBySupervisor(
-      tokenPayload,
-      name,
-      nim,
-      parseInt(String(page ?? "1")),
-      constants.HISTORY_ELEMENTS_PER_PAGE
-    );
+    let result: any;
+
+    if (!page) {
+      result = this.cstService.getCstsBySupervisorWithoutPage(tokenPayload);
+    } else {
+      result = await this.cstService.getCstsBySupervisor(
+        tokenPayload,
+        name,
+        nim,
+        parseInt(String(page ?? "1")),
+        constants.HISTORY_ELEMENTS_PER_PAGE
+      );
+    }
 
     return res.status(200).json(
       createResponse(
         constants.SUCCESS_RESPONSE_MESSAGE,
-        result.map((r) => {
+        result.map((r: any) => {
           return {
             latest: r.updatedAt,
             studentId: r.Student?.studentId,

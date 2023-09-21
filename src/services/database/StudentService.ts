@@ -17,6 +17,27 @@ export class StudentService {
     this.checkInCheckoutModel = new CheckInCheckOut();
   }
 
+  async getStudentBySupervisorIdWithoutPage(
+    tokenPayload: ITokenPayload,
+    ceu: any | undefined
+  ) {
+    if (ceu) {
+      return {
+        data: await this.studentModel.getAllStudentsWithoutPage_(),
+        count: await this.studentModel.getAllStudentsWithoutPage(),
+      };
+    }
+
+    return {
+      data: await this.studentModel.getStudentBySupervisorIdWithoutPage_(
+        tokenPayload.supervisorId
+      ),
+      count: await this.studentModel.getAllStudentsWithoutPageBySupervisorId(
+        tokenPayload.supervisorId ?? ""
+      ),
+    };
+  }
+
   async getStudentBySupervisorId(
     tokenPayload: ITokenPayload,
     ceu: any,
