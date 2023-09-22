@@ -17,18 +17,18 @@ export class UserStudentRegistrationService {
   }
 
   async registerNewUserStudent(payload: IPostStudentPayload) {
-    const user = await this.userService.getUserByUsername(payload.username);
-    const student = await this.studentService.getStudentByStudentId(
-      payload.studentId
-    );
+    // const user = await this.userService.getUserByUsername(payload.username);
+    // const student = await this.studentService.getStudentByStudentId(
+    //   payload.studentId
+    // );
 
-    if (!("error" in user) && user) {
-      return createErrorObject(400, "username has been used");
-    }
+    // if (!("error" in user) && user) {
+    //   return createErrorObject(400, "username has been used");
+    // }
 
-    if ("error" in student && student) {
-      return createErrorObject(400, "studentId has been used");
-    }
+    // if ("error" in student && student) {
+    //   return createErrorObject(400, "studentId has been used");
+    // }
 
     const hashedPassword = await bcryptjs.hash(payload.password, 10);
 
