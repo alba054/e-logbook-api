@@ -35,7 +35,11 @@ export class UserService {
       return this.userModel.updateUserStudentProfileMaster(id, payload);
     }
 
-    return this.userModel.updateUserSupervisorProfileMaster(id, payload);
+    return this.userModel.updateUserSupervisorProfileMaster(
+      id,
+      user.supervisorId ?? "",
+      payload
+    );
   }
 
   async getUserByFilter(

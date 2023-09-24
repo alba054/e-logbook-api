@@ -9,62 +9,63 @@ export class User {
 
   async updateUserSupervisorProfileMaster(
     id: string,
+    supervisorId: string,
     payload: IPutUserMasterData
   ) {
-    return db.user.update({
-      where: {
-        id,
-      },
-      data: {
-        email: payload.email,
-        password: payload.password
-          ? await bcryptjs.hash(payload.password, 10)
-          : undefined,
-        badges: payload.badges
-          ? {
-              connect: payload.badges.map((b) => {
-                return {
-                  id: b,
-                };
-              }),
-            }
-          : undefined,
-        username: payload.username,
-        supervisor: {
-          update: {
-            address: payload.address,
-            dateOfBirth: payload.dateOfBirth,
-            placeOfBirth: payload.placeOfBirth,
-            fullname: payload.fullName,
-            gender: payload.gender,
-            supervisorId: payload.nip,
-            headDivUnit: {
-              connect: {
-                id: payload.headDivUnit,
-              },
-            },
-            locations: payload.location
-              ? {
-                  connect: payload.location.map((b) => {
-                    return {
-                      id: b,
-                    };
-                  }),
-                }
-              : undefined,
-            units: payload.unit
-              ? {
-                  connect: payload.unit.map((b) => {
-                    return {
-                      id: b,
-                    };
-                  }),
-                }
-              : undefined,
-          },
+    return db.$transaction([
+      db.user.update({
+        where: {
+          id,
         },
-      },
-    });
+        data: {
+          email: payload.email,
+          password: payload.password
+            ? await bcryptjs.hash(payload.password, 10)
+            : undefined,
+          badges: payload.badges
+            ? {
+                connect: payload.badges.map((b) => {
+                  return {
+                    id: b,
+                  };
+                }),
+              }
+            : undefined,
+          username: payload.username,
+        },
+      }),
+      db.supervisor.update({
+        where: {
+          id: supervisorId,
+        },
+        data: {
+          address: payload.address,
+          unitId: payload.headDivUnit,
+          fullname: payload.fullName,
+          gender: payload.gender,
+          dateOfBirth: payload.dateOfBirth,
+          placeOfBirth: payload.placeOfBirth,
+          locations: payload.location
+            ? {
+                connect: payload.location.map((b) => {
+                  return {
+                    id: b,
+                  };
+                }),
+              }
+            : undefined,
+          units: payload.unit
+            ? {
+                connect: payload.unit.map((b) => {
+                  return {
+                    id: b,
+                  };
+                }),
+              }
+            : undefined,
+        },
+      }),
+    ]);
   }
 
   async updateUserStudentProfileMaster(

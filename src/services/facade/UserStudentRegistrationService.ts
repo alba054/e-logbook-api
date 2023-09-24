@@ -6,29 +6,35 @@ import { createErrorObject } from "../../utils";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { UserService } from "../database/UserService";
 import { StudentService } from "../database/StudentService";
+import { User } from "../../models/User";
+import { Student } from "../../models/Student";
 
 export class UserStudentRegistrationService {
   private userService: UserService;
   private studentService: StudentService;
+  private userModel: User;
+  private studentModel: Student;
 
   constructor() {
     this.userService = new UserService();
     this.studentService = new StudentService();
+    this.userModel = new User();
+    this.studentModel = new Student();
   }
 
   async registerNewUserStudent(payload: IPostStudentPayload) {
-    // const user = await this.userService.getUserByUsername(payload.username);
-    // const student = await this.studentService.getStudentByStudentId(
-    //   payload.studentId
-    // );
+    const user = await this.userModel.getUserByUsername(payload.username);
+    const student = await this.studentModel.getStudentByStudentId(
+      payload.studentId
+    );
 
-    // if (!("error" in user) && user) {
-    //   return createErrorObject(400, "username has been used");
-    // }
+    if (user) {
+      return createErrorObject(400, "username has been used");
+    }
 
-    // if ("error" in student && student) {
-    //   return createErrorObject(400, "studentId has been used");
-    // }
+    if (student) {
+      return createErrorObject(400, "studentId has been used");
+    }
 
     const hashedPassword = await bcryptjs.hash(payload.password, 10);
 
