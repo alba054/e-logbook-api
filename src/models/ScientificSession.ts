@@ -67,6 +67,9 @@ export class ScientificSession {
       include: {
         supervisor: true,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
   }
 
@@ -78,6 +81,9 @@ export class ScientificSession {
       include: {
         Student: true,
         Unit: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
       },
     });
   }
@@ -102,6 +108,9 @@ export class ScientificSession {
       include: {
         Student: true,
         Unit: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
       },
       take: take,
       skip: take * (page - 1),
@@ -138,7 +147,7 @@ export class ScientificSession {
               id,
               studentId: studentId ?? "",
               unitId: unitId ?? "",
-              reference: payload.reference,
+              reference: payload.reference ?? "",
               title: payload.title,
               topic: payload.topic,
               attachment: payload.attachment,

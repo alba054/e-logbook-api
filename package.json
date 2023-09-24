@@ -6,7 +6,7 @@
     "start::dev": "nodemon ./src/index.ts",
     "migrate::dev": "prisma migrate dev --name",
     "build": "rimraf ./dist && tsc",
-    "start": "npm run build && node ./dist/index.js",
+    "start": "export TZ=Asia/Singapore && npm run build && node ./dist/index.js",
     "seed": "prisma migrate reset && ts-node ./src/loader/seed.ts",
     "test": "jest"
   },
