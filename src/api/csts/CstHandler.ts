@@ -307,7 +307,7 @@ export class CstHandler {
     let result: any;
 
     if (!page) {
-      result = this.cstService.getCstsBySupervisorWithoutPage(tokenPayload);
+      result = await this.cstService.getCstsBySupervisorWithoutPage(tokenPayload);
     } else {
       result = await this.cstService.getCstsBySupervisor(
         tokenPayload,
