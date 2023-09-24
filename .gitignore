@@ -133,3 +133,5 @@ dist
 prisma/migrations/
 storage/
 *.zip
+
+.DS_Store
