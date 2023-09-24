@@ -7,7 +7,7 @@ export const ScientificSessionPayloadSchema = Joi.object({
   sessionType: Joi.number().required(),
   topic: Joi.string().required(),
   title: Joi.string().required(),
-  reference: Joi.string().required(),
+  reference: Joi.string().optional(),
   role: Joi.number().required(),
 });
 

@@ -5,7 +5,7 @@ export interface IPostScientificSessionPayload {
   readonly sessionType: number;
   readonly topic: string;
   readonly title: string;
-  readonly reference: string;
+  readonly reference?: string;
   readonly role: number;
 }
 
