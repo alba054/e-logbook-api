@@ -66,6 +66,9 @@ export class Cst {
         Student: true,
         supervisor: true,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
   }
 
