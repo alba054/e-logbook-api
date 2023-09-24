@@ -65,6 +65,9 @@ export class Sgl {
         Student: true,
         supervisor: true,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
   }
 
