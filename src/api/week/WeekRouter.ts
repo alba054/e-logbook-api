@@ -37,6 +37,12 @@ export class WeekRouter {
         this.handler.getWeeks
       );
 
+      this.router.route(this.path + "/:id/status").put(AuthorizationBearer.authorize([
+          constants.ER_ROLE,
+          constants.ADMIN_ROLE,
+        ]),
+        this.handler.putWeekStatus)
+
     // * edit week
     // * delete week
     this.router

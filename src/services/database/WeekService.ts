@@ -9,10 +9,19 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 export class WeekService {
   private weekModel: Week;
   private dayModel: Day;
-
+  
   constructor() {
     this.weekModel = new Week();
     this.dayModel = new Day();
+  }
+  async updateWeekStatus(id: string, status: boolean) {
+    const week = await this.weekModel.getWeeksById(id);
+
+    if (!week) {
+      return createErrorObject(404, "week's not found");
+    }
+
+    return this.weekModel.updateWeekStatusById(id, status);
   }
 
   async deleteWeek(id: string) {

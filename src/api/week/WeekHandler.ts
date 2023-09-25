@@ -3,7 +3,7 @@ import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
 import { WeekService } from "../../services/database/WeekService";
-import { constants, createResponse } from "../../utils";
+import { constants, createErrorObject, createResponse } from "../../utils";
 import { IListWeek } from "../../utils/dto/WeekDTO";
 import { IPostWeek, IPutWeek } from "../../utils/interfaces/Week";
 import { Validator } from "../../validator/Validator";
@@ -15,13 +15,48 @@ import {
 export class WeekHandler {
   private validator: Validator;
   private weekService: WeekService;
-
+  
   constructor() {
     this.validator = new Validator();
     this.weekService = new WeekService();
-
+    
     this.postWeek = this.postWeek.bind(this);
     this.getWeeks = this.getWeeks.bind(this);
+    this.putWeekStatus = this.putWeekStatus.bind(this);
+  }
+  async putWeekStatus(req: Request, res: Response, next: NextFunction) {
+    const {id } = req.params;
+    const {status} = req.body;
+
+    try {
+        if (!status) {
+          return createErrorObject(400, "status must be provided (true or false)")
+        }
+
+        const testError = await this.weekService.updateWeekStatus(id, Boolean(status));
+
+      if (testError && "error" in testError) {
+        switch (testError.error) {
+          case 400:
+            throw new BadRequestError(testError.message);
+          case 404:
+            throw new NotFoundError(testError.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(201)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully insert new week"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
     this.putWeek = this.putWeek.bind(this);
     this.deleteWeek = this.deleteWeek.bind(this);
   }
