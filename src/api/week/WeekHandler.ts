@@ -15,25 +15,31 @@ import {
 export class WeekHandler {
   private validator: Validator;
   private weekService: WeekService;
-  
+
   constructor() {
     this.validator = new Validator();
     this.weekService = new WeekService();
-    
+
     this.postWeek = this.postWeek.bind(this);
     this.getWeeks = this.getWeeks.bind(this);
     this.putWeekStatus = this.putWeekStatus.bind(this);
   }
   async putWeekStatus(req: Request, res: Response, next: NextFunction) {
-    const {id } = req.params;
-    const {status} = req.body;
+    const { id } = req.params;
+    const { status } = req.body;
 
     try {
-        if (!status) {
-          return createErrorObject(400, "status must be provided (true or false)")
-        }
+      if (!status) {
+        return createErrorObject(
+          400,
+          "status must be provided (true or false)"
+        );
+      }
 
-        const testError = await this.weekService.updateWeekStatus(id, Boolean(status));
+      const testError = await this.weekService.updateWeekStatus(
+        id,
+        Boolean(status)
+      );
 
       if (testError && "error" in testError) {
         switch (testError.error) {
@@ -157,6 +163,7 @@ export class WeekHandler {
             unitId: w.unitId,
             weekName: w.weekNum,
             unitName: w.Unit?.name,
+            status: w.status,
           } as IListWeek;
         })
       )
