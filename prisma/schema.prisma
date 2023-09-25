@@ -519,6 +519,7 @@ model Week {
   startDate BigInt   @db.UnsignedBigInt
   endDate   BigInt   @db.UnsignedBigInt
   Day       Day[]
+  status    Boolean  @default(false)
 
   @@map("weeks")
 }

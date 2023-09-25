@@ -4,6 +4,17 @@ import { createErrorObject } from "../utils";
 import { IPostWeek } from "../utils/interfaces/Week";
 
 export class Week {
+  async updateWeekStatusById(id: string, status: boolean) {
+    return db.week.update({
+      where: {
+        id
+      },
+      data: {
+        status
+      }
+    })
+  }
+
   async getAllWeeks() {
     return db.week.findMany({
       include: {
