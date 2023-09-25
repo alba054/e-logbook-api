@@ -872,6 +872,7 @@ export class StudentHandler {
             unitId: w.unitId ?? "",
             unitName: w.Unit?.name ?? "",
             weekName: w.weekNum,
+            status: w.status,
             id: w.id,
             days: w.Day.map((d) => {
               return {

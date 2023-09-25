@@ -315,6 +315,7 @@ export class DailyActivityHandler {
               endDate: Number(w.endDate),
               startDate: Number(w.startDate),
               unitId: w.unitId ?? "",
+              status: w.status,
               unitName: w.Unit?.name ?? "",
               weekName: w.weekNum,
               id: w.id,
