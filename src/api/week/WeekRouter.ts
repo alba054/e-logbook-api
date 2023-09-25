@@ -15,6 +15,8 @@ export class WeekRouter {
   }
 
   register() {
+    // * post week for unit
+    // * get all weeks
     this.router
       .route(this.path)
       .post(
@@ -33,6 +35,25 @@ export class WeekRouter {
           constants.STUDENT_ROLE,
         ]),
         this.handler.getWeeks
+      );
+
+    // * edit week
+    // * delete week
+    this.router
+      .route(this.path + "/:id")
+      .put(
+        AuthorizationBearer.authorize([
+          constants.ER_ROLE,
+          constants.ADMIN_ROLE,
+        ]),
+        this.handler.putWeek
+      )
+      .delete(
+        AuthorizationBearer.authorize([
+          constants.ER_ROLE,
+          constants.ADMIN_ROLE,
+        ]),
+        this.handler.deleteWeek
       );
 
     return this.router;

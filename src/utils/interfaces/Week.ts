@@ -4,3 +4,9 @@ export interface IPostWeek {
   startDate: number;
   endDate: number;
 }
+
+export interface IPutWeek {
+  weekNum?: number;
+  startDate?: number;
+  endDate?: number;
+}
