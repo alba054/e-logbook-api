@@ -5,9 +5,12 @@ import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
 import { WeekService } from "../../services/database/WeekService";
 import { constants, createResponse } from "../../utils";
 import { IListWeek } from "../../utils/dto/WeekDTO";
-import { IPostWeek } from "../../utils/interfaces/Week";
+import { IPostWeek, IPutWeek } from "../../utils/interfaces/Week";
 import { Validator } from "../../validator/Validator";
-import { WeekPayloadSchema } from "../../validator/week/WeekSchema";
+import {
+  WeekEditPayloadSchema,
+  WeekPayloadSchema,
+} from "../../validator/week/WeekSchema";
 
 export class WeekHandler {
   private validator: Validator;
@@ -19,6 +22,77 @@ export class WeekHandler {
 
     this.postWeek = this.postWeek.bind(this);
     this.getWeeks = this.getWeeks.bind(this);
+    this.putWeek = this.putWeek.bind(this);
+    this.deleteWeek = this.deleteWeek.bind(this);
+  }
+
+  async deleteWeek(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+
+    try {
+      const testError = await this.weekService.deleteWeek(id);
+
+      if (testError && "error" in testError) {
+        switch (testError.error) {
+          case 400:
+            throw new BadRequestError(testError.message);
+          case 404:
+            throw new NotFoundError(testError.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully insert new week"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async putWeek(req: Request, res: Response, next: NextFunction) {
+    const payload: IPutWeek = req.body;
+    const { id } = req.params;
+
+    try {
+      const validationResult = this.validator.validate(
+        WeekEditPayloadSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        throw new BadRequestError(validationResult.message);
+      }
+      const testError = await this.weekService.editWeek(id, payload);
+
+      if (testError && "error" in testError) {
+        switch (testError.error) {
+          case 400:
+            throw new BadRequestError(testError.message);
+          case 404:
+            throw new NotFoundError(testError.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "successfully insert new week"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getWeeks(req: Request, res: Response, next: NextFunction) {

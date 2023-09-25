@@ -6,3 +6,9 @@ export const WeekPayloadSchema = Joi.object({
   startDate: Joi.number().required(),
   endDate: Joi.number().required(),
 });
+
+export const WeekEditPayloadSchema = Joi.object({
+  weekNum: Joi.number().optional(),
+  startDate: Joi.number().optional(),
+  endDate: Joi.number().optional(),
+});

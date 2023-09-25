@@ -1,5 +1,5 @@
 import { Week } from "../../models/Week";
-import { IPostWeek } from "../../utils/interfaces/Week";
+import { IPostWeek, IPutWeek } from "../../utils/interfaces/Week";
 import { v4 as uuidv4 } from "uuid";
 import { createErrorObject, generateDay } from "../../utils";
 import { Day } from "../../models/Day";
@@ -13,6 +13,67 @@ export class WeekService {
   constructor() {
     this.weekModel = new Week();
     this.dayModel = new Day();
+  }
+
+  async deleteWeek(id: string) {
+    const week = this.weekModel.getWeeksById(id);
+
+    if (!week) {
+      return createErrorObject(404, "week's not found");
+    }
+
+    return db.$transaction([
+      db.day.deleteMany({
+        where: {
+          weekId: id,
+        },
+      }),
+      db.week.delete({
+        where: { id },
+      }),
+    ]);
+  }
+
+  async editWeek(id: string, payload: IPutWeek) {
+    try {
+      const generatedDays = generateDay(
+        payload.startDate ?? 0,
+        payload.endDate ?? 0
+      );
+
+      return db.$transaction([
+        db.day.deleteMany({
+          where: {
+            weekId: id,
+          },
+        }),
+        db.week.update({
+          where: {
+            id,
+          },
+          data: {
+            endDate: payload.endDate,
+            startDate: payload.startDate,
+            weekNum: payload.weekNum,
+          },
+        }),
+        ...generatedDays.map((d) => {
+          return db.day.create({
+            data: {
+              day: d,
+              id: uuidv4(),
+              weekId: id,
+            },
+          });
+        }),
+      ]);
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to insert new week");
+      } else {
+        return createErrorObject(500);
+      }
+    }
   }
 
   async getWeeks() {
