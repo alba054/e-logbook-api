@@ -295,6 +295,7 @@ export class DailyActivityHandler {
             unitName: w.Unit?.name,
             weekName: w.weekNum,
             id: w.id,
+            status: w.status,
             days: w.Day.map((d) => {
               return {
                 day: d.day,
