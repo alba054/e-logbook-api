@@ -159,251 +159,257 @@ export class StudentHandler {
     // const activeUnit = await this.studentService.getActiveUnit(
     //   tokenPayload.studentId ?? ""
     // );
-    const student = await this.studentService.getStudentById(
-      tokenPayload.studentId
-    );
-    const activeUnit = await this.studentService.getActiveUnit(
-      tokenPayload.studentId ?? ""
-    );
-    const caseTypes = await this.caseTypeService.getCaseTypesByUnitId(
-      activeUnit?.activeUnit.activeUnit?.id ?? ""
-    );
-
-    const skillTypes = await this.skillTypeService.getSkillTypesByUnitId(
-      activeUnit?.activeUnit.activeUnit?.id ?? ""
-    );
-
-    const cases = await this.competencyService.getCasesByStudentAndUnitId(
-      tokenPayload
-    );
-    const skills = await this.competencyService.getSkillsByStudentAndUnitId(
-      tokenPayload
-    );
-    const assesments =
-      await this.assesmentService.getAssesmentsByStudentIdAndUnitId(
-        student?.studentId ?? "",
+    try {
+      const student = await this.studentService.getStudentById(
+        tokenPayload.studentId
+      );
+      const activeUnit = await this.studentService.getActiveUnit(
+        tokenPayload.studentId ?? ""
+      );
+      const caseTypes = await this.caseTypeService.getCaseTypesByUnitId(
         activeUnit?.activeUnit.activeUnit?.id ?? ""
       );
 
-    const weeklyAssesment =
-      await this.weeklyAssesmentService.getWeeklyAssesmentByStudentIdAndUnitId(
-        student?.studentId ?? "",
+      const skillTypes = await this.skillTypeService.getSkillTypesByUnitId(
         activeUnit?.activeUnit.activeUnit?.id ?? ""
       );
 
-    const dailyActivities =
-      await this.dailyActivityService.getDailyActivitiesByStudentNimAndUnitId(
-        student?.id ?? "",
-        activeUnit?.activeUnit.activeUnit?.id ?? ""
+      const cases = await this.competencyService.getCasesByStudentAndUnitId(
+        tokenPayload
       );
+      const skills = await this.competencyService.getSkillsByStudentAndUnitId(
+        tokenPayload
+      );
+      const assesments =
+        await this.assesmentService.getAssesmentsByStudentIdAndUnitId(
+          student?.studentId ?? "",
+          activeUnit?.activeUnit.activeUnit?.id ?? ""
+        );
 
-    const miniCex = await this.assesmentService.getMiniCexsByUnitId(
-      tokenPayload,
-      activeUnit?.activeUnit.activeUnit?.id ?? ""
-    );
+      const weeklyAssesment =
+        await this.weeklyAssesmentService.getWeeklyAssesmentByStudentIdAndUnitId(
+          student?.studentId ?? "",
+          activeUnit?.activeUnit.activeUnit?.id ?? ""
+        );
 
-    if (miniCex && "error" in miniCex) {
-      switch (miniCex.error) {
-        case 400:
-          throw new BadRequestError(miniCex.message);
-        case 404:
-          throw new NotFoundError(miniCex.message);
-        default:
-          throw new InternalServerError();
-      }
-    }
+      const dailyActivities =
+        await this.dailyActivityService.getDailyActivitiesByStudentNimAndUnitId(
+          student?.id ?? "",
+          activeUnit?.activeUnit.activeUnit?.id ?? ""
+        );
 
-    // * grade will be zero if no minicexgrade
-    let miniCexGrade = 0;
-    if (miniCex.MiniCex?.MiniCexGrade) {
-      miniCex.MiniCex?.MiniCexGrade.forEach((g) => {
-        miniCexGrade += g.score ?? 0;
-      });
-      miniCexGrade = miniCexGrade / miniCex.MiniCex?.MiniCexGrade.length;
-    }
-
-    const scientificAssesment =
-      await this.assesmentService.getScientificAssesmentByUnitId(
+      const miniCex = await this.assesmentService.getMiniCexsByUnitId(
         tokenPayload,
         activeUnit?.activeUnit.activeUnit?.id ?? ""
       );
 
-    if (scientificAssesment && "error" in scientificAssesment) {
-      switch (scientificAssesment.error) {
-        case 400:
-          throw new BadRequestError(scientificAssesment.message);
-        case 404:
-          throw new NotFoundError(scientificAssesment.message);
-        default:
-          throw new InternalServerError();
+      if (miniCex && "error" in miniCex) {
+        switch (miniCex.error) {
+          case 400:
+            throw new BadRequestError(miniCex.message);
+          case 404:
+            throw new NotFoundError(miniCex.message);
+          default:
+            throw new InternalServerError();
+        }
       }
-    }
 
-    // * grade will be zero if no scientificAssesmentgrade
-    let saGrade = 0;
-    if (scientificAssesment.ScientificAssesment?.grades) {
-      scientificAssesment.ScientificAssesment?.grades.forEach((g) => {
-        saGrade += g.score ?? 0;
+      // * grade will be zero if no minicexgrade
+      let miniCexGrade = 0;
+      if (miniCex.MiniCex?.MiniCexGrade) {
+        miniCex.MiniCex?.MiniCexGrade.forEach((g) => {
+          miniCexGrade += g.score ?? 0;
+        });
+        miniCexGrade = miniCexGrade / miniCex.MiniCex?.MiniCexGrade.length;
+      }
+
+      const scientificAssesment =
+        await this.assesmentService.getScientificAssesmentByUnitId(
+          tokenPayload,
+          activeUnit?.activeUnit.activeUnit?.id ?? ""
+        );
+
+      if (scientificAssesment && "error" in scientificAssesment) {
+        switch (scientificAssesment.error) {
+          case 400:
+            throw new BadRequestError(scientificAssesment.message);
+          case 404:
+            throw new NotFoundError(scientificAssesment.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      // * grade will be zero if no scientificAssesmentgrade
+      let saGrade = 0;
+      if (scientificAssesment.ScientificAssesment?.grades) {
+        scientificAssesment.ScientificAssesment?.grades.forEach((g) => {
+          saGrade += g.score ?? 0;
+        });
+        saGrade =
+          saGrade / scientificAssesment.ScientificAssesment?.grades.length;
+      }
+
+      let finalScore = 0;
+
+      assesments.forEach((a) => {
+        let grade = 0;
+        if (a.MiniCex) {
+          if (a.MiniCex.MiniCexGrade) {
+            a.MiniCex.MiniCexGrade.forEach((g) => {
+              grade += g.score ?? 0;
+            });
+            grade = grade / (a.MiniCex.MiniCexGrade.length || 1);
+            grade *= a.MiniCex.weight;
+          }
+        }
+
+        if (a.ScientificAssesment) {
+          if (a.ScientificAssesment?.grades) {
+            a.ScientificAssesment?.grades.forEach((g) => {
+              grade += g.score ?? 0;
+            });
+            grade = grade / a.ScientificAssesment?.grades.length;
+            grade *= a.ScientificAssesment.weight;
+          }
+        }
+
+        if (a.osce) {
+          grade = a.osce.score ?? 0;
+          grade *= a.osce.weight;
+        }
+
+        if (a.cbt) {
+          grade = a.cbt.score ?? 0;
+          grade *= a.cbt.weight;
+        }
+
+        finalScore = finalScore + grade;
       });
-      saGrade =
-        saGrade / scientificAssesment.ScientificAssesment?.grades.length;
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          totalCases: caseTypes?.length ?? 0,
+          totalSkills: skillTypes?.length ?? 0,
+          verifiedCases: cases.filter(
+            (c) => c.verificationStatus === "VERIFIED"
+          ).length,
+          verifiedSkills: skills.filter(
+            (s) => s.verificationStatus === "VERIFIED"
+          ).length,
+          cases: cases
+            .filter((c) => c.verificationStatus === "VERIFIED")
+            .map((c) => {
+              return {
+                caseId: c.id,
+                caseName: c.case?.name,
+                caseType: c.competencyType,
+                caseTypeId: c.caseTypeId,
+                verificationStatus: c.verificationStatus,
+              };
+            }),
+          skills: skills
+            .filter((c) => c.verificationStatus === "VERIFIED")
+            .map((c) => {
+              return {
+                skillId: c.id,
+                skillName: c.skill?.name,
+                skillType: c.competencyType,
+                skillTypeId: c.skillTypeId,
+                verificationStatus: c.verificationStatus,
+              };
+            }),
+          student: {
+            studentId: student?.studentId,
+            address: student?.address,
+            fullName: student?.fullName,
+            clinicId: student?.clinicId,
+            graduationDate: student?.graduationDate,
+            phoneNumber: student?.phoneNumber,
+            preClinicId: student?.preClinicId,
+            checkInStatus: student?.CheckInCheckOut.at(-1)?.checkInStatus,
+            checkOutStatus: student?.CheckInCheckOut.at(-1)?.checkOutStatus,
+            academicSupervisorName: student?.academicAdvisor?.fullname,
+            academicSupervisorId: student?.academicAdvisor?.supervisorId,
+            academicSupervisorUserId: student?.academicAdvisor?.id,
+            supervisingDPKName: student?.supervisingDPK?.fullname,
+            supervisingDPKId: student?.supervisingDPK?.supervisorId,
+            supervisingDPKUserId: student?.supervisingDPK?.id,
+            examinerDPKName: student?.examinerDPK?.fullname,
+            examinerDPKId: student?.examinerDPK?.supervisorId,
+            examinerDPKUserId: student?.examinerDPK?.id,
+            rsStation: student?.rsStation,
+            pkmStation: student?.pkmStation,
+            periodLengthStation: Number(student?.periodLengthStation),
+          },
+          weeklyAssesment: {
+            studentName: weeklyAssesment[0]?.Student?.fullName,
+            studentId: weeklyAssesment[0]?.Student?.studentId,
+            unitName: weeklyAssesment[0]?.Unit?.name,
+            assesments: weeklyAssesment.map((w) => {
+              return {
+                attendNum: dailyActivities
+                  .filter((a) => a.day?.week?.weekNum === w.weekNum)
+                  .filter((a) => a.Activity?.activityStatus === "ATTEND")
+                  .length,
+                notAttendNum: dailyActivities
+                  .filter((a) => a.day?.week?.weekNum === w.weekNum)
+                  .filter(
+                    (a) =>
+                      a.Activity?.activityStatus === "NOT_ATTEND" ||
+                      a.Activity?.activityStatus === "SICK" ||
+                      a.Activity?.activityStatus === "HOLIDAY"
+                  ).length,
+                score: w.score,
+                verificationStatus: w.verificationStatus,
+                weekNum: w.weekNum,
+                id: w.id,
+              };
+            }),
+          },
+          miniCex: {
+            case: miniCex.MiniCex?.case,
+            id: miniCex.miniCexId,
+            location: miniCex.MiniCex?.location?.name,
+            studentId: miniCex.Student?.studentId,
+            studentName: miniCex.Student?.fullName,
+            scores: miniCex.MiniCex?.MiniCexGrade.map((g) => {
+              return {
+                name: g.name,
+                score: g.score,
+                id: g.id,
+              };
+            }),
+            miniCexGrade,
+            academicSupervisorId: miniCex.Student?.academicSupervisorId,
+            examinerDPKId: miniCex.Student?.examinerSupervisorId,
+            supervisingDPKId: miniCex.Student?.supervisingSupervisorId,
+          },
+          scientificAssesement: {
+            id: scientificAssesment.scientificAssesmentId,
+            studentId: scientificAssesment.Student?.studentId,
+            studentName: scientificAssesment.Student?.fullName,
+            case: scientificAssesment.ScientificAssesment?.title,
+            location: scientificAssesment.ScientificAssesment?.location?.name,
+            scores: scientificAssesment.ScientificAssesment?.grades.map((g) => {
+              return {
+                name: g.gradeItem.name,
+                score: g.score,
+                id: g.id,
+                type: g.gradeItem.scientificGradeType,
+              };
+            }),
+            saGrade,
+            academicSupervisorId: miniCex.Student?.academicSupervisorId,
+            examinerDPKId: miniCex.Student?.examinerSupervisorId,
+            supervisingDPKId: miniCex.Student?.supervisingSupervisorId,
+          },
+          finalScore,
+        } as IStudentStastic)
+      );
+    } catch (error) {
+      return next(error);
     }
-
-    let finalScore = 0;
-
-    assesments.forEach((a) => {
-      let grade = 0;
-      if (a.MiniCex) {
-        if (a.MiniCex.MiniCexGrade) {
-          a.MiniCex.MiniCexGrade.forEach((g) => {
-            grade += g.score ?? 0;
-          });
-          grade = grade / (a.MiniCex.MiniCexGrade.length || 1);
-          grade *= a.MiniCex.weight;
-        }
-      }
-
-      if (a.ScientificAssesment) {
-        if (a.ScientificAssesment?.grades) {
-          a.ScientificAssesment?.grades.forEach((g) => {
-            grade += g.score ?? 0;
-          });
-          grade = grade / a.ScientificAssesment?.grades.length;
-          grade *= a.ScientificAssesment.weight;
-        }
-      }
-
-      if (a.osce) {
-        grade = a.osce.score ?? 0;
-        grade *= a.osce.weight;
-      }
-
-      if (a.cbt) {
-        grade = a.cbt.score ?? 0;
-        grade *= a.cbt.weight;
-      }
-
-      finalScore = finalScore + grade;
-    });
-
-    return res.status(200).json(
-      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-        totalCases: caseTypes?.length ?? 0,
-        totalSkills: skillTypes?.length ?? 0,
-        verifiedCases: cases.filter((c) => c.verificationStatus === "VERIFIED")
-          .length,
-        verifiedSkills: skills.filter(
-          (s) => s.verificationStatus === "VERIFIED"
-        ).length,
-        cases: cases
-          .filter((c) => c.verificationStatus === "VERIFIED")
-          .map((c) => {
-            return {
-              caseId: c.id,
-              caseName: c.case?.name,
-              caseType: c.competencyType,
-              caseTypeId: c.caseTypeId,
-              verificationStatus: c.verificationStatus,
-            };
-          }),
-        skills: skills
-          .filter((c) => c.verificationStatus === "VERIFIED")
-          .map((c) => {
-            return {
-              skillId: c.id,
-              skillName: c.skill?.name,
-              skillType: c.competencyType,
-              skillTypeId: c.skillTypeId,
-              verificationStatus: c.verificationStatus,
-            };
-          }),
-        student: {
-          studentId: student?.studentId,
-          address: student?.address,
-          fullName: student?.fullName,
-          clinicId: student?.clinicId,
-          graduationDate: student?.graduationDate,
-          phoneNumber: student?.phoneNumber,
-          preClinicId: student?.preClinicId,
-          checkInStatus: student?.CheckInCheckOut.at(-1)?.checkInStatus,
-          checkOutStatus: student?.CheckInCheckOut.at(-1)?.checkOutStatus,
-          academicSupervisorName: student?.academicAdvisor?.fullname,
-          academicSupervisorId: student?.academicAdvisor?.supervisorId,
-          academicSupervisorUserId: student?.academicAdvisor?.id,
-          supervisingDPKName: student?.supervisingDPK?.fullname,
-          supervisingDPKId: student?.supervisingDPK?.supervisorId,
-          supervisingDPKUserId: student?.supervisingDPK?.id,
-          examinerDPKName: student?.examinerDPK?.fullname,
-          examinerDPKId: student?.examinerDPK?.supervisorId,
-          examinerDPKUserId: student?.examinerDPK?.id,
-          rsStation: student?.rsStation,
-          pkmStation: student?.pkmStation,
-          periodLengthStation: Number(student?.periodLengthStation),
-        },
-        weeklyAssesment: {
-          studentName: weeklyAssesment[0]?.Student?.fullName,
-          studentId: weeklyAssesment[0]?.Student?.studentId,
-          unitName: weeklyAssesment[0]?.Unit?.name,
-          assesments: weeklyAssesment.map((w) => {
-            return {
-              attendNum: dailyActivities
-                .filter((a) => a.day?.week?.weekNum === w.weekNum)
-                .filter((a) => a.Activity?.activityStatus === "ATTEND").length,
-              notAttendNum: dailyActivities
-                .filter((a) => a.day?.week?.weekNum === w.weekNum)
-                .filter(
-                  (a) =>
-                    a.Activity?.activityStatus === "NOT_ATTEND" ||
-                    a.Activity?.activityStatus === "SICK" ||
-                    a.Activity?.activityStatus === "HOLIDAY"
-                ).length,
-              score: w.score,
-              verificationStatus: w.verificationStatus,
-              weekNum: w.weekNum,
-              id: w.id,
-            };
-          }),
-        },
-        miniCex: {
-          case: miniCex.MiniCex?.case,
-          id: miniCex.miniCexId,
-          location: miniCex.MiniCex?.location?.name,
-          studentId: miniCex.Student?.studentId,
-          studentName: miniCex.Student?.fullName,
-          scores: miniCex.MiniCex?.MiniCexGrade.map((g) => {
-            return {
-              name: g.name,
-              score: g.score,
-              id: g.id,
-            };
-          }),
-          miniCexGrade,
-          academicSupervisorId: miniCex.Student?.academicSupervisorId,
-          examinerDPKId: miniCex.Student?.examinerSupervisorId,
-          supervisingDPKId: miniCex.Student?.supervisingSupervisorId,
-        },
-        scientificAssesement: {
-          id: scientificAssesment.scientificAssesmentId,
-          studentId: scientificAssesment.Student?.studentId,
-          studentName: scientificAssesment.Student?.fullName,
-          case: scientificAssesment.ScientificAssesment?.title,
-          location: scientificAssesment.ScientificAssesment?.location?.name,
-          scores: scientificAssesment.ScientificAssesment?.grades.map((g) => {
-            return {
-              name: g.gradeItem.name,
-              score: g.score,
-              id: g.id,
-              type: g.gradeItem.scientificGradeType,
-            };
-          }),
-          saGrade,
-          academicSupervisorId: miniCex.Student?.academicSupervisorId,
-          examinerDPKId: miniCex.Student?.examinerSupervisorId,
-          supervisingDPKId: miniCex.Student?.supervisingSupervisorId,
-        },
-        finalScore,
-      } as IStudentStastic)
-    );
   }
 
   async getStudentWeeklyAssesments(
@@ -608,105 +614,110 @@ export class StudentHandler {
     next: NextFunction
   ) {
     const tokenPayload: ITokenPayload = res.locals.user;
-    const student = await this.studentService.getStudentById(
-      tokenPayload.studentId
-    );
-    const activeUnit = await this.studentService.getActiveUnit(
-      tokenPayload.studentId ?? ""
-    );
 
-    const assesments =
-      await this.assesmentService.getAssesmentsByStudentIdAndUnitId(
-        student?.studentId ?? "",
-        activeUnit?.activeUnit.activeUnit?.id ?? ""
+    try {
+      const student = await this.studentService.getStudentById(
+        tokenPayload.studentId
+      );
+      const activeUnit = await this.studentService.getActiveUnit(
+        tokenPayload.studentId ?? ""
       );
 
-    let finalScore = 0;
-    let isFinalScoreShown = true;
+      const assesments =
+        await this.assesmentService.getAssesmentsByStudentIdAndUnitId(
+          student?.studentId ?? "",
+          activeUnit?.activeUnit.activeUnit?.id ?? ""
+        );
 
-    assesments.forEach((a) => {
-      let grade = 0;
-      if (a.MiniCex) {
-        if (a.MiniCex.MiniCexGrade.length) {
-          a.MiniCex.MiniCexGrade.forEach((g) => {
-            grade += g.score ?? 0;
-          });
-          grade = grade / a.MiniCex?.MiniCexGrade.length;
+      let finalScore = 0;
+      let isFinalScoreShown = true;
+
+      assesments.forEach((a) => {
+        let grade = 0;
+        if (a.MiniCex) {
+          if (a.MiniCex.MiniCexGrade.length) {
+            a.MiniCex.MiniCexGrade.forEach((g) => {
+              grade += g.score ?? 0;
+            });
+            grade = grade / a.MiniCex?.MiniCexGrade.length;
+          }
         }
-      }
 
-      if (a.ScientificAssesment) {
-        if (a.ScientificAssesment?.grades) {
-          a.ScientificAssesment?.grades.forEach((g) => {
-            grade += g.score ?? 0;
-          });
-          grade = grade / a.ScientificAssesment?.grades.length;
+        if (a.ScientificAssesment) {
+          if (a.ScientificAssesment?.grades) {
+            a.ScientificAssesment?.grades.forEach((g) => {
+              grade += g.score ?? 0;
+            });
+            grade = grade / a.ScientificAssesment?.grades.length;
+          }
         }
-      }
 
-      if (a.osce) {
-        grade = a.osce.score ?? 0;
-        isFinalScoreShown = a.osce.verified;
-      }
+        if (a.osce) {
+          grade = a.osce.score ?? 0;
+          isFinalScoreShown = a.osce.verified;
+        }
 
-      if (a.cbt) {
-        grade = a.cbt.score ?? 0;
-      }
+        if (a.cbt) {
+          grade = a.cbt.score ?? 0;
+        }
 
-      finalScore =
-        finalScore +
-        grade *
-          (a.MiniCex?.weight ??
-            a.ScientificAssesment?.weight ??
-            a.osce?.weight ??
-            a.cbt?.weight ??
-            0);
-    });
-
-    return res.status(200).json(
-      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-        finalScore: isFinalScoreShown ? finalScore : null,
-        assesments: assesments.map((a) => {
-          let grade = 0;
-          if (a.MiniCex) {
-            if (a.MiniCex.MiniCexGrade) {
-              a.MiniCex.MiniCexGrade.forEach((g) => {
-                grade += g.score ?? 0;
-              });
-              grade = grade / a.MiniCex?.MiniCexGrade.length;
-            }
-          }
-
-          if (a.ScientificAssesment) {
-            if (a.ScientificAssesment?.grades) {
-              a.ScientificAssesment?.grades.forEach((g) => {
-                grade += g.score ?? 0;
-              });
-              grade = grade / a.ScientificAssesment?.grades.length;
-            }
-          }
-
-          if (a.osce) {
-            grade = a.osce.score ?? 0;
-          }
-
-          if (a.cbt) {
-            grade = a.cbt.score ?? 0;
-          }
-
-          return {
-            type: a.type,
-            weight:
-              a.MiniCex?.weight ??
+        finalScore =
+          finalScore +
+          grade *
+            (a.MiniCex?.weight ??
               a.ScientificAssesment?.weight ??
               a.osce?.weight ??
               a.cbt?.weight ??
-              0,
-            score: grade,
-          } as IStudentAssesmentUnit;
-        }),
-      })
-    );
+              0);
+      });
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          finalScore: isFinalScoreShown ? finalScore : null,
+          assesments: assesments.map((a) => {
+            let grade = 0;
+            if (a.MiniCex) {
+              if (a.MiniCex.MiniCexGrade) {
+                a.MiniCex.MiniCexGrade.forEach((g) => {
+                  grade += g.score ?? 0;
+                });
+                grade = grade / a.MiniCex?.MiniCexGrade.length;
+              }
+            }
+
+            if (a.ScientificAssesment) {
+              if (a.ScientificAssesment?.grades) {
+                a.ScientificAssesment?.grades.forEach((g) => {
+                  grade += g.score ?? 0;
+                });
+                grade = grade / a.ScientificAssesment?.grades.length;
+              }
+            }
+
+            if (a.osce) {
+              grade = a.osce.score ?? 0;
+            }
+
+            if (a.cbt) {
+              grade = a.cbt.score ?? 0;
+            }
+
+            return {
+              type: a.type,
+              weight:
+                a.MiniCex?.weight ??
+                a.ScientificAssesment?.weight ??
+                a.osce?.weight ??
+                a.cbt?.weight ??
+                0,
+              score: grade,
+            } as IStudentAssesmentUnit;
+          }),
+        })
+      );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getPersonalBehaviours(req: Request, res: Response, next: NextFunction) {
