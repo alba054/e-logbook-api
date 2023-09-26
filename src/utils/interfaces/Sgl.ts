@@ -15,13 +15,13 @@ export interface IPutSglTopicVerificationStatus {
   readonly verified: boolean;
 }
 
-export interface IPutSGLTopic {
-  topicId: number;
-}
-
 export interface IPutSGL {
   supervisorId?: string;
   startTime?: number;
   endTime?: number;
   notes?: string;
+   topics?: {
+    oldId: string;
+    newId: number;
+  }[]
 }

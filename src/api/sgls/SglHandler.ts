@@ -10,13 +10,11 @@ import {
   IPostSGL,
   IPostSGLTopic,
   IPutSGL,
-  IPutSGLTopic,
   IPutSglTopicVerificationStatus,
 } from "../../utils/interfaces/Sgl";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import {
   SglEditPayloadSchema,
-  SglEditTopicPayloadSchema,
   SglPayloadSchema,
   SglTopicPayloadSchema,
   SglTopicVerificationStatusSchema,
@@ -44,7 +42,6 @@ export class SglHandler {
     this.putAllTopicsVerificationStatus =
     this.putAllTopicsVerificationStatus.bind(this);
     this.putSgl =  this.putSgl.bind(this);
-    this.putTopicDataSgl =  this.putTopicDataSgl.bind(this);
     this.deleteSgl =  this.deleteSgl.bind(this);
   }
 
@@ -86,60 +83,7 @@ export class SglHandler {
   }
  
 
-  async putTopicDataSgl(req: Request,
-    res: Response,
-    next: NextFunction) {
-    const { topicId } = req.params;
-    const tokenPayload: ITokenPayload = res.locals.user;
-    const payload: IPutSGLTopic = req.body;
 
-    try {
-      const validationResult = this.validator.validate(
-        SglEditTopicPayloadSchema,
-        payload
-      );
-
-      if (validationResult && "error" in validationResult) {
-        switch (validationResult.error) {
-          case 400:
-            throw new BadRequestError(validationResult.message);
-          case 404:
-            throw new NotFoundError(validationResult.message);
-          default:
-            throw new InternalServerError();
-        }}
-
-        const result = await this.sglService.editSglTopicById(
-        topicId,
-        tokenPayload,
-        payload
-      );
-
-      if (result && "error" in result) {
-        switch (result.error) {
-          case 400:
-            throw new BadRequestError(result.message);
-          case 404:
-            throw new NotFoundError(result.message);
-          default:
-            throw new InternalServerError();
-        }
-      }
-
-      return res
-        .status(200)
-        .json(
-          createResponse(
-            constants.SUCCESS_RESPONSE_MESSAGE,
-            "verify topic successfully"
-          )
-        );
-
-    }catch(e){
-      return next(e);
-    }
-
-  }
 
   async putSgl( req: Request,
     res: Response,

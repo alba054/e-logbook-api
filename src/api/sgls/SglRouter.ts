@@ -87,7 +87,8 @@ export class SglRouter {
         ]),
         this.handler.putVerificationStatusSglTopic
       );
-
+    
+    // * edit sgl
     this.router
       .route(this.path + "/:id/edit")
       .put(
@@ -95,15 +96,7 @@ export class SglRouter {
         UnitCheckIn.restrictUncheckInActiveUnit(),
         this.handler.putSgl
       );
-
-    this.router
-      .route(this.path + "/topics/:topicId/edit")
-      .put(
-          AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
-        UnitCheckIn.restrictUncheckInActiveUnit(),
-        this.handler.putTopicDataSgl
-      );
-
+      
     return this.router;
   }
 }

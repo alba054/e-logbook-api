@@ -5,7 +5,6 @@ import {
   IPostSGL,
   IPostSGLTopic,
   IPutSGL,
-  IPutSGLTopic,
   IPutSglTopicVerificationStatus,
 } from "../utils/interfaces/Sgl";
 import { History } from "./History";
@@ -25,36 +24,33 @@ export class Sgl {
       });
   }
 
-  async editSglTopicById(topicId: string, payload: IPutSGLTopic) {
-   return db.$transaction([
-     db.topic.deleteMany({
-        where: {
-          SglTopic: {
-            every: {
-              id: topicId
-            }
-          }
-        },
-      }
-    ),
-     db.sglTopic.update({
-        where: {
-          id: topicId,
-        },
-        data: {
-          topic: {
-            connect: {
-              id: payload.topicId
-            },
-          }
-        }
-      }
-    ),
-   ]);
-  }
 
   async editSglById(id: string, payload: IPutSGL) {
-    return db.$transaction([
+      return db.$transaction([
+      ...payload.topics?.map(t => {
+        return db.sglTopic.delete({
+          where: {
+            id: t.oldId
+          }
+        })
+      }) ?? [],
+      ...payload.topics?.map(t => {
+        return db.sglTopic.create({
+          data: {
+            id: t.oldId,
+            SGL: {
+              connect: {
+                id
+              }
+            },
+            topic: {
+              connect: {
+                id: t.newId
+              }
+            }
+          }
+        })
+      }) ?? [],
       db.sGL.update({
         where: {
           id

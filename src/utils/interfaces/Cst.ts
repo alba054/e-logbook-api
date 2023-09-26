@@ -14,3 +14,14 @@ export interface IPostCSTTopic {
 export interface IPutCstTopicVerificationStatus {
   readonly verified: boolean;
 }
+
+export interface IPutCST {
+  supervisorId?: string;
+  startTime?: number;
+  endTime?: number;
+  notes?: string;
+  topics?: {
+    oldId: string;
+    newId: number;
+  }[]
+}
