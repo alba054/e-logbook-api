@@ -40,6 +40,9 @@ export class SglRouter {
       .put(
         AuthorizationBearer.authorize([constants.CEU_BADGE]),
         this.handler.putVerificationStatusSgl
+      ).delete(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.handler.deleteSgl,
       );
 
     // * get sgl topics of student
@@ -83,6 +86,22 @@ export class SglRouter {
           constants.DPK_ROLE,
         ]),
         this.handler.putVerificationStatusSglTopic
+      );
+
+    this.router
+      .route(this.path + "/:id/edit")
+      .put(
+          AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        UnitCheckIn.restrictUncheckInActiveUnit(),
+        this.handler.putSgl
+      );
+
+    this.router
+      .route(this.path + "/topics/:topicId/edit")
+      .put(
+          AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        UnitCheckIn.restrictUncheckInActiveUnit(),
+        this.handler.putTopicDataSgl
       );
 
     return this.router;

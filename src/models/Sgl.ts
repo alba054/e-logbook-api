@@ -4,6 +4,8 @@ import { createErrorObject, getUnixTimestamp } from "../utils";
 import {
   IPostSGL,
   IPostSGLTopic,
+  IPutSGL,
+  IPutSGLTopic,
   IPutSglTopicVerificationStatus,
 } from "../utils/interfaces/Sgl";
 import { History } from "./History";
@@ -13,6 +15,56 @@ export class Sgl {
 
   constructor() {
     this.historyModel = new History();
+  }
+
+  async deleteSglById(id: string) {
+    return db.sGL.delete({
+        where: {
+          id
+        },
+      });
+  }
+
+  async editSglTopicById(topicId: string, payload: IPutSGLTopic) {
+   return db.$transaction([
+     db.topic.deleteMany({
+        where: {
+          SglTopic: {
+            every: {
+              id: topicId
+            }
+          }
+        },
+      }
+    ),
+     db.sglTopic.update({
+        where: {
+          id: topicId,
+        },
+        data: {
+          topic: {
+            connect: {
+              id: payload.topicId
+            },
+          }
+        }
+      }
+    ),
+   ]);
+  }
+
+  async editSglById(id: string, payload: IPutSGL) {
+    return db.$transaction([
+      db.sGL.update({
+        where: {
+          id
+        },
+        data: {
+          endTime: payload.endTime,
+          startTime: payload.startTime,     
+        }
+      }),
+    ])
   }
 
   async getSglsWithoutPage() {
