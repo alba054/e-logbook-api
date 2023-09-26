@@ -23,6 +23,8 @@ export class WeekHandler {
     this.postWeek = this.postWeek.bind(this);
     this.getWeeks = this.getWeeks.bind(this);
     this.putWeekStatus = this.putWeekStatus.bind(this);
+    this.putWeek = this.putWeek.bind(this);
+    this.deleteWeek = this.deleteWeek.bind(this);
   }
   async putWeekStatus(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
