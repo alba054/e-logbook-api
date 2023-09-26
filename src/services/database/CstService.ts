@@ -6,6 +6,7 @@ import db from "../../database";
 import {
   IPostCST,
   IPostCSTTopic,
+  IPutCST,
   IPutCstTopicVerificationStatus,
 } from "../../utils/interfaces/Cst";
 import { Cst } from "../../models/Cst";
@@ -17,6 +18,37 @@ export class CstService {
   constructor() {
     this.studentService = new StudentService();
     this.cstModel = new Cst();
+  }
+
+  async deleteSglById(id: string, tokenPayload: ITokenPayload) {
+     const cst = await this.cstModel.getCstById(id);
+
+    if (!cst) {
+      return createErrorObject(404, "cst's not found");
+    }
+
+    if (cst.studentId !== tokenPayload.studentId) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return this.cstModel.deleteCstById(id);
+  }
+  
+  async editCstById(id: string, tokenPayload: ITokenPayload, payload: IPutCST) {
+    const cst = await this.cstModel.getCstById(id);
+
+     if (!cst) {
+      return createErrorObject(404, "cst topic's not found");
+    }
+
+    if (cst?.studentId !== tokenPayload.studentId) {
+      return createErrorObject(
+        400,
+        "you are not authorized to verify this sgl"
+      );
+    }
+
+    return this.cstModel.ediCstById(id, payload);
   }
 
   async getCstsBySupervisorWithoutPage(tokenPayload: ITokenPayload) {

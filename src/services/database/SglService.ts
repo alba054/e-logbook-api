@@ -2,6 +2,7 @@ import { Sgl } from "../../models/Sgl";
 import {
   IPostSGL,
   IPostSGLTopic,
+  IPutSGL,
   IPutSglTopicVerificationStatus,
 } from "../../utils/interfaces/Sgl";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
@@ -11,12 +12,46 @@ import { constants, createErrorObject } from "../../utils";
 import db from "../../database";
 
 export class SglService {
+ 
+  
   private studentService: StudentService;
   private sglModel: Sgl;
 
   constructor() {
     this.studentService = new StudentService();
     this.sglModel = new Sgl();
+  }
+
+  async deleteSglById(id: string, tokenPayload: ITokenPayload) {
+    const sgl = await this.sglModel.getSglById(id);
+
+    if (!sgl) {
+      return createErrorObject(404, "sgl's not found");
+    }
+
+    if (sgl.studentId !== tokenPayload.studentId) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return this.sglModel.deleteSglById(id);
+  }
+
+
+  async editSglById(id: string, tokenPayload: ITokenPayload, payload: IPutSGL) {
+    const sgl = await this.sglModel.getSglById(id);
+
+     if (!sgl) {
+      return createErrorObject(404, "sgl topic's not found");
+    }
+
+    if (sgl?.studentId !== tokenPayload.studentId) {
+      return createErrorObject(
+        400,
+        "you are not authorized to verify this sgl"
+      );
+    }
+
+    return this.sglModel.editSglById(id, payload);
   }
 
   async getSglsBySupervisorWithoutPage(tokenPayload: ITokenPayload) {

@@ -40,6 +40,9 @@ export class CstRouter {
       .put(
         AuthorizationBearer.authorize([constants.CEU_BADGE]),
         this.handler.putVerificationStatusCst
+      ).delete(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.handler.deleteCst
       );
 
     // * get cst topics of student
@@ -83,6 +86,15 @@ export class CstRouter {
           constants.DPK_ROLE,
         ]),
         this.handler.putVerificationStatusCstTopic
+      );
+    
+    // * edit cst 
+    this.router
+      .route(this.path + "/:id/edit")
+      .put(
+          AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        UnitCheckIn.restrictUncheckInActiveUnit(),
+        this.handler.putCst
       );
 
     return this.router;

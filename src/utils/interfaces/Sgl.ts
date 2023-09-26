@@ -14,3 +14,14 @@ export interface IPostSGLTopic {
 export interface IPutSglTopicVerificationStatus {
   readonly verified: boolean;
 }
+
+export interface IPutSGL {
+  supervisorId?: string;
+  startTime?: number;
+  endTime?: number;
+  notes?: string;
+   topics?: {
+    oldId: string;
+    newId: number;
+  }[]
+}

@@ -9,10 +9,12 @@ import { ICstDetail, IStudentCst, ISubmittedCst } from "../../utils/dto/CstDTO";
 import {
   IPostCST,
   IPostCSTTopic,
+  IPutCST,
   IPutCstTopicVerificationStatus,
 } from "../../utils/interfaces/Cst";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import {
+  CstEditPayloadSchema,
   CstPayloadSchema,
   CstTopicPayloadSchema,
   CstTopicVerificationStatusSchema,
@@ -38,6 +40,100 @@ export class CstHandler {
     this.putTopicCst = this.putTopicCst.bind(this);
     this.putAllTopicsVerificationStatus =
       this.putAllTopicsVerificationStatus.bind(this);
+    this.deleteCst = this.deleteCst.bind(this);
+    this.putCst = this.putCst.bind(this);
+  }
+
+
+  async deleteCst(req: Request,
+    res: Response,
+    next: NextFunction) {
+    const { id } = req.params;
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    try {
+        const result = await this.cstService.deleteSglById(
+        id,
+        tokenPayload,
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "verify topic successfully"
+          )
+        );
+
+    }catch(e){
+      return next(e);
+    }
+  }
+
+  async putCst(req: Request,
+    res: Response,
+    next: NextFunction) {
+    const { id } = req.params;
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const payload: IPutCST = req.body;
+
+    try {
+      const validationResult = this.validator.validate(
+        CstEditPayloadSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        switch (validationResult.error) {
+          case 400:
+            throw new BadRequestError(validationResult.message);
+          case 404:
+            throw new NotFoundError(validationResult.message);
+          default:
+            throw new InternalServerError();
+        }}
+
+        const result = await this.cstService.editCstById(
+        id,
+        tokenPayload,
+        payload
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "verify topic successfully"
+          )
+        );
+
+    }catch(e){
+      return next(e);
+    }
   }
 
   async putAllTopicsVerificationStatus(

@@ -9,10 +9,12 @@ import { ISglDetail, IStudentSgl, ISubmittedSgl } from "../../utils/dto/SglDTO";
 import {
   IPostSGL,
   IPostSGLTopic,
+  IPutSGL,
   IPutSglTopicVerificationStatus,
 } from "../../utils/interfaces/Sgl";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import {
+  SglEditPayloadSchema,
   SglPayloadSchema,
   SglTopicPayloadSchema,
   SglTopicVerificationStatusSchema,
@@ -20,6 +22,7 @@ import {
 import { Validator } from "../../validator/Validator";
 
 export class SglHandler {
+  
   private validator: Validator;
   private sglService: SglService;
   private studentService: StudentService;
@@ -33,11 +36,110 @@ export class SglHandler {
     this.postSgl = this.postSgl.bind(this);
     this.getSglTopics = this.getSglTopics.bind(this);
     this.putVerificationStatusSglTopic =
-      this.putVerificationStatusSglTopic.bind(this);
+    this.putVerificationStatusSglTopic.bind(this);
     this.putVerificationStatusSgl = this.putVerificationStatusSgl.bind(this);
     this.putTopicSgl = this.putTopicSgl.bind(this);
     this.putAllTopicsVerificationStatus =
-      this.putAllTopicsVerificationStatus.bind(this);
+    this.putAllTopicsVerificationStatus.bind(this);
+    this.putSgl =  this.putSgl.bind(this);
+    this.deleteSgl =  this.deleteSgl.bind(this);
+  }
+
+  async deleteSgl(req: Request,
+    res: Response,
+    next: NextFunction) {
+    const { id } = req.params;
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    try {
+        const result = await this.sglService.deleteSglById(
+        id,
+        tokenPayload,
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "verify topic successfully"
+          )
+        );
+
+    }catch(e){
+      return next(e);
+    }
+  }
+ 
+
+
+
+  async putSgl( req: Request,
+    res: Response,
+    next: NextFunction) {
+    const { id } = req.params;
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const payload: IPutSGL = req.body;
+
+    try {
+      const validationResult = this.validator.validate(
+        SglEditPayloadSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        switch (validationResult.error) {
+          case 400:
+            throw new BadRequestError(validationResult.message);
+          case 404:
+            throw new NotFoundError(validationResult.message);
+          default:
+            throw new InternalServerError();
+        }}
+
+        const result = await this.sglService.editSglById(
+        id,
+        tokenPayload,
+        payload
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "verify topic successfully"
+          )
+        );
+
+    }catch(e){
+      return next(e);
+    }
+
+
+    
   }
 
   async putAllTopicsVerificationStatus(

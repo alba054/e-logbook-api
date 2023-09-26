@@ -4,15 +4,64 @@ import { createErrorObject, getUnixTimestamp } from "../utils";
 import {
   IPostCST,
   IPostCSTTopic,
+  IPutCST,
   IPutCstTopicVerificationStatus,
 } from "../utils/interfaces/Cst";
 import { History } from "./History";
 
 export class Cst {
+ 
+ 
   private historyModel: History;
 
   constructor() {
     this.historyModel = new History();
+  }
+
+  async deleteCstById(id: string) {
+    return db.cST.delete({
+        where: {
+          id
+        },
+      });
+  }
+
+  async ediCstById(id: string, payload: IPutCST) {
+    return db.$transaction([
+      ...payload.topics?.map(t => {
+        return db.cstTopic.delete({
+          where: {
+            id: t.oldId
+          }
+        })
+      }) ?? [],
+      ...payload.topics?.map(t => {
+        return db.cstTopic.create({
+          data: {
+            id: t.oldId,
+            CST: {
+              connect: {
+                id
+              }
+            },
+            topic: {
+              connect: {
+                id: t.newId
+              }
+            }
+          }
+        })
+      }) ?? [],
+      db.cST.update({
+        where: {
+          id
+        },
+        data: {
+          endTime: payload.endTime,
+          startTime: payload.startTime,     
+        }
+      }),
+    ])
   }
 
   async getCstsWithoutPage() {
