@@ -28,19 +28,16 @@ export class WeekHandler {
   }
   async putWeekStatus(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
-    const { status } = req.body;
+    const payload: { status: boolean } = req.body;
 
     try {
-      if (!status) {
-        return createErrorObject(
-          400,
-          "status must be provided (true or false)"
-        );
+      if (typeof payload.status === "undefined") {
+        throw new BadRequestError("status must be provided (true or false)");
       }
 
       const testError = await this.weekService.updateWeekStatus(
         id,
-        Boolean(status)
+        Boolean(payload)
       );
 
       if (testError && "error" in testError) {
@@ -55,7 +52,7 @@ export class WeekHandler {
       }
 
       return res
-        .status(201)
+        .status(200)
         .json(
           createResponse(
             constants.SUCCESS_RESPONSE_MESSAGE,
@@ -65,8 +62,6 @@ export class WeekHandler {
     } catch (error) {
       return next(error);
     }
-    this.putWeek = this.putWeek.bind(this);
-    this.deleteWeek = this.deleteWeek.bind(this);
   }
 
   async deleteWeek(req: Request, res: Response, next: NextFunction) {
