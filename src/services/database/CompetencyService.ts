@@ -2,7 +2,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { v4 as uuidv4 } from "uuid";
 import db from "../../database";
 import { Competency } from "../../models/Competency";
-import { constants, createErrorObject } from "../../utils";
+import { constants, createErrorObject, getUnixTimestamp } from "../../utils";
 import {
   IPostCase,
   IPutCasesVerificationStatus,
@@ -15,13 +15,17 @@ import {
 } from "../../utils/interfaces/Skill";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentService } from "./StudentService";
+import { History } from "../../models/History";
+
 
 export class CompetencyService {
   private studentService: StudentService;
   private competencyModel: Competency;
-
+  private historyModel: History;
+  
   constructor() {
     this.competencyModel = new Competency();
+    this.historyModel = new History();
     this.studentService = new StudentService();
   }
 
@@ -234,6 +238,14 @@ export class CompetencyService {
           caseDone: payload.verified,
         },
       }),
+       this.historyModel.insertHistoryAsync(
+            "CASE",
+            getUnixTimestamp(),
+            skill?.studentId??'',
+            skill?.supervisorId,
+            id,
+            skill?.unitId??''
+        ),
     ]);
   }
 
@@ -413,6 +425,14 @@ export class CompetencyService {
             skillDone: true,
           },
         }),
+        // this.historyModel.insertHistoryAsync(
+        //     "SKILLS",
+        //     getUnixTimestamp(),
+        //     skill?.studentId??'',
+        //     skill?.supervisorId,
+        //     id,
+        //     skill?.unitId??''
+        // ),
       ]);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -498,6 +518,14 @@ export class CompetencyService {
             caseDone: true,
           },
         }),
+        // this.historyModel.insertHistoryAsync(
+        //     "CASES",
+        //     getUnixTimestamp(),
+        //     skill?.studentId??'',
+        //     skill?.supervisorId,
+        //     id,
+        //     skill?.unitId??''
+        // ),
       ]);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -541,6 +569,14 @@ export class CompetencyService {
           skillDone: payload.verified,
         },
       }),
+      this.historyModel.insertHistoryAsync(
+            "SKILL",
+            getUnixTimestamp(),
+            skill?.studentId??'',
+            skill?.supervisorId,
+            id,
+            skill?.unitId??''
+      ),
     ]);
   }
 }

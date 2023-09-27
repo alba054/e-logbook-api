@@ -23,5 +23,6 @@ export interface IPutSGL {
    topics?: {
     oldId: string;
     newId: number;
+    date: string,
   }[]
 }

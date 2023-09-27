@@ -15,6 +15,7 @@ export const SglEditPayloadSchema = Joi.object({
   notes: Joi.string().optional(),
    topics: Joi.array().items(Joi.object({
     oldId: Joi.string().optional(),
+    date: Joi.string().optional(),
     newId: Joi.number().optional(),
   }))
 });

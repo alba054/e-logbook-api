@@ -56,14 +56,6 @@ export class studentPersonalBehaviourService {
             unitId: unitId,
           },
         }),
-        this.historyModel.insertHistoryAsync(
-          "PERSONAL_BEHAVIOUR",
-          getUnixTimestamp(),
-          studentId,
-          undefined,
-          assesmentId,
-          unitId
-        ),
       ];
     }
 

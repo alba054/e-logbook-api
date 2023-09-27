@@ -293,14 +293,6 @@ export class SelfReflection {
               unitId,
             },
           }),
-          this.historyModel.insertHistoryAsync(
-            "SELF_REFLECTION",
-            getUnixTimestamp(),
-            studentId,
-            undefined,
-            id,
-            unitId
-          ),
         ])
       )[0];
     } catch (error) {

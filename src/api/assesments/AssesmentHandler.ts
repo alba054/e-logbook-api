@@ -323,7 +323,7 @@ export class AssesmentHandler {
 
       return res
         .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, miniCex));
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "success update personal behaviour"));
     } catch (error) {
       return next(error);
     }
@@ -356,7 +356,7 @@ export class AssesmentHandler {
 
       return res.status(200).json(
         createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-          id: miniCex.miniCexId,
+          id: miniCex.personalBehaviourId,
           studentId: miniCex.Student?.studentId,
           studentName: miniCex.Student?.fullName,
           scores: miniCex.PersonalBehaviour?.PersonalBehaviourGrade.map((g) => {
@@ -436,7 +436,7 @@ export class AssesmentHandler {
 
       return res
         .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, miniCex));
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "success score minicex"));
     } catch (error) {
       return next(error);
     }
@@ -480,7 +480,7 @@ export class AssesmentHandler {
 
       return res
         .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, miniCex));
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "success update score"));
     } catch (error) {
       return next(error);
     }
@@ -522,7 +522,7 @@ export class AssesmentHandler {
 
       return res.status(200).json(
         createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-          id: miniCex.miniCexId,
+          id: miniCex.scientificAssesmentId,
           studentId: miniCex.Student?.studentId,
           studentName: miniCex.Student?.fullName,
           case: miniCex.ScientificAssesment?.title,

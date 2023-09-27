@@ -7,16 +7,20 @@ import {
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { v4 as uuidv4 } from "uuid";
 import { StudentService } from "./StudentService";
-import { createErrorObject } from "../../utils";
+import { createErrorObject, getUnixTimestamp } from "../../utils";
 import db from "../../database";
+import { History } from "../../models/History";
+
 
 export class SelfReflectionService {
   private selfReflectionModel: SelfReflection;
   private studentService: StudentService;
+  private historyModel: History;
 
   constructor() {
     this.selfReflectionModel = new SelfReflection();
     this.studentService = new StudentService();
+    this.historyModel = new History();
   }
 
   async getSelfReflectionsBySupervisorWithoutPage(tokenPayload: ITokenPayload) {
@@ -123,6 +127,14 @@ export class SelfReflectionService {
           selfReflectionDone: payload.verified,
         },
       }),
+      this.historyModel.insertHistoryAsync(
+            "SELF_REFLECTION",
+            getUnixTimestamp(),
+            selfReflection?.studentId ?? "",
+            undefined,
+            id,
+            selfReflection?.unitId ?? ""
+          ),
     ]);
   }
 

@@ -130,7 +130,7 @@ export class ClinicalRecordHandler {
 
       return res
         .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, result));
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "success"));
     } catch (error) {
       return next(error);
     }

@@ -216,7 +216,7 @@ export class ScientificSessionHandler {
 
       return res
         .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, result));
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "success verify scientific session"));
     } catch (error) {
       return next(error);
     }
