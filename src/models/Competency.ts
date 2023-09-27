@@ -536,14 +536,6 @@ export class Competency {
               supervisorId: payload.supervisorId,
             },
           }),
-          this.historyModel.insertHistoryAsync(
-            "CASE",
-            getUnixTimestamp(),
-            studentId,
-            payload.supervisorId,
-            id,
-            unitId
-          ),
         ])
       )[0];
     } catch (error) {

@@ -200,14 +200,31 @@ export class Cst {
 
   async verifyCstById(id: string, payload: IPutCstTopicVerificationStatus) {
     try {
-      return db.cST.update({
+        const cstSelect = await db.cST.findUnique(
+        {
+          where: {
+            id,
+          }
+        }
+      );
+      return db.$transaction([
+        db.cST.update({
         where: {
           id,
         },
         data: {
           verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
         },
-      });
+      }),
+       this.historyModel.insertHistoryAsync(
+            "CST",
+            getUnixTimestamp(),
+            cstSelect?.studentId ?? '',
+            cstSelect?.supervisorId ?? '',
+            id,
+            cstSelect?.unitId?? ''
+          ),
+      ]);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to insert Cst");
@@ -350,14 +367,6 @@ export class Cst {
               },
             },
           }),
-          this.historyModel.insertHistoryAsync(
-            "CST",
-            getUnixTimestamp(),
-            studentId ?? "",
-            payload.supervisorId,
-            id,
-            unitId
-          ),
         ])
       )[0];
     } catch (error) {

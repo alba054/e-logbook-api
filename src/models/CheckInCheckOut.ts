@@ -61,6 +61,7 @@ export class CheckInCheckOut {
           student: {
             studentId: studentId === null ? undefined : studentId,
           },
+          
           unitId: unitId === null ? undefined : unitId,
         },
       });

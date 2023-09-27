@@ -1,7 +1,7 @@
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentService } from "./StudentService";
 import { v4 as uuidv4 } from "uuid";
-import { constants, createErrorObject } from "../../utils";
+import { constants, createErrorObject, getUnixTimestamp } from "../../utils";
 import db from "../../database";
 import {
   IPostCST,
@@ -10,14 +10,19 @@ import {
   IPutCstTopicVerificationStatus,
 } from "../../utils/interfaces/Cst";
 import { Cst } from "../../models/Cst";
+import { History } from "../../models/History";
+
 
 export class CstService {
   private studentService: StudentService;
   private cstModel: Cst;
+  private historyModel: History;
+
 
   constructor() {
     this.studentService = new StudentService();
     this.cstModel = new Cst();
+    this.historyModel = new History();
   }
 
   async deleteSglById(id: string, tokenPayload: ITokenPayload) {
@@ -98,6 +103,7 @@ export class CstService {
           cstDone: payload.verified,
         },
       }),
+
     ]);
   }
 
@@ -166,6 +172,14 @@ export class CstService {
           cstDone: payload.verified,
         },
       }),
+      this.historyModel.insertHistoryAsync(
+          "CST",
+          getUnixTimestamp(),
+          Cst?.studentId ?? '',
+          Cst?.supervisorId ?? '',
+          id,
+          Cst?.unitId?? ''
+        ),
     ]);
   }
 

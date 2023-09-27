@@ -157,14 +157,6 @@ export class ScientificSession {
               scientificRoleId: payload.role,
             },
           }),
-          this.historyModel.insertHistoryAsync(
-            "SCIENTIFIC_SESSION",
-            getUnixTimestamp(),
-            studentId,
-            payload.supervisorId,
-            id,
-            unitId
-          ),
         ])
       )[0];
     } catch (error) {

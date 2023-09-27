@@ -43,6 +43,7 @@ export class Sgl {
                 id
               }
             },
+            createdAt: new Date(t.date),
             topic: {
               connect: {
                 id: t.newId
@@ -195,14 +196,32 @@ export class Sgl {
 
   async verifySglById(id: string, payload: IPutSglTopicVerificationStatus) {
     try {
-      return db.sGL.update({
+      const sglSelect = await db.sGL.findUnique(
+        {
+          where: {
+            id,
+          }
+        }
+      );
+      return db.$transaction([
+        db.sGL.update({
         where: {
           id,
         },
         data: {
           verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
         },
-      });
+        
+      }),
+      this.historyModel.insertHistoryAsync(
+          "SGL",
+          getUnixTimestamp(),
+          sglSelect?.studentId ?? '',
+          sglSelect?.supervisorId ?? '',
+          id,
+          sglSelect?.unitId?? ''
+        ),
+      ]);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to insert sgl");
@@ -345,14 +364,7 @@ export class Sgl {
               },
             },
           }),
-          this.historyModel.insertHistoryAsync(
-            "SGL",
-            getUnixTimestamp(),
-            studentId,
-            payload.supervisorId,
-            id,
-            unitId
-          ),
+          
         ])
       )[0];
     } catch (error) {
