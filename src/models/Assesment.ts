@@ -65,7 +65,7 @@ export class Assesment {
   }
 
   async scoreCBT(id: string, score: number) {
-    return db.cBT.update({
+    return await db.cBT.update({
       where: {
         id,
       },
@@ -76,7 +76,7 @@ export class Assesment {
   }
 
   async scoreOSCE(id: string, score: number) {
-    return db.oSCE.update({
+    return await db.oSCE.update({
       where: {
         id,
       },

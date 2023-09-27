@@ -183,7 +183,7 @@ export class SelfReflectionHandler {
 
       return res
         .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, result));
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "success verify self reflection"));
     } catch (error) {
       return next(error);
     }

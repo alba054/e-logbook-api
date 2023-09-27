@@ -189,7 +189,7 @@ export class ProblemConsultationHandler {
 
       return res
         .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, result));
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "Verify problem consultation"));
     } catch (error) {
       return next(error);
     }

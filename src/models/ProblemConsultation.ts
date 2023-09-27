@@ -295,14 +295,6 @@ export class ProblemConsultation {
               unitId,
             },
           }),
-          this.historyModel.insertHistoryAsync(
-            "PROBLEM_CONSULTATION",
-            getUnixTimestamp(),
-            studentId,
-            undefined,
-            id,
-            unitId
-          ),
         ])
       )[0];
     } catch (error) {

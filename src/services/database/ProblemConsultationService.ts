@@ -1,7 +1,7 @@
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { v4 as uuidv4 } from "uuid";
 import { StudentService } from "./StudentService";
-import { createErrorObject } from "../../utils";
+import { createErrorObject, getUnixTimestamp } from "../../utils";
 import db from "../../database";
 import { ProblemConsultation } from "../../models/ProblemConsultation";
 import {
@@ -9,14 +9,18 @@ import {
   IPutProblemConsultation,
   IPutProblemConsultationVerificationStatus,
 } from "../../utils/interfaces/ProblemConsultation";
+import { History } from "../../models/History";
+
 
 export class ProblemConsultationService {
   private ProblemConsultationModel: ProblemConsultation;
   private studentService: StudentService;
+  private historyModel: History;
 
   constructor() {
     this.ProblemConsultationModel = new ProblemConsultation();
     this.studentService = new StudentService();
+    this.historyModel = new History();
   }
 
   async getProblemConsultationsBySupervisorWithoutPage(
@@ -119,6 +123,14 @@ export class ProblemConsultationService {
           rating: payload.rating,
         },
       }),
+      this.historyModel.insertHistoryAsync(
+            "PROBLEM_CONSULTATION",
+            getUnixTimestamp(),
+            ProblemConsultation?.Student?.id,
+            undefined,
+            id,
+            ProblemConsultation?.Student?.unitId ?? ''
+          ),
     ]);
   }
 
