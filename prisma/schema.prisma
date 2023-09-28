@@ -852,6 +852,9 @@ enum HistoryType {
   PROBLEM_CONSULTATION // "attachment" is null (for now)
   CHECK_IN // "attachment" is null (for now)
   CHECK_OUT // "attachment" is null (for now)
+  CEU_SKILL
+  CEU_CASE
+  DAILY_ACTIVITY
 }
 
 enum ReferenceType {
