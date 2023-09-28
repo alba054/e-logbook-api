@@ -44,18 +44,12 @@ export class CstHandler {
     this.putCst = this.putCst.bind(this);
   }
 
-
-  async deleteCst(req: Request,
-    res: Response,
-    next: NextFunction) {
+  async deleteCst(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
     const tokenPayload: ITokenPayload = res.locals.user;
 
     try {
-        const result = await this.cstService.deleteSglById(
-        id,
-        tokenPayload,
-      );
+      const result = await this.cstService.deleteSglById(id, tokenPayload);
 
       if (result && "error" in result) {
         switch (result.error) {
@@ -76,15 +70,12 @@ export class CstHandler {
             "verify topic successfully"
           )
         );
-
-    }catch(e){
+    } catch (e) {
       return next(e);
     }
   }
 
-  async putCst(req: Request,
-    res: Response,
-    next: NextFunction) {
+  async putCst(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
     const tokenPayload: ITokenPayload = res.locals.user;
     const payload: IPutCST = req.body;
@@ -103,9 +94,10 @@ export class CstHandler {
             throw new NotFoundError(validationResult.message);
           default:
             throw new InternalServerError();
-        }}
+        }
+      }
 
-        const result = await this.cstService.editCstById(
+      const result = await this.cstService.editCstById(
         id,
         tokenPayload,
         payload
@@ -130,8 +122,7 @@ export class CstHandler {
             "verify topic successfully"
           )
         );
-
-    }catch(e){
+    } catch (e) {
       return next(e);
     }
   }
@@ -386,6 +377,7 @@ export class CstHandler {
               supervisorName: r.supervisor.fullname,
               topic: r.topics.map((t) => ({
                 topicName: t.topic?.map((n) => n.name),
+                topicId: t.topic[0]?.id,
                 verificationStatus: t.verificationStatus,
                 notes: t.notes,
                 id: t.id,
@@ -403,7 +395,9 @@ export class CstHandler {
     let result: any;
 
     if (!page) {
-      result = await this.cstService.getCstsBySupervisorWithoutPage(tokenPayload);
+      result = await this.cstService.getCstsBySupervisorWithoutPage(
+        tokenPayload
+      );
     } else {
       result = await this.cstService.getCstsBySupervisor(
         tokenPayload,
