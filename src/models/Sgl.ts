@@ -43,7 +43,7 @@ export class Sgl {
                 id
               }
             },
-            createdAt: new Date(t.date),
+            // createdAt: new Date(t.date),
             topic: {
               connect: {
                 id: t.newId
@@ -237,7 +237,14 @@ export class Sgl {
         id,
       },
       include: {
-        topics: true,
+        topics: {
+          include: {
+            topic: true,
+          },
+        },
+        Student: true,
+        Unit: true,
+        supervisor: true,
       },
     });
   }

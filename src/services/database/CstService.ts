@@ -25,6 +25,16 @@ export class CstService {
     this.historyModel = new History();
   }
 
+  async getCstById(id: string, tokenPayload: ITokenPayload) {
+    const cst = await this.cstModel.getCstById(id);
+
+    if (!cst) {
+      return createErrorObject(404, "cst's not found");
+    }
+
+    return cst;
+  }
+
   async deleteSglById(id: string, tokenPayload: ITokenPayload) {
      const cst = await this.cstModel.getCstById(id);
 

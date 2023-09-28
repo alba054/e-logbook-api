@@ -15,6 +15,7 @@ import { History } from "../../models/History";
 
 export class SglService {
  
+ 
   private historyModel: History;
   private studentService: StudentService;
   private sglModel: Sgl;
@@ -23,6 +24,16 @@ export class SglService {
     this.studentService = new StudentService();
     this.sglModel = new Sgl();
     this.historyModel = new History();
+  }
+
+  async getSglById(id: string, tokenPayload: ITokenPayload) {
+     const sgl = await this.sglModel.getSglById(id);
+
+    if (!sgl) {
+      return createErrorObject(404, "sgl's not found");
+    }
+
+    return sgl;
   }
 
   async deleteSglById(id: string, tokenPayload: ITokenPayload) {

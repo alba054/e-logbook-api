@@ -37,6 +37,15 @@ export class CstRouter {
     // * verify cst by ceu after all topics is verified
     this.router
       .route(this.path + "/:id")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+          constants.CEU_BADGE,
+                    constants.STUDENT_ROLE,
+        ]),
+        this.handler.getCst
+      )
       .put(
         AuthorizationBearer.authorize([constants.CEU_BADGE]),
         this.handler.putVerificationStatusCst

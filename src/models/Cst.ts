@@ -240,7 +240,14 @@ export class Cst {
         id,
       },
       include: {
-        topics: true,
+        topics: {
+          include: {
+            topic: true,
+          },
+        },
+        Student: true,
+        supervisor: true,
+        Unit: true
       },
     });
   }

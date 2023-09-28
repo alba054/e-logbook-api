@@ -5,7 +5,7 @@ import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
 import { CstService } from "../../services/database/CstService";
 import { StudentService } from "../../services/database/StudentService";
 import { constants, createResponse } from "../../utils";
-import { ICstDetail, IStudentCst, ISubmittedCst } from "../../utils/dto/CstDTO";
+import { ICstDetail, ICstHistoryDetail, IStudentCst, ISubmittedCst } from "../../utils/dto/CstDTO";
 import {
   IPostCST,
   IPostCSTTopic,
@@ -22,6 +22,7 @@ import {
 import { Validator } from "../../validator/Validator";
 
 export class CstHandler {
+
   private validator: Validator;
   private cstService: CstService;
   private studentService: StudentService;
@@ -31,6 +32,7 @@ export class CstHandler {
     this.validator = new Validator();
     this.studentService = new StudentService();
 
+    this.getCst = this.getCst.bind(this);
     this.getCsts = this.getCsts.bind(this);
     this.postCst = this.postCst.bind(this);
     this.getCstTopics = this.getCstTopics.bind(this);
@@ -42,6 +44,46 @@ export class CstHandler {
       this.putAllTopicsVerificationStatus.bind(this);
     this.deleteCst = this.deleteCst.bind(this);
     this.putCst = this.putCst.bind(this);
+  }
+
+  async getCst(req: Request, res: Response, next: NextFunction) {
+   const tokenPayload: ITokenPayload = res.locals.user;
+    const { id } = req.params;
+
+    const result = await this.cstService.getCstById(id, tokenPayload);
+    
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          cstId: result.id,
+          studentId: result.Student?.studentId,
+          studentName: result.Student?.fullName,
+          supervisorId: result.supervisor?.supervisorId,
+          supervisorName: result.supervisor?.fullname,
+          unitName: result.Unit?.name,
+          createdAt: result.createdAt,
+          startTime: Number(result.startTime),
+          endTime: Number(result.endTime),
+          topic: result.topics.map((t) => ({
+                topicName: t.topic.map((n) => n.name),
+                topicId: t.topic[0]?.id,
+                verificationStatus: t.verificationStatus,
+                notes: t.notes,
+                id: t.id,
+          })),
+        } as ICstHistoryDetail)
+      )
+
   }
 
   async deleteCst(req: Request, res: Response, next: NextFunction) {
