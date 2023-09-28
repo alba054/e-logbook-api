@@ -22,7 +22,6 @@ import {
 import { Validator } from "../../validator/Validator";
 
 export class SglHandler {
-  
   private validator: Validator;
   private sglService: SglService;
   private studentService: StudentService;
@@ -36,26 +35,21 @@ export class SglHandler {
     this.postSgl = this.postSgl.bind(this);
     this.getSglTopics = this.getSglTopics.bind(this);
     this.putVerificationStatusSglTopic =
-    this.putVerificationStatusSglTopic.bind(this);
+      this.putVerificationStatusSglTopic.bind(this);
     this.putVerificationStatusSgl = this.putVerificationStatusSgl.bind(this);
     this.putTopicSgl = this.putTopicSgl.bind(this);
     this.putAllTopicsVerificationStatus =
-    this.putAllTopicsVerificationStatus.bind(this);
-    this.putSgl =  this.putSgl.bind(this);
-    this.deleteSgl =  this.deleteSgl.bind(this);
+      this.putAllTopicsVerificationStatus.bind(this);
+    this.putSgl = this.putSgl.bind(this);
+    this.deleteSgl = this.deleteSgl.bind(this);
   }
 
-  async deleteSgl(req: Request,
-    res: Response,
-    next: NextFunction) {
+  async deleteSgl(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
     const tokenPayload: ITokenPayload = res.locals.user;
 
     try {
-        const result = await this.sglService.deleteSglById(
-        id,
-        tokenPayload,
-      );
+      const result = await this.sglService.deleteSglById(id, tokenPayload);
 
       if (result && "error" in result) {
         switch (result.error) {
@@ -76,18 +70,12 @@ export class SglHandler {
             "verify topic successfully"
           )
         );
-
-    }catch(e){
+    } catch (e) {
       return next(e);
     }
   }
- 
 
-
-
-  async putSgl( req: Request,
-    res: Response,
-    next: NextFunction) {
+  async putSgl(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
     const tokenPayload: ITokenPayload = res.locals.user;
     const payload: IPutSGL = req.body;
@@ -106,9 +94,10 @@ export class SglHandler {
             throw new NotFoundError(validationResult.message);
           default:
             throw new InternalServerError();
-        }}
+        }
+      }
 
-        const result = await this.sglService.editSglById(
+      const result = await this.sglService.editSglById(
         id,
         tokenPayload,
         payload
@@ -133,13 +122,9 @@ export class SglHandler {
             "verify topic successfully"
           )
         );
-
-    }catch(e){
+    } catch (e) {
       return next(e);
     }
-
-
-    
   }
 
   async putAllTopicsVerificationStatus(
@@ -394,6 +379,7 @@ export class SglHandler {
               supervisorId: r.supervisor.supervisorId,
               topic: r.topics.map((t) => ({
                 topicName: t.topic.map((n) => n.name),
+                topicId: t.topic[0]?.id,
                 verificationStatus: t.verificationStatus,
                 notes: t.notes,
                 id: t.id,
