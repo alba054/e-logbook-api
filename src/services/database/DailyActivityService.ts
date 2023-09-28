@@ -12,13 +12,11 @@ import { v4 as uuidv4 } from "uuid";
 import { WeeklyAssesmentService } from "./WeeklyAssesmentService";
 import { History } from "../../models/History";
 
-
 export class DailyActivityService {
   private dailyActivityModel: DailyActivity;
   private studentService: StudentService;
   private weeklyAssesmentService: WeeklyAssesmentService;
   private historyModel: History;
-
 
   constructor() {
     this.dailyActivityModel = new DailyActivity();
@@ -162,14 +160,14 @@ export class DailyActivityService {
         },
       }),
       ...weekOp,
-      //  this.historyModel.insertHistoryAsync(
-      //       "DAILY_ACTIVITY",
-      //       getUnixTimestamp(),
-      //       dailyActivity?.studentId??'',
-      //       dailyActivity?.Activity?.supervisorId,
-      //       id,
-      //       dailyActivity?.unitId??''
-      //   ),
+      this.historyModel.insertHistoryAsync(
+        "DAILY_ACTIVITY",
+        getUnixTimestamp(),
+        dailyActivity?.studentId ?? "",
+        dailyActivity?.Activity?.supervisorId,
+        id,
+        dailyActivity?.unitId ?? ""
+      ),
     ]);
   }
 

@@ -37,7 +37,7 @@ export class WeekHandler {
 
       const testError = await this.weekService.updateWeekStatus(
         id,
-        Boolean(payload)
+        Boolean(payload.status)
       );
 
       if (testError && "error" in testError) {

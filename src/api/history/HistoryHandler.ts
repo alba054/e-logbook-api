@@ -26,7 +26,8 @@ export class HistoryHandler {
       if (
         tokenPayload.role == "ER" ||
         tokenPayload.role == "ADMIN" ||
-        tokenPayload.badges?.includes("HEAD_DIV")
+        tokenPayload.badges?.includes("HEAD_DIV") ||
+        tokenPayload.badges?.includes("CEU")
       ) {
         // can see all history
         result = await this.historyService.retrieveHistory(
