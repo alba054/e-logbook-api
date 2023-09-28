@@ -11,6 +11,20 @@ export interface IStudentCst {
   csts: ICstDetail[];
 }
 
+
+
+export interface ICstHistoryDetail {
+  createdAt: Date | string;
+  cstId: string;
+  startTime?: number;
+  endTime?: number;
+  supervisorName?: string;
+  supervisorId?: string;
+  studentId?: string,
+  studentName?: string,
+  unitName?: string;
+  topic: ICstTopic[];
+}
 export interface ICstDetail {
   startTime?: number;
   endTime?: number;

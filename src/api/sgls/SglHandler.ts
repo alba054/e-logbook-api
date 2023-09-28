@@ -5,7 +5,7 @@ import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
 import { SglService } from "../../services/database/SglService";
 import { StudentService } from "../../services/database/StudentService";
 import { constants, createResponse } from "../../utils";
-import { ISglDetail, IStudentSgl, ISubmittedSgl } from "../../utils/dto/SglDTO";
+import { ISglDetail, ISglHistoryDetail, IStudentSgl, ISubmittedSgl } from "../../utils/dto/SglDTO";
 import {
   IPostSGL,
   IPostSGLTopic,
@@ -30,7 +30,7 @@ export class SglHandler {
     this.sglService = new SglService();
     this.validator = new Validator();
     this.studentService = new StudentService();
-
+    this.getSgl = this.getSgl.bind(this);
     this.getSgls = this.getSgls.bind(this);
     this.postSgl = this.postSgl.bind(this);
     this.getSglTopics = this.getSglTopics.bind(this);
@@ -42,6 +42,46 @@ export class SglHandler {
       this.putAllTopicsVerificationStatus.bind(this);
     this.putSgl = this.putSgl.bind(this);
     this.deleteSgl = this.deleteSgl.bind(this);
+  }
+
+  async getSgl(req: Request, res: Response, next: NextFunction) {
+   const tokenPayload: ITokenPayload = res.locals.user;
+    const { id } = req.params;
+
+    const result = await this.sglService.getSglById(id, tokenPayload);
+    
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          sglId: result.id,
+          studentId: result.Student?.studentId,
+          studentName: result.Student?.fullName,
+          supervisorId: result.supervisor?.supervisorId,
+          supervisorName: result.supervisor?.fullname,
+          unitName: result.Unit?.name,
+          createdAt: result.createdAt,
+          startTime: Number(result.startTime),
+          endTime: Number(result.endTime),
+          topic: result.topics.map((t) => ({
+                topicName: t.topic.map((n) => n.name),
+                topicId: t.topic[0]?.id,
+                verificationStatus: t.verificationStatus,
+                notes: t.notes,
+                id: t.id,
+          })),
+        } as ISglHistoryDetail)
+      )
+
   }
 
   async deleteSgl(req: Request, res: Response, next: NextFunction) {
