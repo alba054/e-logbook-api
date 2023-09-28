@@ -565,6 +565,7 @@ export class StudentHandler {
               supervisorId: r.supervisor.supervisorId,
               topic: r.topics.map((t) => ({
                 topicName: t.topic.map((n) => n.name),
+                topicId: t.topic[0]?.id,
                 verificationStatus: t.verificationStatus,
                 notes: t.notes,
                 id: t.id,
@@ -598,6 +599,7 @@ export class StudentHandler {
               supervisorName: r.supervisor.fullname,
               topic: r.topics.map((t) => ({
                 topicName: t.topic.map((n) => n.name),
+                topicId: t.topic[0]?.id,
                 verificationStatus: t.verificationStatus,
                 notes: t.notes,
                 id: t.id,
