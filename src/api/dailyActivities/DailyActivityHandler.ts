@@ -24,6 +24,7 @@ import {
 import { Validator } from "../../validator/Validator";
 
 export class DailyActivityHandler {
+
   private dailyActivityService: DailyActivityService;
   private validator: Validator;
   private studentService: StudentService;
@@ -45,7 +46,7 @@ export class DailyActivityHandler {
       this.putVerificationStatusOfDailyActivities.bind(this);
     this.getActivities = this.getActivities.bind(this);
   }
-
+  
   async getActivities(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
 
@@ -172,7 +173,7 @@ export class DailyActivityHandler {
 
       return res
         .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, result));
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "Success verify daily activity"));
     } catch (error) {
       return next(error);
     }
@@ -204,26 +205,26 @@ export class DailyActivityHandler {
         }
       }
 
-      // return res.status(200).json(
-      //   createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-      //     alpha: result.activities.filter((a) => a.activityStatus !== "ATTEND")
-      //       .length,
-      //     attend: result.activities.filter((a) => a.activityStatus === "ATTEND")
-      //       .length,
-      //     weekName: result.weekNum,
-      //     verificationStatus: result.verificationStatus,
-      //     activities: result.activities.map((a) => {
-      //       return {
-      //         activityStatus: a.activityStatus,
-      //         day: a.day,
-      //         verificationStatus: a.verificationStatus,
-      //         activityName: a.ActivityName?.name,
-      //         detail: a.detail,
-      //         location: a.location?.name,
-      //       } as IActivitiesDetail;
-      //     }),
-      //   } as IListActivitiesPerWeek)
-      // );
+    return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            {
+              activityName: result.Activity?.ActivityName?.name,
+              activityStatus: result.Activity?.activityStatus,
+              id: result.id,
+              createdAt: result.createdAt,
+              location: result.Activity?.location?.name,
+              studentId: result.Student?.studentId,
+              studentName: result.Student?.fullName,
+              unitName: result.Unit?.name,
+              verificationStatus: result.verificationStatus,
+              weekNum: result.day?.week?.weekNum,
+              day: result.day?.day,
+            } as IListActivities
+          )
+        );
     } catch (error) {
       return next(error);
     }

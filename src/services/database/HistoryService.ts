@@ -99,12 +99,14 @@ export class HistoryService {
       type: History.getHistoryName(value.type),
       studentName: value.student?.fullName ?? null,
       supervisorName: value.supervisor?.fullname ?? null,
+      supervisorId: value.supervisor?.supervisorId,
       timestamp: Number(value.timestamp),
       patientName: patientName,
       rating: rating,
       attachment: value.attachment,
       studentId: value.student?.studentId,
       unitName: value.Unit?.name,
+      unitId: value.Unit?.id,
     } as IHistoryInfo;
   }
 }

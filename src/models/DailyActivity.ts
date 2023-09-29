@@ -98,6 +98,21 @@ export class DailyActivity {
         unitId,
         studentId,
       },
+      include: {
+        Unit: true,
+        Student: true,
+        day: {
+          include: {
+            week: true,
+          },
+        },
+        Activity: {
+          include: {
+            location: true,
+            ActivityName: true,
+          },
+        },
+      },
     });
   }
 
@@ -221,8 +236,16 @@ export class DailyActivity {
         id,
       },
       include: {
-        Activity: true,
-        day: { include: { week: true } },
+        Activity: {
+          include: {
+            location: true,
+            ActivityName: true,
+          }
+        },
+        Student: true,
+        
+        Unit: true,
+        day: { include: { week: true} },
       },
     });
   }

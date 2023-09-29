@@ -87,13 +87,13 @@ export class StudentService {
 
   async getStudentByStudentId(studentId: string) {
     const student = await this.studentModel.getStudentByStudentId(studentId);
-
     if (!student) {
       return createErrorObject(404, "student's not found");
     }
-
     return student;
   }
+
+
 
   async getStudentById(studentId?: string) {
     return this.studentModel.getStudentById(studentId);
