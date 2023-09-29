@@ -211,7 +211,7 @@ export class AssesmentService {
       await this.historyModel.insertHistoryAsync(
         "PERSONAL_BEHAVIOUR",
         getUnixTimestamp(),
-        tokenPayload.studentId,
+        personalBehaviour.studentId ?? '',
         tokenPayload.supervisorId,
         personalBehaviour.personalBehaviourId ?? '',
         personalBehaviour?.unitId ?? '',
@@ -299,7 +299,7 @@ export class AssesmentService {
       await this.historyModel.insertHistoryAsync(
           "SCIENTIFIC_ASSESMENT",
           getUnixTimestamp(),
-          tokenPayload.studentId,
+          miniCex.studentId ?? '',
           tokenPayload.supervisorId,
           miniCex.scientificAssesmentId ??'',
           miniCex?.unitId ?? ''
@@ -442,7 +442,7 @@ export class AssesmentService {
       await this.historyModel.insertHistoryAsync(
         "MINI_CEX",
         getUnixTimestamp(),
-        tokenPayload.studentId,
+        miniCex.studentId ?? '',
         tokenPayload.supervisorId,
         miniCex.miniCexId ?? '',
         miniCex?.unitId ?? ''
