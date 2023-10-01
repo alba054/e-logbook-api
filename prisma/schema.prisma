@@ -855,6 +855,7 @@ enum HistoryType {
   CEU_SKILL
   CEU_CASE
   DAILY_ACTIVITY
+  WEEKLY_ASSESMENT
 }
 
 enum ReferenceType {
