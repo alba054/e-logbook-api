@@ -251,6 +251,8 @@ export class StudentHandler {
       }
 
       let finalScore = 0;
+      let osce = 0;
+      let cbt = 0;
 
       assesments.forEach((a) => {
         let grade = 0;
@@ -276,16 +278,20 @@ export class StudentHandler {
 
         if (a.osce) {
           grade = a.osce.score ?? 0;
+          osce = a.osce.score ?? 0;
           grade *= a.osce.weight;
         }
 
         if (a.cbt) {
+          cbt = a.cbt.score ?? 0;
           grade = a.cbt.score ?? 0;
           grade *= a.cbt.weight;
         }
-
         finalScore = finalScore + grade;
       });
+
+    
+
 
       return res.status(200).json(
         createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
@@ -404,6 +410,8 @@ export class StudentHandler {
             examinerDPKId: miniCex.Student?.examinerSupervisorId,
             supervisingDPKId: miniCex.Student?.supervisingSupervisorId,
           },
+          osce: osce,
+          cbt: cbt,
           finalScore,
         } as IStudentStastic)
       );
