@@ -474,7 +474,10 @@ export class AssesmentService {
   }
 
   async getMiniCexsByUnitId(tokenPayload: ITokenPayload, id: string) {
-    const miniCex = await this.assesmentModel.getMiniCexByUnitId(id);
+    const miniCex = await this.assesmentModel.getMiniCexByUnitId(
+      tokenPayload,
+      id
+    );
 
     if (!miniCex) {
       return createErrorObject(404, "mini cex's not found");
