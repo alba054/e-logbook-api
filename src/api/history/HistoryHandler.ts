@@ -24,10 +24,7 @@ export class HistoryHandler {
       }
 
       if (
-        tokenPayload.role == "ER" ||
-        tokenPayload.role == "ADMIN" ||
-        tokenPayload.badges?.includes("HEAD_DIV") ||
-        tokenPayload.badges?.includes("CEU")
+        tokenPayload.role == "ADMIN"
       ) {
         // can see all history
         result = await this.historyService.retrieveHistory(
@@ -35,17 +32,49 @@ export class HistoryHandler {
           constants.HISTORY_ELEMENTS_PER_PAGE,
           checkIn
         );
-      } else if (
-        tokenPayload.role == "SUPERVISOR" &&
-        tokenPayload.supervisorId
-      ) {
-        // can see own supervisor history
-        result = await this.historyService.retrieveHistoryBySupervisors(
-          [tokenPayload.supervisorId],
+      } else if (tokenPayload.role == "ER"){
+        result = await this.historyService.retrieveHistoryEr(
           page - 1,
           constants.HISTORY_ELEMENTS_PER_PAGE,
           checkIn
         );
+      } 
+      else if (
+        tokenPayload.role == "SUPERVISOR" &&
+        tokenPayload.supervisorId
+      ) {
+        if(tokenPayload.badges?.includes("HEAD_DIV") && tokenPayload.badges?.includes("CEU")){
+          result = await this.historyService.retrieveHistoryBySupervisorCeu(
+            [tokenPayload.supervisorId],
+            page - 1,
+            constants.HISTORY_ELEMENTS_PER_PAGE,
+            true
+          );
+        }
+        else if(tokenPayload.badges?.includes("HEAD_DIV")){
+          result = await this.historyService.retrieveHistoryBySupervisors(
+            [tokenPayload.supervisorId],
+            page - 1,
+            constants.HISTORY_ELEMENTS_PER_PAGE,
+            true
+          );
+        }
+        else if(tokenPayload.badges?.includes("CEU")){
+          result = await this.historyService.retrieveHistoryBySupervisorCeu(
+            [tokenPayload.supervisorId],
+            page - 1,
+            constants.HISTORY_ELEMENTS_PER_PAGE,
+            false
+          );
+        }else{
+          result = await this.historyService.retrieveHistoryBySupervisors(
+          [tokenPayload.supervisorId],
+          page - 1,
+          constants.HISTORY_ELEMENTS_PER_PAGE,
+          false
+        );
+        }
+        
       } else if (tokenPayload.role == "STUDENT" && tokenPayload.studentId) {
         // can see student history
         result = await this.historyService.retrieveHistoryByStudents(

@@ -10,12 +10,48 @@ import { ClinicalRecord } from "../../models/ClinicalRecord";
 import { createErrorObject } from "../../utils";
 
 export class HistoryService {
+  
   private historyModel: History;
   private clinicalRecordModel: ClinicalRecord;
 
   constructor() {
     this.historyModel = new History();
     this.clinicalRecordModel = new ClinicalRecord();
+  }
+
+  async retrieveHistoryBySupervisorCeu(supervisorId: string[],
+    page: number = 0,
+    elemPerPage?: number,
+    checkIn?: any) {
+    const history = await this.historyModel.getHistoryBySupervisorCeu(
+      supervisorId,
+      page,
+      elemPerPage,
+      checkIn
+    );
+
+    if (history && "error" in history) {
+      return createErrorObject(500, history.message);
+    }
+
+    return await Promise.all(history.map(this.processHistoryResult));
+  }
+
+  async retrieveHistoryEr( 
+    page: number = 0,
+    elemPerPage?: number,
+    checkIn?: any) {
+    const history = await this.historyModel.getHistoryByEr(
+      page,
+      elemPerPage,
+      checkIn
+    );
+
+     if (history && "error" in history) {
+      return createErrorObject(500, history.message);
+    }
+
+    return await Promise.all(history.map(this.processHistoryResult));
   }
 
   async retrieveHistoryBySupervisors(

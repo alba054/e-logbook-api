@@ -11,6 +11,7 @@ import { IPutWeeklyAssesmentScore } from "../../utils/interfaces/WeeklyAssesment
 import { AssesmentScoreSchema } from "../../validator/assesment/AssesmentSchema";
 import { Validator } from "../../validator/Validator";
 import { WeeklyAssesmentScorePayloadSchema } from "../../validator/weeklyAssesment/WeeklyAssesmentSchema";
+import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 
 export class WeeklyAssesmentHandler {
   private weeklyAssesmentService: WeeklyAssesmentService;
@@ -54,6 +55,7 @@ export class WeeklyAssesmentHandler {
     next: NextFunction
   ) {
     const { id } = req.params;
+    const tokenPayload: ITokenPayload = res.locals.user;
     const payload: IPutWeeklyAssesmentScore = req.body;
 
     try {
@@ -66,7 +68,7 @@ export class WeeklyAssesmentHandler {
         throw new BadRequestError(validationResult.message);
       }
 
-      await this.weeklyAssesmentService.scoreWeelyAssesmentById(id, payload);
+      await this.weeklyAssesmentService.scoreWeelyAssesmentById(id, payload, tokenPayload);
 
       return res
         .status(200)

@@ -33,16 +33,31 @@ export class WeeklyAssesment {
     });
   }
 
-  async updateScoreById(id: string, payload: IPutWeeklyAssesmentScore) {
-    return db.weekAssesment.update({
+   async getWeeklyAssesmentById(
+    id: string
+  ) {
+    return db.weekAssesment.findFirst({
       where: {
-        id,
-      },
-      data: {
-        score: payload.score,
-        verificationStatus: "VERIFIED",
+        id
       },
     });
+  }
+
+  async updateScoreById(id: string, payload: IPutWeeklyAssesmentScore) {
+    return (
+     await  db.$transaction([
+        db.weekAssesment.update({
+          where: {
+            id,
+          },
+          data: {
+            score: payload.score,
+            verificationStatus: "VERIFIED",
+            },
+          }
+        ),
+      ])
+    )[0];
   }
 
   async getWeeklyAssesmentByStudentIdAndUnitId(
