@@ -19,6 +19,7 @@ export interface IPutCST {
   supervisorId?: string;
   startTime?: number;
   endTime?: number;
+  date?: string;
   notes?: string;
   topics?: {
     oldId: string;

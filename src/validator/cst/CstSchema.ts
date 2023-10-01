@@ -20,6 +20,7 @@ export const CstTopicVerificationStatusSchema = Joi.object({
 export const CstEditPayloadSchema = Joi.object({
   supervisorId: Joi.string().optional(),
   startTime: Joi.number().optional(),
+  date: Joi.string().optional(),
   endTime: Joi.number().optional(),
   notes: Joi.string().optional(),
   topics: Joi.array().items(Joi.object({

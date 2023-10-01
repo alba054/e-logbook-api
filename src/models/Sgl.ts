@@ -43,7 +43,6 @@ export class Sgl {
                 id
               }
             },
-            // createdAt: new Date(t.date),
             topic: {
               connect: {
                 id: t.newId
@@ -57,6 +56,7 @@ export class Sgl {
           id
         },
         data: {
+          createdAt: payload.date ? new Date(payload.date) : new Date(),
           endTime: payload.endTime,
           startTime: payload.startTime,     
         }
