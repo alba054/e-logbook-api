@@ -252,7 +252,11 @@ export class StudentHandler {
 
       let finalScore = 0;
       let osce = 0;
+      let oscePercentage = 0;
       let cbt = 0;
+      let cbtPercentage = 0;
+      let minicexPercentage = 0;
+      let saPercentage = 0;
 
       assesments.forEach((a) => {
         let grade = 0;
@@ -263,6 +267,7 @@ export class StudentHandler {
             });
             grade = grade / (a.MiniCex.MiniCexGrade.length || 1);
             grade *= a.MiniCex.weight;
+            minicexPercentage = a.MiniCex.weight;
           }
         }
 
@@ -273,6 +278,7 @@ export class StudentHandler {
             });
             grade = grade / a.ScientificAssesment?.grades.length;
             grade *= a.ScientificAssesment.weight;
+            saPercentage = a.ScientificAssesment.weight;
           }
         }
 
@@ -410,9 +416,24 @@ export class StudentHandler {
             examinerDPKId: miniCex.Student?.examinerSupervisorId,
             supervisingDPKId: miniCex.Student?.supervisingSupervisorId,
           },
-          osce: osce,
-          cbt: cbt,
-          finalScore,
+          finalScore: {
+            osce : {
+              score:osce,
+              percentage: oscePercentage,
+            },
+            cbt: {
+              score:cbt,
+              percentage: cbtPercentage
+            },
+            miniCex: {
+              score: miniCexGrade,
+              percentage: minicexPercentage,
+            },
+            sa: {
+              score: saGrade,
+              percentage: saPercentage,
+            }
+          },
         } as IStudentStastic)
       );
     } catch (error) {
