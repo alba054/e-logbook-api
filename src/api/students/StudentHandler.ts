@@ -286,12 +286,14 @@ export class StudentHandler {
           grade = a.osce.score ?? 0;
           osce = a.osce.score ?? 0;
           grade *= a.osce.weight;
+          oscePercentage = a.osce.weight;
         }
 
         if (a.cbt) {
           cbt = a.cbt.score ?? 0;
           grade = a.cbt.score ?? 0;
           grade *= a.cbt.weight;
+          cbtPercentage = a.cbt.weight;
         }
         finalScore = finalScore + grade;
       });
@@ -417,6 +419,7 @@ export class StudentHandler {
             supervisingDPKId: miniCex.Student?.supervisingSupervisorId,
           },
           finalScore: {
+            finalScore: finalScore,
             osce : {
               score:osce,
               percentage: oscePercentage,
