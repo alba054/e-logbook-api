@@ -10,12 +10,12 @@ export const SglPayloadSchema = Joi.object({
 
 export const SglEditPayloadSchema = Joi.object({
   supervisorId: Joi.string().optional(),
+  date: Joi.string().optional(),
   startTime: Joi.number().optional(),
   endTime: Joi.number().optional(),
   notes: Joi.string().optional(),
    topics: Joi.array().items(Joi.object({
     oldId: Joi.string().optional(),
-    date: Joi.string().optional(),
     newId: Joi.number().optional(),
   }))
 });

@@ -57,6 +57,7 @@ export class Cst {
           id
         },
         data: {
+          createdAt: payload.date ? new Date(payload.date) : new Date(),
           endTime: payload.endTime,
           startTime: payload.startTime,     
         }

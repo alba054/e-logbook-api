@@ -60,6 +60,7 @@ export class DailyActivityRouter {
         AuthorizationBearer.authorize([
           constants.SUPERVISOR_ROLE,
           constants.DPK_ROLE,
+          constants.STUDENT_ROLE,
         ]),
         this.handler.getActivitiesOfDailyActivity
       )

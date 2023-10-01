@@ -19,10 +19,10 @@ export interface IPutSGL {
   supervisorId?: string;
   startTime?: number;
   endTime?: number;
+  date?: string;
   notes?: string;
    topics?: {
     oldId: string;
     newId: number;
-    date: string,
   }[]
 }
