@@ -16,6 +16,8 @@ export interface IStudentStastic {
   totalSkills: number;
   verifiedCases: number;
   verifiedSkills: number;
+  osce: number;
+  cbt: number
   cases: IListCaseDTO[];
   skills: IListSkillDTO[];
 }
