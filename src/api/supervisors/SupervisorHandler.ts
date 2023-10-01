@@ -83,7 +83,7 @@ export class SupervisorHandler {
     }
 
     const activeUnit = await this.studentService.getActiveUnit(
-        studentId ?? ""
+        student.id ?? ""
       );
 
      const caseTypes = await this.caseTypeService.getCaseTypesByUnitId(
