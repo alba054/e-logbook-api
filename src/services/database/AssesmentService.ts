@@ -483,19 +483,6 @@ export class AssesmentService {
       return createErrorObject(404, "mini cex's not found");
     }
 
-    console.log(
-      miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId
-    );
-    console.log(
-      miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId
-    );
-
-    console.log(
-      miniCex?.Student?.academicSupervisorId !== tokenPayload.supervisorId
-    );
-
-    console.log(miniCex.Student?.id !== tokenPayload.studentId);
-
     if (
       miniCex.Student?.id !== tokenPayload.studentId &&
       miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
