@@ -31,6 +31,7 @@ export interface IStudentDailyActivities {
     id: string;
     weekName: number;
     unitId: string;
+    status: boolean;
     unitName: string;
     startDate: number;
     endDate: number;
@@ -62,12 +63,13 @@ export interface IListActivities {
   day: string;
 }
 
-interface IDailyActivities {
+export interface IDailyActivities {
   attendNum?: number | any;
   notAttendNum?: number | any;
   sickNum?: number | any;
   dailyActivityId: string | any;
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED" | any;
-  weekName: number | any;
+  weekId?: string | any;
+  weekName?: string | any;
   activitiesStatus: IActivitiesDetail[];
 }

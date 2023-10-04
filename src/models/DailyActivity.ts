@@ -177,7 +177,7 @@ export class DailyActivity {
         },
       },
       orderBy: {
-        day: {
+        day: {  
           week: {
             weekNum: "asc",
           },

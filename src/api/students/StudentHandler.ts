@@ -36,6 +36,7 @@ import { CompetencyService } from "../../services/database/CompetencyService";
 import { DailyActivityService } from "../../services/database/DailyActivityService";
 import {
   IActivitiesDetail,
+  IDailyActivities,
   IListActivitiesPerWeek,
   IStudentDailyActivities,
 } from "../../utils/dto/DailyActiveDTO";
@@ -851,29 +852,38 @@ export class StudentHandler {
       await this.dailyActivityService.getDailyActivitiesByStudentIdAndUnitId(
         tokenPayload
       );
+    
+    // Student
+    const student = await this.studentService.getStudentById(
+      tokenPayload.studentId
+    );
 
-    const weekNums = new Map();
+    const weekIds = new Map();
 
+    let checkInTime : number | null;
+    let checkOutTime : number | null; 
+    student?.CheckInCheckOut.forEach((check) => {
+      if(check.unitId == student.unitId){
+        console.log()
+        checkInTime = check.checkInTime != null ? Number(check.checkInTime) : null;
+        checkOutTime = check.checkOutTime != null ? Number(check.checkOutTime) : null;
+      }
+    });
+    
     result.forEach((r) => {
-      const weekNum = r.day?.week?.weekNum;
-      if (weekNums.has(weekNum)) {
-        const activities: any[] = weekNums.get(weekNum);
+      const weekId = r.day?.weekId;
+      if (weekIds.has(weekId)) {
+        const activities: any[] = weekIds.get(weekId);
         activities.push(r);
-        weekNums.set(weekNum, activities);
+        weekIds.set(weekId, activities);
       } else {
-        weekNums.set(weekNum, [r]);
+        weekIds.set(weekId, [r]);
       }
     });
 
-    const dailyActivities: { weekNum: number; activities: any }[] = [];
 
-    weekNums.forEach((v, k) => {
-      dailyActivities.push({
-        weekNum: k,
-        activities: v,
-      });
-    });
-
+   
+    // INITIAL WEEK
     let response = {
       unitName: result[0]?.Unit?.name,
       weeks: weeks.map((w) => {
@@ -895,6 +905,15 @@ export class StudentHandler {
       }),
       dailyActivities: [],
     } as IStudentDailyActivities;
+
+
+    const dailyActivities: { weekId: string; activities: any }[] = [];
+    weekIds.forEach((v, k) => {
+      dailyActivities.push({
+        weekId: k,
+        activities: v,
+      });
+    });
 
     if (dailyActivities !== null) {
       response = {
@@ -919,7 +938,7 @@ export class StudentHandler {
         dailyActivities: Array.isArray(dailyActivities)
           ? dailyActivities.map((d) => {
               return {
-                weekName: d.weekNum,
+                weekId: d.weekId,
                 attendNum: d.activities.filter(
                   (a: any) => a.Activity?.activityStatus === "ATTEND"
                 ).length,
@@ -948,9 +967,50 @@ export class StudentHandler {
       };
     }
 
+
+    let fixWeek = response.weeks.filter((w)=>{
+         return (w.startDate)>=(checkInTime??0) && checkOutTime===null ? true: w.endDate<=(checkOutTime??0);
+      }).map((w, index)=>{
+        return {
+          endDate: w.endDate,
+          startDate: w.startDate,
+          unitId: w.unitId ?? "",
+          unitName: w.unitName,
+          weekName: index + 1,
+          status: w.status,
+          id: w.id,
+          days: w.days,
+        }
+      });
+
+    let fixDailyActivities : IDailyActivities[] = [];
+    response.dailyActivities.forEach((activities)=>{
+      weeks.forEach((week)=>{
+        if(week.id==activities.weekId){
+          fixDailyActivities.push({
+            weekId: activities.weekId,
+            weekName: week.weekNum,
+            attendNum: activities.attendNum,
+            notAttendNum: activities.notAttendNum,
+            sickNum: activities.sickNum,
+            activitiesStatus: activities.activitiesStatus,
+            dailyActivityId: activities.dailyActivityId,
+            verificationStatus: activities.verificationStatus,
+        });
+        }
+      });
+    });
+ 
+
+    let modifResponse = {
+      unitName: response.unitName,
+      weeks: fixWeek,
+      dailyActivities: fixDailyActivities,
+    }
+
     return res
       .status(200)
-      .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, response));
+      .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, modifResponse));
   }
 
   async putDailyActivityActivity(
