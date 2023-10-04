@@ -969,7 +969,7 @@ export class StudentHandler {
 
 
     let fixWeek = response.weeks.filter((w)=>{
-         return (w.startDate)>=(checkInTime??0) && checkOutTime===null ? true: w.endDate<=(checkOutTime??0);
+         return (((checkInTime??0)>=w.startDate&&(checkInTime??0)<=w.endDate)||(w.startDate)>=(checkInTime??0))  && checkOutTime===null ? true: w.endDate<=(checkOutTime??0);
       }).map((w, index)=>{
         return {
           endDate: w.endDate,
