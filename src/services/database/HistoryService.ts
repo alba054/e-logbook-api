@@ -22,11 +22,13 @@ export class HistoryService {
   async retrieveHistoryBySupervisorCeu(supervisorId: string[],
     page: number = 0,
     elemPerPage?: number,
+    status?:boolean,
     checkIn?: any) {
     const history = await this.historyModel.getHistoryBySupervisorCeu(
       supervisorId,
       page,
       elemPerPage,
+      status,
       checkIn
     );
 

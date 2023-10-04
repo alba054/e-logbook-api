@@ -23,9 +23,27 @@ export class History {
   async getHistoryBySupervisorCeu(  supervisorId: string[],
     page: number = 0,
     elemPerPage: number = constants.HISTORY_ELEMENTS_PER_PAGE,
+    status?: boolean,
     checkin?: boolean) {
     try {
       if (checkin) {
+        return db.history.findMany({
+          where: {
+            OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }]
+          },
+          skip: page * elemPerPage,
+          take: elemPerPage,
+          orderBy: {
+            timestamp: "desc",
+          },
+          include: {
+            student: true,
+            supervisor: true,
+            Unit: true,
+          },
+        });
+      }
+      else if (status) {
         return db.history.findMany({
           where: {
             OR: [
@@ -150,10 +168,10 @@ export class History {
     supervisorId: string[],
     page: number = 0,
     elemPerPage: number = constants.HISTORY_ELEMENTS_PER_PAGE,
-    checkin?: boolean
+    status?: boolean,
   ) {
     try {
-      if (checkin) {
+       if (status) {
         return db.history.findMany({
           where: {
             OR: [

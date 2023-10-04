@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { HistoryService } from "../../services/database/HistoryService";
-import { constants, createErrorObject, createResponse } from "../../utils";
+import { constants, createResponse } from "../../utils";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 
@@ -36,7 +36,7 @@ export class HistoryHandler {
         result = await this.historyService.retrieveHistoryEr(
           page - 1,
           constants.HISTORY_ELEMENTS_PER_PAGE,
-          checkIn
+          false
         );
       } 
       else if (
@@ -48,7 +48,8 @@ export class HistoryHandler {
             [tokenPayload.supervisorId],
             page - 1,
             constants.HISTORY_ELEMENTS_PER_PAGE,
-            true
+            true,
+            checkIn,
           );
         }
         else if(tokenPayload.badges?.includes("HEAD_DIV")){
@@ -64,15 +65,16 @@ export class HistoryHandler {
             [tokenPayload.supervisorId],
             page - 1,
             constants.HISTORY_ELEMENTS_PER_PAGE,
-            false
+            false,
+            checkIn
           );
         }else{
           result = await this.historyService.retrieveHistoryBySupervisors(
-          [tokenPayload.supervisorId],
-          page - 1,
-          constants.HISTORY_ELEMENTS_PER_PAGE,
-          false
-        );
+            [tokenPayload.supervisorId],
+            page - 1,
+            constants.HISTORY_ELEMENTS_PER_PAGE,
+            false
+          );
         }
         
       } else if (tokenPayload.role == "STUDENT" && tokenPayload.studentId) {

@@ -8,6 +8,7 @@ import { WeekService } from "../../services/database/WeekService";
 import { constants, createResponse } from "../../utils";
 import {
   IActivitiesDetail,
+  IDailyActivities,
   IListActivities,
   IListActivitiesPerWeek,
   IStudentDailyActivities,
@@ -264,39 +265,74 @@ export class DailyActivityHandler {
           student.unitId ?? ""
         );
 
-      const weekNums = new Map();
 
-      result.forEach((r) => {
-        const weekNum = r.day?.week?.weekNum;
-        if (weekNums.has(weekNum)) {
-          const activities: any[] = weekNums.get(weekNum);
-          activities.push(r);
-          weekNums.set(weekNum, activities);
-        } else {
-          weekNums.set(weekNum, [r]);
-        }
+       const weekIds = new Map();
+
+    let checkInTime : number | null;
+    let checkOutTime : number | null; 
+    student?.CheckInCheckOut.forEach((check) => {
+      if(check.unitId == student.unitId){
+        console.log()
+        checkInTime = check.checkInTime != null ? Number(check.checkInTime) : null;
+        checkOutTime = check.checkOutTime != null ? Number(check.checkOutTime) : null;
+      }
+    });
+    
+    result.forEach((r) => {
+      const weekId = r.day?.weekId;
+      if (weekIds.has(weekId)) {
+        const activities: any[] = weekIds.get(weekId);
+        activities.push(r);
+        weekIds.set(weekId, activities);
+      } else {
+        weekIds.set(weekId, [r]);
+      }
+    });
+
+    // INITIAL WEEK
+    let response = {
+      unitName: result[0]?.Unit?.name,
+      weeks: weeks.map((w) => {
+        return {
+          endDate: Number(w.endDate),
+          startDate: Number(w.startDate),
+          unitId: w.unitId,
+          unitName: w.Unit?.name,
+          weekName: w.weekNum,
+          id: w.id,
+          status: w.status,
+          days: w.Day.map((d) => {
+            return {
+              day: d.day,
+              id: d.id,
+            };
+          }),
+        };
+      }),
+      dailyActivities: [],
+    } as IStudentDailyActivities;
+
+
+    const dailyActivities: { weekId: string; activities: any }[] = [];
+    weekIds.forEach((v, k) => {
+      dailyActivities.push({
+        weekId: k,
+        activities: v,
       });
+    });
 
-      const dailyActivities: { weekNum: number; activities: any }[] = [];
-
-      weekNums.forEach((v, k) => {
-        dailyActivities.push({
-          weekNum: k,
-          activities: v,
-        });
-      });
-
-      let response = {
+    if (dailyActivities !== null) {
+      response = {
         unitName: result[0]?.Unit?.name,
         weeks: weeks.map((w) => {
           return {
             endDate: Number(w.endDate),
             startDate: Number(w.startDate),
-            unitId: w.unitId,
-            unitName: w.Unit?.name,
+            unitId: w.unitId ?? "",
+            unitName: w.Unit?.name ?? "",
             weekName: w.weekNum,
-            id: w.id,
             status: w.status,
+            id: w.id,
             days: w.Day.map((d) => {
               return {
                 day: d.day,
@@ -305,60 +341,78 @@ export class DailyActivityHandler {
             }),
           };
         }),
-        dailyActivities: [],
-      } as IStudentDailyActivities;
+        dailyActivities: Array.isArray(dailyActivities)
+          ? dailyActivities.map((d) => {
+              return {
+                weekId: d.weekId,
+                attendNum: d.activities.filter(
+                  (a: any) => a.Activity?.activityStatus === "ATTEND"
+                ).length,
+                notAttendNum: d.activities.filter(
+                  (a: any) => a.Activity?.activityStatus === "NOT_ATTEND"
+                ).length,
+                sickNum: d.activities.filter(
+                  (a: any) => a.Activity?.activityStatus === "SICK"
+                ).length,
+                activitiesStatus: d.activities?.map((d: any) => {
+                  return {
+                    id: d.id,
+                    day: d.day?.day,
+                    location: d.Activity?.location?.name,
+                    detail: d.Activity?.detail,
+                    activityStatus: d.Activity?.activityStatus,
+                    activityName: d.Activity?.ActivityName?.name,
+                    verificationStatus: d.verificationStatus,
+                  };
+                }),
+                dailyActivityId: "",
+                verificationStatus: "",
+              };
+            })
+          : [],
+      };
+    }
 
-      if (dailyActivities !== null) {
-        response = {
-          unitName: result[0]?.Unit?.name,
-          weeks: weeks.map((w) => {
-            return {
-              endDate: Number(w.endDate),
-              startDate: Number(w.startDate),
-              unitId: w.unitId ?? "",
-              status: w.status,
-              unitName: w.Unit?.name ?? "",
-              weekName: w.weekNum,
-              id: w.id,
-              days: w.Day.map((d) => {
-                return {
-                  day: d.day,
-                  id: d.id,
-                };
-              }),
-            };
-          }),
-          dailyActivities: Array.isArray(dailyActivities)
-            ? dailyActivities.map((d) => {
-                return {
-                  weekName: d.weekNum,
-                  attendNum: d.activities.filter(
-                    (a: any) => a.Activity?.activityStatus === "ATTEND"
-                  ).length,
-                  notAttendNum: d.activities.filter(
-                    (a: any) => a.Activity?.activityStatus === "NOT_ATTEND"
-                  ).length,
-                  sickNum: d.activities.filter(
-                    (a: any) => a.Activity?.activityStatus === "SICK"
-                  ).length,
-                  activitiesStatus: d.activities?.map((d: any) => {
-                    return {
-                      id: d.id,
-                      day: d.day?.day,
-                      location: d.Activity.location?.name,
-                      detail: d.Activity?.detail,
-                      activityStatus: d.Activity?.activityStatus,
-                      activityName: d.Activity.ActivityName?.name,
-                      verificationStatus: d.verificationStatus,
-                    };
-                  }),
-                  dailyActivityId: "",
-                  verificationStatus: "",
-                };
-              })
-            : [],
-        };
-      }
+
+    let fixWeek = response.weeks.filter((w)=>{
+         return (w.startDate)>=(checkInTime??0) && checkOutTime===null ? true: w.endDate<=(checkOutTime??0);
+      }).map((w, index)=>{
+        return {
+          endDate: w.endDate,
+          startDate: w.startDate,
+          unitId: w.unitId ?? "",
+          unitName: w.unitName,
+          weekName: index + 1,
+          status: w.status,
+          id: w.id,
+          days: w.days,
+        }
+      });
+
+      let fixDailyActivities : IDailyActivities[] = [];
+      response.dailyActivities.forEach((activities)=>{
+        weeks.forEach((week)=>{
+          if(week.id==activities.weekId){
+            fixDailyActivities.push({
+              weekId: activities.weekId,
+              weekName: week.weekNum,
+              attendNum: activities.attendNum,
+              notAttendNum: activities.notAttendNum,
+              sickNum: activities.sickNum,
+              activitiesStatus: activities.activitiesStatus,
+              dailyActivityId: activities.dailyActivityId,
+              verificationStatus: activities.verificationStatus,
+          });
+          }
+        });
+      });
+  
+
+      let modifResponse = {
+        unitName: response.unitName,
+        weeks: fixWeek,
+        dailyActivities: fixDailyActivities,
+    }
 
       return res
         .status(200)
