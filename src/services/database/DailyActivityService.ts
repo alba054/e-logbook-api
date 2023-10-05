@@ -137,6 +137,7 @@ export class DailyActivityService {
             studentId: dailyActivity?.studentId,
             unitId: dailyActivity?.unitId,
             score: 0,
+            weekId: dailyActivity?.day?.week?.id,
           },
         })
       );

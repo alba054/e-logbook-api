@@ -108,7 +108,7 @@ export class WeekService {
           data: {
             endDate: payload.endDate,
             startDate: payload.startDate,
-            weekNum: +new Date(),
+            weekNum: payload.weekNum,
             unitId: payload.unitId,
             id: weekId,
           },

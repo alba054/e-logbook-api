@@ -146,7 +146,7 @@ export class WeeklyAssesmentHandler {
         let endDate: number | null = null;
         let weekNum : number = 0;
         fixWeek.forEach((wd, index)=>{
-          if(w.weekNum===wd.weekNum){
+          if(w.weekId===wd.id){
             weekNum = index+1;
             startDate = Number(wd.startDate);
             endDate = Number(wd.endDate);
@@ -154,10 +154,10 @@ export class WeeklyAssesmentHandler {
         });  
         listWeeklyAssesment.push({
               attendNum: dailyActivities
-                .filter((a) => a.day?.week?.weekNum === w.weekNum)
+                .filter((a) => a.day?.week?.id === w.weekId)
                 .filter((a) => a.Activity?.activityStatus === "ATTEND").length,
               notAttendNum: dailyActivities
-                .filter((a) => a.day?.week?.weekNum === w.weekNum)
+                .filter((a) => a.day?.week?.id === w.weekId)
                 .filter(
                   (a) =>
                     a.Activity?.activityStatus === "NOT_ATTEND" ||
