@@ -45,7 +45,7 @@ export class Week {
         Day: true,
         Unit: true,
       },
-      orderBy: [{ startDate: "asc" }, { updatedAt: "desc" }],
+      orderBy: [{ startDate: "desc" }, { updatedAt: "desc" }],
     });
   }
 
