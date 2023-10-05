@@ -47,7 +47,6 @@ export class DailyActivityHandler {
       this.putVerificationStatusOfDailyActivities.bind(this);
     this.getActivities = this.getActivities.bind(this);
   }
-
   
   async getActivities(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
@@ -56,48 +55,12 @@ export class DailyActivityHandler {
       await this.dailyActivityService.getActivitiesBySupervisorId(
         tokenPayload.supervisorId
       );
-    
 
-    let listActivities : IListActivities[] = [];
-    for (const a of activities) {
-      const student = await this.studentService.getStudentByStudentId(a.Student?.id ?? '');
-      if (student && "error" in student) {
-          switch (student.error) {
-            case 400:
-              throw new BadRequestError(student.message);
-            case 404:
-              throw new NotFoundError(student.message);
-            default:
-              throw new InternalServerError();
-          }
-      }
-      let checkInTime: number | null;
-      let checkOutTime: number | null;
-
-      student?.CheckInCheckOut.forEach((check) => {
-        if(check.unitId == student.unitId){
-          checkInTime = check.checkInTime != null ? Number(check.checkInTime) : null;
-          checkOutTime = check.checkOutTime != null ? Number(check.checkOutTime) : null;
-        }
-      });
-
-      const weeks = await this.weekService.getWeeksByUnitId(
-        student.unitId ?? ""
-      );
-
-      let fixWeek = weeks.filter((w)=>{
-         return (w.startDate)>=(checkInTime??0) && checkOutTime===null ? true: w.endDate<=(checkOutTime??0);
-      });
-
-      let weekNum : number = 0;
-      fixWeek.forEach((w, index)=>{
-        if(a.day?.weekId===w.id){
-          weekNum = index+1;
-        }
-      });  
-
-      listActivities.push(
-        {
+    return res.status(200).json(
+      createResponse(
+        constants.SUCCESS_RESPONSE_MESSAGE,
+        activities.map((a) => {
+          return {
             activityName: a.Activity?.ActivityName?.name,
             activityStatus: a.Activity?.activityStatus,
             id: a.id,
@@ -107,16 +70,10 @@ export class DailyActivityHandler {
             studentName: a.Student?.fullName,
             unitName: a.Unit?.name,
             verificationStatus: a.verificationStatus,
-            weekNum: weekNum,
+            weekNum: a.day?.week?.weekNum,
             day: a.day?.day,
-          } as IListActivities
-        );
-    }
-
-    return res.status(200).json(
-      createResponse(
-        constants.SUCCESS_RESPONSE_MESSAGE,
-        listActivities,
+          } as IListActivities;
+        })
       )
     );
   }
@@ -249,43 +206,6 @@ export class DailyActivityHandler {
         }
       }
 
-      const student = await this.studentService.getStudentByStudentId(result.Student?.studentId ?? '');
-      if (student && "error" in student) {
-          switch (student.error) {
-            case 400:
-              throw new BadRequestError(student.message);
-            case 404:
-              throw new NotFoundError(student.message);
-            default:
-              throw new InternalServerError();
-          }
-      }
-      let checkInTime: number | null;
-      let checkOutTime: number | null;
-
-      student?.CheckInCheckOut.forEach((check) => {
-        if(check.unitId == student.unitId){
-          checkInTime = check.checkInTime != null ? Number(check.checkInTime) : null;
-          checkOutTime = check.checkOutTime != null ? Number(check.checkOutTime) : null;
-        }
-      });
-
-      const weeks = await this.weekService.getWeeksByUnitId(
-        student.unitId ?? ""
-      );
-
-      let fixWeek = weeks.filter((w)=>{
-         return (w.startDate)>=(checkInTime??0) && checkOutTime===null ? true: w.endDate<=(checkOutTime??0);
-      });
-
-      let weekNum : number = 0;
-      fixWeek.forEach((w, index)=>{
-        if(result.day?.weekId===w.id){
-          weekNum = index+1;
-        }
-      });  
-
-
     return res
         .status(200)
         .json(
@@ -301,7 +221,7 @@ export class DailyActivityHandler {
               studentName: result.Student?.fullName,
               unitName: result.Unit?.name,
               verificationStatus: result.verificationStatus,
-              weekNum: weekNum,
+              weekNum: result.day?.week?.weekNum,
               day: result.day?.day,
             } as IListActivities
           )
@@ -352,6 +272,7 @@ export class DailyActivityHandler {
     let checkOutTime : number | null; 
     student?.CheckInCheckOut.forEach((check) => {
       if(check.unitId == student.unitId){
+        console.log()
         checkInTime = check.checkInTime != null ? Number(check.checkInTime) : null;
         checkOutTime = check.checkOutTime != null ? Number(check.checkOutTime) : null;
       }
@@ -507,7 +428,7 @@ export class DailyActivityHandler {
     next: NextFunction
   ) {
     const tokenPayload: ITokenPayload = res.locals.user;
-    const { dayId  } = req.params;
+    const { dayId } = req.params;
     const payload: IPutDailyActivityActivity = req.body;
 
     try {
@@ -519,8 +440,6 @@ export class DailyActivityHandler {
       if (validationResult && "error" in validationResult) {
         throw new BadRequestError(validationResult.message);
       }
-      
-
 
       const result = await this.dailyActivityService.editDailyActivityActivity(
         tokenPayload,
