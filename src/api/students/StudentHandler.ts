@@ -985,11 +985,11 @@ export class StudentHandler {
 
     let fixDailyActivities : IDailyActivities[] = [];
     response.dailyActivities.forEach((activities)=>{
-      weeks.forEach((week)=>{
-        if(week.id==activities.weekId){
+      fixWeek.forEach((week)=>{
+        if(week.id===activities.weekId){
           fixDailyActivities.push({
-            weekId: activities.weekId,
-            weekName: week.weekNum,
+            weekId: week.id,
+            weekName: week.weekName,
             attendNum: activities.attendNum,
             notAttendNum: activities.notAttendNum,
             sickNum: activities.sickNum,
