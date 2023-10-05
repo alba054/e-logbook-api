@@ -59,7 +59,7 @@ import { IStudentProfileDTO } from "../../utils/dto/StudentProfileDTO";
 import { WeeklyAssesmentService } from "../../services/database/WeeklyAssesmentService";
 import { IStudentStastic } from "../../utils/dto/StudentDTO";
 import { WeekService } from "../../services/database/WeekService";
-import { IStudentWeeklyAssesment } from "../../utils/dto/WeeklyAssesmentDTO";
+import { IStudentWeeklyAssesment, IWeeklyAssesment } from "../../utils/dto/WeeklyAssesmentDTO";
 import { CaseTypes } from "../../models/CaseTypes";
 import { SkillTypes } from "../../models/SkillTypes";
 
@@ -469,29 +469,65 @@ export class StudentHandler {
         tokenPayload.studentId ?? "",
         activeUnit?.activeUnit.activeUnit?.id ?? ""
       );
+    
+    let listWeeklyAssesment : IWeeklyAssesment[] = [];
+      for(const w of weeklyAssesment){
+        const student = await this.studentService.getStudentById(w.Student?.id ?? '');
+        let checkInTime: number | null;
+        let checkOutTime: number | null;
+
+        student?.CheckInCheckOut.forEach((check) => {
+          if(check.unitId == student.unitId){
+            checkInTime = check.checkInTime != null ? Number(check.checkInTime) : null;
+            checkOutTime = check.checkOutTime != null ? Number(check.checkOutTime) : null;
+          }
+        });
+        const weeks = await this.weekService.getWeeksByUnitId(
+         student?.unitId ?? ""
+        );
+
+        let fixWeek = weeks.filter((w)=>{
+          return (w.startDate)>=(checkInTime??0) && checkOutTime===null ? true: w.endDate<=(checkOutTime??0);
+        });
+
+        let startDate: number | null = null;
+        let endDate: number | null = null;
+        let weekNum : number = 0;
+        fixWeek.forEach((wd, index)=>{
+          if(w.weekId===wd.id){
+            weekNum = index+1;
+            startDate = Number(wd.startDate);
+            endDate = Number(wd.endDate);
+          }
+        });  
+        listWeeklyAssesment.push({
+              attendNum: dailyActivities
+                .filter((a) => a.day?.week?.id === w.weekId)
+                .filter((a) => a.Activity?.activityStatus === "ATTEND").length,
+              notAttendNum: dailyActivities
+                .filter((a) => a.day?.week?.id === w.weekId)
+                .filter(
+                  (a) =>
+                    a.Activity?.activityStatus === "NOT_ATTEND" ||
+                    a.Activity?.activityStatus === "SICK" ||
+                    a.Activity?.activityStatus === "HOLIDAY"
+                ).length,
+              score: w.score,
+              verificationStatus: w.verificationStatus,
+              weekNum: weekNum,
+              id: w.id,
+              startDate: startDate,
+              endDate: endDate,
+            } as IWeeklyAssesment);
+      }
+
+
 
     return res.status(200).json(
       createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
         studentName: weeklyAssesment[0]?.Student?.fullName,
         studentId: weeklyAssesment[0]?.Student?.studentId,
-        assesments: weeklyAssesment.map((w) => {
-          return {
-            attendNum: dailyActivities
-              .filter((a) => a.day?.week?.weekNum === w.weekNum)
-              .filter((a) => a.Activity?.activityStatus === "ATTEND").length,
-            notAttendNum: dailyActivities
-              .filter((a) => a.day?.week?.weekNum === w.weekNum)
-              .filter(
-                (a) =>
-                  a.Activity?.activityStatus === "NOT_ATTEND" ||
-                  a.Activity?.activityStatus === "SICK"
-              ).length,
-            score: w.score,
-            verificationStatus: w.verificationStatus,
-            weekNum: w.weekNum,
-            id: w.id,
-          };
-        }),
+        assesments: listWeeklyAssesment,
       } as IStudentWeeklyAssesment)
     );
   }
@@ -864,7 +900,6 @@ export class StudentHandler {
     let checkOutTime : number | null; 
     student?.CheckInCheckOut.forEach((check) => {
       if(check.unitId == student.unitId){
-        console.log()
         checkInTime = check.checkInTime != null ? Number(check.checkInTime) : null;
         checkOutTime = check.checkOutTime != null ? Number(check.checkOutTime) : null;
       }
