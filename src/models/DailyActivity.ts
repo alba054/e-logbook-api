@@ -65,7 +65,7 @@ export class DailyActivity {
     studentId: string,
     unitId: string,
     activityId: string,
-    payload: IPutDailyActivityActivity
+    payload: IPutDailyActivityActivity,
   ) {
     return db.dailyActivity.create({
       data: {
