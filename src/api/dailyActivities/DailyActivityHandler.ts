@@ -239,7 +239,7 @@ export class DailyActivityHandler {
         }
       }
 
-      const student = await this.studentService.getStudentById(result.Student?.studentId ?? '');
+      const student = await this.studentService.getStudentById(result?.studentId ?? '');
       let checkInTime: number | null;
       let checkOutTime: number | null;
 
@@ -249,7 +249,6 @@ export class DailyActivityHandler {
           checkOutTime = check.checkOutTime != null ? Number(check.checkOutTime) : null;
         }
       });
-
       const weeks = await this.weekService.getWeeksByUnitId(
         student?.unitId ?? ""
       );
