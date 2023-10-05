@@ -153,7 +153,7 @@ export class Student {
         studentId,
       },
       include: {
-         CheckInCheckOut: true,
+        CheckInCheckOut: true,
         supervisingDPK: true,
         academicAdvisor: true,
         examinerDPK: true,
