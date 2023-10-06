@@ -241,7 +241,9 @@ export class User {
           email: payload.email,
           profilePic: payload.pic,
           username: payload.username,
-          password: await bcryptjs.hash(payload.password ?? "", 10),
+          password: payload.password
+            ? await bcryptjs.hash(payload.password, 10)
+            : undefined,
           supervisor: {
             update: {
               supervisorId: payload.nim,
