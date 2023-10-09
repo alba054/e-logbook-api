@@ -217,16 +217,7 @@ export class CheckInCheckOut {
         return createErrorObject(404, "cannot find last check-out");
       }
 
-      if (
-        lastCheckin.caseDone &&
-        lastCheckin.cstDone &&
-        lastCheckin.sglDone &&
-        lastCheckin.skillDone &&
-        lastCheckin.clinicalRecordDone &&
-        lastCheckin.selfReflectionDone &&
-        lastCheckin.scientificSessionDone
-      ) {
-        return db.checkInCheckOut.updateMany({
+      return db.checkInCheckOut.updateMany({
           where: {
             id: lastCheckin.id,
           },
@@ -236,12 +227,35 @@ export class CheckInCheckOut {
             checkOutTime: Math.floor(new Date().getTime() / 1000),
           },
         });
-      }
 
-      return createErrorObject(
-        400,
-        "cannot checkout finish all activities first"
-      );
+      // if (
+      //   lastCheckin.caseDone &&
+      //   lastCheckin.cstDone &&
+      //   lastCheckin.sglDone &&
+      //   lastCheckin.skillDone &&
+      //   lastCheckin.clinicalRecordDone &&
+      //   lastCheckin.selfReflectionDone &&
+      //   lastCheckin.scientificSessionDone
+      // ) {
+      //   return db.checkInCheckOut.updateMany({
+      //     where: {
+      //       id: lastCheckin.id,
+      //     },
+      //     data: {
+      //       checkOut: true,
+      //       checkOutStatus: "INPROCESS",
+      //       checkOutTime: Math.floor(new Date().getTime() / 1000),
+      //     },
+      //   });
+      // }
+      // return createErrorObject(
+      //   400,
+      //   "cannot checkout finish all activities first"
+      // );
+
+      
+
+      
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to update in process checkout");
