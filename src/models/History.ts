@@ -31,8 +31,8 @@ export class History {
           where: {
             OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }]
           },
-          skip: page * elemPerPage,
-          take: elemPerPage,
+          // skip: page * elemPerPage,
+          // take: elemPerPage,
           orderBy: {
             timestamp: "desc",
           },
@@ -51,8 +51,8 @@ export class History {
               { OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }, {type: "ASSESMENT"},{type: "SGL"}, {type:"CST"}] },
             ],
           },
-          skip: page * elemPerPage,
-          take: elemPerPage,
+          // skip: page * elemPerPage,
+          // take: elemPerPage,
           orderBy: {
             timestamp: "desc",
           },
@@ -64,8 +64,8 @@ export class History {
         });
       }
       return db.history.findMany({
-        skip: page * elemPerPage,
-        take: elemPerPage,
+        // skip: page * elemPerPage,
+        // take: elemPerPage,
         where: {
           OR: [
             {OR: supervisorId.map(History.remapSupervisor)},
@@ -97,8 +97,8 @@ export class History {
 
      try{
       return db.history.findMany({
-        skip: page * elemPerPage,
-        take: elemPerPage,
+        // skip: page * elemPerPage,
+        // take: elemPerPage,
         where: {
           type: 'WEEKLY_ASSESMENT',
         },
@@ -131,8 +131,8 @@ export class History {
           where: {
             OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }],
           },
-          skip: page * elemPerPage,
-          take: elemPerPage,
+          // skip: page * elemPerPage,
+          // take: elemPerPage,
           orderBy: {
             timestamp: "desc",
           },
@@ -144,8 +144,8 @@ export class History {
         });
       }
       return db.history.findMany({
-        skip: page * elemPerPage,
-        take: elemPerPage,
+        // skip: page * elemPerPage,
+        // take: elemPerPage,
         orderBy: {
           timestamp: "desc",
         },
@@ -179,8 +179,8 @@ export class History {
               { OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }] },
             ],
           },
-          skip: page * elemPerPage,
-          take: elemPerPage,
+          // skip: page * elemPerPage,
+          // take: elemPerPage,
           orderBy: {
             timestamp: "desc",
           },
@@ -192,8 +192,8 @@ export class History {
         });
       }
       return db.history.findMany({
-        skip: page * elemPerPage,
-        take: elemPerPage,
+        // skip: page * elemPerPage,
+        // take: elemPerPage,
         where: {
           OR: supervisorId.map(History.remapSupervisor),
         },
@@ -230,8 +230,8 @@ export class History {
               { OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }] },
             ],
           },
-          skip: page * elemPerPage,
-          take: elemPerPage,
+          // skip: page * elemPerPage,
+          // take: elemPerPage,
           orderBy: {
             timestamp: "desc",
           },
@@ -243,8 +243,8 @@ export class History {
         });
       }
       return db.history.findMany({
-        skip: page * elemPerPage,
-        take: elemPerPage,
+        // skip: page * elemPerPage,
+        // take: elemPerPage,
         where: {
           OR: studentId.map(History.remapStudent),
         },
