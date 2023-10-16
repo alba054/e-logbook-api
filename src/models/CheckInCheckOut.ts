@@ -61,7 +61,7 @@ export class CheckInCheckOut {
           student: {
             studentId: studentId === null ? undefined : studentId,
           },
-          
+
           unitId: unitId === null ? undefined : unitId,
         },
       });
@@ -110,14 +110,15 @@ export class CheckInCheckOut {
       }
 
       if (
-        lastCheckin.caseDone &&
-        lastCheckin.cstDone &&
-        lastCheckin.sglDone &&
-        lastCheckin.skillDone &&
-        lastCheckin.dailyActiviyDone &&
-        lastCheckin.clinicalRecordDone &&
-        lastCheckin.selfReflectionDone &&
-        lastCheckin.scientificSessionDone
+        // lastCheckin.caseDone &&
+        // lastCheckin.cstDone &&
+        // lastCheckin.sglDone &&
+        // lastCheckin.skillDone &&
+        // lastCheckin.dailyActiviyDone &&
+        // lastCheckin.clinicalRecordDone &&
+        // lastCheckin.selfReflectionDone &&
+        // lastCheckin.scientificSessionDone
+        true
       ) {
         await this.historyModel.insertHistory(
           "CHECK_OUT",
@@ -218,15 +219,15 @@ export class CheckInCheckOut {
       }
 
       return db.checkInCheckOut.updateMany({
-          where: {
-            id: lastCheckin.id,
-          },
-          data: {
-            checkOut: true,
-            checkOutStatus: "INPROCESS",
-            checkOutTime: Math.floor(new Date().getTime() / 1000),
-          },
-        });
+        where: {
+          id: lastCheckin.id,
+        },
+        data: {
+          checkOut: true,
+          checkOutStatus: "INPROCESS",
+          checkOutTime: Math.floor(new Date().getTime() / 1000),
+        },
+      });
 
       // if (
       //   lastCheckin.caseDone &&
@@ -252,10 +253,6 @@ export class CheckInCheckOut {
       //   400,
       //   "cannot checkout finish all activities first"
       // );
-
-      
-
-      
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to update in process checkout");
