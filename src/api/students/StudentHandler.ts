@@ -987,7 +987,10 @@ export class StudentHandler {
                   (a: any) => a.Activity?.activityStatus === "SICK"
                 ).length,
                 activitiesStatus: d.activities
-                  .filter((a: any) => a.Activity?.activityStatus !== null)
+                  .filter(
+                    (a: any) =>
+                      a.Activity !== null && a.Activity?.activityStatus !== null
+                  )
                   .map((d: any) => {
                     return {
                       id: d.id,
