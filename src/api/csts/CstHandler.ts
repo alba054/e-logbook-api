@@ -5,7 +5,12 @@ import { NotFoundError } from "../../exceptions/httpError/NotFoundError";
 import { CstService } from "../../services/database/CstService";
 import { StudentService } from "../../services/database/StudentService";
 import { constants, createResponse } from "../../utils";
-import { ICstDetail, ICstHistoryDetail, IStudentCst, ISubmittedCst } from "../../utils/dto/CstDTO";
+import {
+  ICstDetail,
+  ICstHistoryDetail,
+  IStudentCst,
+  ISubmittedCst,
+} from "../../utils/dto/CstDTO";
 import {
   IPostCST,
   IPostCSTTopic,
@@ -22,7 +27,6 @@ import {
 import { Validator } from "../../validator/Validator";
 
 export class CstHandler {
-
   private validator: Validator;
   private cstService: CstService;
   private studentService: StudentService;
@@ -47,43 +51,42 @@ export class CstHandler {
   }
 
   async getCst(req: Request, res: Response, next: NextFunction) {
-   const tokenPayload: ITokenPayload = res.locals.user;
+    const tokenPayload: ITokenPayload = res.locals.user;
     const { id } = req.params;
 
     const result = await this.cstService.getCstById(id, tokenPayload);
-    
-      if (result && "error" in result) {
-        switch (result.error) {
-          case 400:
-            throw new BadRequestError(result.message);
-          case 404:
-            throw new NotFoundError(result.message);
-          default:
-            throw new InternalServerError();
-        }
+
+    if (result && "error" in result) {
+      switch (result.error) {
+        case 400:
+          throw new BadRequestError(result.message);
+        case 404:
+          throw new NotFoundError(result.message);
+        default:
+          throw new InternalServerError();
       }
+    }
 
-      return res.status(200).json(
-        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-          cstId: result.id,
-          studentId: result.Student?.studentId,
-          studentName: result.Student?.fullName,
-          supervisorId: result.supervisor?.supervisorId,
-          supervisorName: result.supervisor?.fullname,
-          unitName: result.Unit?.name,
-          createdAt: result.createdAt,
-          startTime: Number(result.startTime),
-          endTime: Number(result.endTime),
-          topic: result.topics.map((t) => ({
-                topicName: t.topic.map((n) => n.name),
-                topicId: t.topic[0]?.id,
-                verificationStatus: t.verificationStatus,
-                notes: t.notes,
-                id: t.id,
-          })),
-        } as ICstHistoryDetail)
-      )
-
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        cstId: result.id,
+        studentId: result.Student?.studentId,
+        studentName: result.Student?.fullName,
+        supervisorId: result.supervisor?.supervisorId,
+        supervisorName: result.supervisor?.fullname,
+        unitName: result.Unit?.name,
+        createdAt: result.createdAt,
+        startTime: Number(result.startTime),
+        endTime: Number(result.endTime),
+        topic: result.topics.map((t) => ({
+          topicName: t.topic.map((n) => n.name),
+          topicId: t.topic[0]?.id,
+          verificationStatus: t.verificationStatus,
+          notes: t.notes,
+          id: t.id,
+        })),
+      } as ICstHistoryDetail)
+    );
   }
 
   async deleteCst(req: Request, res: Response, next: NextFunction) {
@@ -432,13 +435,14 @@ export class CstHandler {
 
   async getCsts(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
-    const { name, nim, page } = req.query;
+    const { name, nim, page, unit } = req.query;
 
     let result: any;
 
     if (!page) {
       result = await this.cstService.getCstsBySupervisorWithoutPage(
-        tokenPayload
+        tokenPayload,
+        String(unit)
       );
     } else {
       result = await this.cstService.getCstsBySupervisor(
@@ -446,7 +450,8 @@ export class CstHandler {
         name,
         nim,
         parseInt(String(page ?? "1")),
-        constants.HISTORY_ELEMENTS_PER_PAGE
+        constants.HISTORY_ELEMENTS_PER_PAGE,
+        String(unit)
       );
     }
 

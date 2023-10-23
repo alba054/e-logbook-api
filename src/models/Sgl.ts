@@ -16,9 +16,8 @@ export class Sgl {
     this.historyModel = new History();
   }
 
-
   async getSglsWithoutPage(unit?: string | undefined) {
-                           return db.sGL.findMany({
+    return db.sGL.findMany({
       where: {
         AND: [{ verificationStatus: "INPROCESS" }, { unitId: unit }],
       },
@@ -34,50 +33,49 @@ export class Sgl {
   }
   async deleteSglById(id: string) {
     return db.sGL.delete({
-        where: {
-          id
-        },
-      });
+      where: {
+        id,
+      },
+    });
   }
 
-
   async editSglById(id: string, payload: IPutSGL) {
-      return db.$transaction([
-      ...payload.topics?.map(t => {
+    return db.$transaction([
+      ...(payload.topics?.map((t) => {
         return db.sglTopic.delete({
           where: {
-            id: t.oldId
-          }
-        })
-      }) ?? [],
-      ...payload.topics?.map(t => {
+            id: t.oldId,
+          },
+        });
+      }) ?? []),
+      ...(payload.topics?.map((t) => {
         return db.sglTopic.create({
           data: {
             id: t.oldId,
             SGL: {
               connect: {
-                id
-              }
+                id,
+              },
             },
             topic: {
               connect: {
-                id: t.newId
-              }
-            }
-          }
-        })
-      }) ?? [],
+                id: t.newId,
+              },
+            },
+          },
+        });
+      }) ?? []),
       db.sGL.update({
         where: {
-          id
+          id,
         },
         data: {
           createdAt: payload.date ? new Date(payload.date) : new Date(),
           endTime: payload.endTime,
-          startTime: payload.startTime,     
-        }
+          startTime: payload.startTime,
+        },
       }),
-    ])
+    ]);
   }
 
   async getSglsBySupervisorIdWithoutPage(
@@ -213,30 +211,27 @@ export class Sgl {
 
   async verifySglById(id: string, payload: IPutSglTopicVerificationStatus) {
     try {
-      const sglSelect = await db.sGL.findUnique(
-        {
-          where: {
-            id,
-          }
-        }
-      );
-      return db.$transaction([
-        db.sGL.update({
+      const sglSelect = await db.sGL.findUnique({
         where: {
           id,
         },
-        data: {
-          verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
-        },
-        
-      }),
-      this.historyModel.insertHistoryAsync(
+      });
+      return db.$transaction([
+        db.sGL.update({
+          where: {
+            id,
+          },
+          data: {
+            verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
+          },
+        }),
+        this.historyModel.insertHistoryAsync(
           "SGL",
           getUnixTimestamp(),
-          sglSelect?.studentId ?? '',
-          sglSelect?.supervisorId ?? '',
+          sglSelect?.studentId ?? "",
+          sglSelect?.supervisorId ?? "",
           id,
-          sglSelect?.unitId?? ''
+          sglSelect?.unitId ?? ""
         ),
       ]);
     } catch (error) {
@@ -394,7 +389,6 @@ export class Sgl {
               },
             },
           }),
-          
         ])
       )[0];
     } catch (error) {
