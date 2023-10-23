@@ -11,7 +11,6 @@ export interface IListSupervisorStudent {
 }
 
 export interface IStudentStastic {
-  finalScore: number;
   totalCases: number;
   totalSkills: number;
   verifiedCases: number;

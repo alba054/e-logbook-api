@@ -10,12 +10,50 @@ import { ClinicalRecord } from "../../models/ClinicalRecord";
 import { createErrorObject } from "../../utils";
 
 export class HistoryService {
+  
   private historyModel: History;
   private clinicalRecordModel: ClinicalRecord;
 
   constructor() {
     this.historyModel = new History();
     this.clinicalRecordModel = new ClinicalRecord();
+  }
+
+  async retrieveHistoryBySupervisorCeu(supervisorId: string[],
+    page: number = 0,
+    elemPerPage?: number,
+    status?:boolean,
+    checkIn?: any) {
+    const history = await this.historyModel.getHistoryBySupervisorCeu(
+      supervisorId,
+      page,
+      elemPerPage,
+      status,
+      checkIn
+    );
+
+    if (history && "error" in history) {
+      return createErrorObject(500, history.message);
+    }
+
+    return await Promise.all(history.map(this.processHistoryResult));
+  }
+
+  async retrieveHistoryEr( 
+    page: number = 0,
+    elemPerPage?: number,
+    checkIn?: any) {
+    const history = await this.historyModel.getHistoryByEr(
+      page,
+      elemPerPage,
+      checkIn
+    );
+
+     if (history && "error" in history) {
+      return createErrorObject(500, history.message);
+    }
+
+    return await Promise.all(history.map(this.processHistoryResult));
   }
 
   async retrieveHistoryBySupervisors(
@@ -105,12 +143,14 @@ export class HistoryService {
       type: History.getHistoryName(value.type),
       studentName: value.student?.fullName ?? null,
       supervisorName: value.supervisor?.fullname ?? null,
+      supervisorId: value.supervisor?.supervisorId,
       timestamp: Number(value.timestamp),
       patientName: patientName,
       rating: rating,
       attachment: value.attachment,
       studentId: value.student?.studentId,
       unitName: value.Unit?.name,
+      unitId: value.Unit?.id,
     } as IHistoryInfo;
   }
 }

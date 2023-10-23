@@ -119,6 +119,7 @@ export class ClinicalRecord {
     return db.clinicalRecord.findMany({
       where: {
         supervisorId: supervisorId === null ? undefined : supervisorId,
+        
       },
       include: {
         Student: true,

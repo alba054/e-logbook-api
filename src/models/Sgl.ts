@@ -4,6 +4,7 @@ import { createErrorObject, getUnixTimestamp } from "../utils";
 import {
   IPostSGL,
   IPostSGLTopic,
+  IPutSGL,
   IPutSglTopicVerificationStatus,
 } from "../utils/interfaces/Sgl";
 import { History } from "./History";
@@ -15,8 +16,9 @@ export class Sgl {
     this.historyModel = new History();
   }
 
+
   async getSglsWithoutPage(unit?: string | undefined) {
-    return db.sGL.findMany({
+                           return db.sGL.findMany({
       where: {
         AND: [{ verificationStatus: "INPROCESS" }, { unitId: unit }],
       },
@@ -29,6 +31,53 @@ export class Sgl {
         updatedAt: "desc",
       },
     });
+  }
+  async deleteSglById(id: string) {
+    return db.sGL.delete({
+        where: {
+          id
+        },
+      });
+  }
+
+
+  async editSglById(id: string, payload: IPutSGL) {
+      return db.$transaction([
+      ...payload.topics?.map(t => {
+        return db.sglTopic.delete({
+          where: {
+            id: t.oldId
+          }
+        })
+      }) ?? [],
+      ...payload.topics?.map(t => {
+        return db.sglTopic.create({
+          data: {
+            id: t.oldId,
+            SGL: {
+              connect: {
+                id
+              }
+            },
+            topic: {
+              connect: {
+                id: t.newId
+              }
+            }
+          }
+        })
+      }) ?? [],
+      db.sGL.update({
+        where: {
+          id
+        },
+        data: {
+          createdAt: payload.date ? new Date(payload.date) : new Date(),
+          endTime: payload.endTime,
+          startTime: payload.startTime,     
+        }
+      }),
+    ])
   }
 
   async getSglsBySupervisorIdWithoutPage(
@@ -164,14 +213,32 @@ export class Sgl {
 
   async verifySglById(id: string, payload: IPutSglTopicVerificationStatus) {
     try {
-      return db.sGL.update({
+      const sglSelect = await db.sGL.findUnique(
+        {
+          where: {
+            id,
+          }
+        }
+      );
+      return db.$transaction([
+        db.sGL.update({
         where: {
           id,
         },
         data: {
           verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
         },
-      });
+        
+      }),
+      this.historyModel.insertHistoryAsync(
+          "SGL",
+          getUnixTimestamp(),
+          sglSelect?.studentId ?? '',
+          sglSelect?.supervisorId ?? '',
+          id,
+          sglSelect?.unitId?? ''
+        ),
+      ]);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to insert sgl");
@@ -187,7 +254,14 @@ export class Sgl {
         id,
       },
       include: {
-        topics: true,
+        topics: {
+          include: {
+            topic: true,
+          },
+        },
+        Student: true,
+        Unit: true,
+        supervisor: true,
       },
     });
   }
@@ -320,14 +394,7 @@ export class Sgl {
               },
             },
           }),
-          this.historyModel.insertHistoryAsync(
-            "SGL",
-            getUnixTimestamp(),
-            studentId,
-            payload.supervisorId,
-            id,
-            unitId
-          ),
+          
         ])
       )[0];
     } catch (error) {

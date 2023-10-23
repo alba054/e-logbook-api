@@ -3,12 +3,31 @@ import {
   IPutGradeItemMiniCex,
   IPutGradeItemPersonalBehaviourVerificationStatus,
 } from "../utils/interfaces/Assesment";
+import { ITokenPayload } from "../utils/interfaces/TokenPayload";
 
 export class Assesment {
-  async getMiniCexByUnitId(id: string) {
+  async getMiniCexByUnitId(tokenPayload: ITokenPayload, id: string) {
     return db.assesment.findFirst({
       where: {
         unitId: id,
+        OR: [
+          { studentId: tokenPayload.studentId },
+          {
+            Student: {
+              academicSupervisorId: tokenPayload.supervisorId,
+            },
+          },
+          {
+            Student: {
+              supervisingSupervisorId: tokenPayload.supervisorId,
+            },
+          },
+          {
+            Student: {
+              examinerSupervisorId: tokenPayload.supervisorId,
+            },
+          },
+        ],
         NOT: { OR: [{ miniCexId: null }, { miniCexId: undefined }] },
       },
       include: {
@@ -65,7 +84,7 @@ export class Assesment {
   }
 
   async scoreCBT(id: string, score: number) {
-    return db.cBT.update({
+    return await db.cBT.update({
       where: {
         id,
       },
@@ -76,7 +95,7 @@ export class Assesment {
   }
 
   async scoreOSCE(id: string, score: number) {
-    return db.oSCE.update({
+    return await db.oSCE.update({
       where: {
         id,
       },

@@ -759,6 +759,7 @@ model WeekAssesment {
   id                 String             @id @db.VarChar(100)
   Student            Student?           @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   studentId          String?            @db.VarChar(100)
+  weekId          String?            @db.VarChar(100)
   Unit               Unit?              @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   unitId             String?            @db.VarChar(100)
   verificationStatus VerificationStatus @default(INPROCESS)
@@ -852,6 +853,10 @@ enum HistoryType {
   PROBLEM_CONSULTATION // "attachment" is null (for now)
   CHECK_IN // "attachment" is null (for now)
   CHECK_OUT // "attachment" is null (for now)
+  CEU_SKILL
+  CEU_CASE
+  DAILY_ACTIVITY
+  WEEKLY_ASSESMENT
 }
 
 enum ReferenceType {

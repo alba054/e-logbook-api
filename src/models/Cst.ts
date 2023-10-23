@@ -4,15 +4,65 @@ import { createErrorObject, getUnixTimestamp } from "../utils";
 import {
   IPostCST,
   IPostCSTTopic,
+  IPutCST,
   IPutCstTopicVerificationStatus,
 } from "../utils/interfaces/Cst";
 import { History } from "./History";
 
 export class Cst {
+ 
+ 
   private historyModel: History;
 
   constructor() {
     this.historyModel = new History();
+  }
+
+  async deleteCstById(id: string) {
+    return db.cST.delete({
+        where: {
+          id
+        },
+      });
+  }
+
+  async ediCstById(id: string, payload: IPutCST) {
+    return db.$transaction([
+      ...payload.topics?.map(t => {
+        return db.cstTopic.delete({
+          where: {
+            id: t.oldId
+          }
+        })
+      }) ?? [],
+      ...payload.topics?.map(t => {
+        return db.cstTopic.create({
+          data: {
+            id: t.oldId,
+            CST: {
+              connect: {
+                id
+              }
+            },
+            topic: {
+              connect: {
+                id: t.newId
+              }
+            }
+          }
+        })
+      }) ?? [],
+      db.cST.update({
+        where: {
+          id
+        },
+        data: {
+          createdAt: payload.date ? new Date(payload.date) : new Date(),
+          endTime: payload.endTime,
+          startTime: payload.startTime,     
+        }
+      }),
+    ])
   }
 
   async getCstsWithoutPage() {
@@ -151,14 +201,31 @@ export class Cst {
 
   async verifyCstById(id: string, payload: IPutCstTopicVerificationStatus) {
     try {
-      return db.cST.update({
+        const cstSelect = await db.cST.findUnique(
+        {
+          where: {
+            id,
+          }
+        }
+      );
+      return db.$transaction([
+        db.cST.update({
         where: {
           id,
         },
         data: {
           verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
         },
-      });
+      }),
+       this.historyModel.insertHistoryAsync(
+            "CST",
+            getUnixTimestamp(),
+            cstSelect?.studentId ?? '',
+            cstSelect?.supervisorId ?? '',
+            id,
+            cstSelect?.unitId?? ''
+          ),
+      ]);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to insert Cst");
@@ -174,7 +241,14 @@ export class Cst {
         id,
       },
       include: {
-        topics: true,
+        topics: {
+          include: {
+            topic: true,
+          },
+        },
+        Student: true,
+        supervisor: true,
+        Unit: true
       },
     });
   }
@@ -301,14 +375,6 @@ export class Cst {
               },
             },
           }),
-          this.historyModel.insertHistoryAsync(
-            "CST",
-            getUnixTimestamp(),
-            studentId ?? "",
-            payload.supervisorId,
-            id,
-            unitId
-          ),
         ])
       )[0];
     } catch (error) {

@@ -149,7 +149,7 @@ export class CompetencyHandler {
 
       return res
         .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, result));
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "Success verify"));
     } catch (error) {
       return next(error);
     }
@@ -200,7 +200,7 @@ export class CompetencyHandler {
 
       return res
         .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, result));
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "Success Verify Skills"));
     } catch (error) {
       return next(error);
     }

@@ -114,7 +114,6 @@ export class ClinicalRecordService {
     ) {
       return createErrorObject(400, "clinical record's not for you");
     }
-
     return db.$transaction([
       db.clinicalRecord.update({
         where: {
@@ -135,6 +134,14 @@ export class ClinicalRecordService {
           clinicalRecordDone: payload.verified,
         },
       }),
+      this.historyModel.insertHistoryAsync(
+          "CLINICAL_RECORD",
+          getUnixTimestamp(),
+          clinicalRecord.studentId ??'',
+          clinicalRecord.supervisorId,
+          id,
+          clinicalRecord.unitId??'',
+        ),
     ]);
 
     // return this.clinicalRecordModel.changeVerificationStatusClinicalRecordById(
@@ -330,14 +337,6 @@ export class ClinicalRecordService {
         ...examinations,
         ...diagnosiss,
         ...managements,
-        this.historyModel.insertHistoryAsync(
-          "CLINICAL_RECORD",
-          getUnixTimestamp(),
-          tokenPayload.studentId,
-          payload.supervisorId,
-          clinicalRecordId,
-          studentActiveUnit?.activeUnit.activeUnit?.id
-        ),
       ]);
     } catch (error) {
       console.log(error);

@@ -2,21 +2,70 @@ import { Sgl } from "../../models/Sgl";
 import {
   IPostSGL,
   IPostSGLTopic,
+  IPutSGL,
   IPutSglTopicVerificationStatus,
 } from "../../utils/interfaces/Sgl";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentService } from "./StudentService";
 import { v4 as uuidv4 } from "uuid";
-import { constants, createErrorObject } from "../../utils";
+import { constants, createErrorObject, getUnixTimestamp } from "../../utils";
 import db from "../../database";
+import { History } from "../../models/History";
+
 
 export class SglService {
+ 
+ 
+  private historyModel: History;
   private studentService: StudentService;
   private sglModel: Sgl;
 
   constructor() {
     this.studentService = new StudentService();
     this.sglModel = new Sgl();
+    this.historyModel = new History();
+  }
+
+  async getSglById(id: string, tokenPayload: ITokenPayload) {
+     const sgl = await this.sglModel.getSglById(id);
+
+    if (!sgl) {
+      return createErrorObject(404, "sgl's not found");
+    }
+
+    return sgl;
+  }
+
+  async deleteSglById(id: string, tokenPayload: ITokenPayload) {
+    const sgl = await this.sglModel.getSglById(id);
+
+    if (!sgl) {
+      return createErrorObject(404, "sgl's not found");
+    }
+
+    if (sgl.studentId !== tokenPayload.studentId) {
+      return createErrorObject(400, "data's not for you");
+    }
+
+    return this.sglModel.deleteSglById(id);
+  }
+
+
+  async editSglById(id: string, tokenPayload: ITokenPayload, payload: IPutSGL) {
+    const sgl = await this.sglModel.getSglById(id);
+
+     if (!sgl) {
+      return createErrorObject(404, "sgl topic's not found");
+    }
+
+    if (sgl?.studentId !== tokenPayload.studentId) {
+      return createErrorObject(
+        400,
+        "you are not authorized to verify this sgl"
+      );
+    }
+
+    return this.sglModel.editSglById(id, payload);
   }
 
   async getSglsBySupervisorWithoutPage(
@@ -138,6 +187,14 @@ export class SglService {
           sglDone: payload.verified,
         },
       }),
+       this.historyModel.insertHistoryAsync(
+          "SGL",
+          getUnixTimestamp(),
+          sgl?.studentId ?? '',
+          sgl?.supervisorId ?? '',
+          id,
+          sgl?.unitId?? ''
+        ),
     ]);
   }
 

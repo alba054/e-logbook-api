@@ -23,6 +23,19 @@ export interface ISglDetail {
   topic: ISglTopic[];
 }
 
+export interface ISglHistoryDetail {
+  createdAt: Date | string;
+  sglId: string;
+  startTime?: number;
+  endTime?: number;
+  supervisorName?: string;
+  supervisorId?: string;
+  studentId?: string,
+  studentName?: string,
+  unitName?: string;
+  topic: ISglTopic[];
+}
+
 export interface ISglTopic {
   topicName: string[];
   verificationStatus: "INPROCESS" | "VERIFIED" | "UNVERIFIED";

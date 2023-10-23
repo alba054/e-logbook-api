@@ -16,3 +16,16 @@ export const CstTopicPayloadSchema = Joi.object({
 export const CstTopicVerificationStatusSchema = Joi.object({
   verified: Joi.boolean().required(),
 });
+
+export const CstEditPayloadSchema = Joi.object({
+  supervisorId: Joi.string().optional(),
+  startTime: Joi.number().optional(),
+  date: Joi.string().optional(),
+  endTime: Joi.number().optional(),
+  notes: Joi.string().optional(),
+  topics: Joi.array().items(Joi.object({
+    oldId: Joi.string().optional(),
+    newId: Joi.number().optional(),
+  }))
+});
+

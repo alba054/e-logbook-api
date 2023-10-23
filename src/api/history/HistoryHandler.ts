@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { HistoryService } from "../../services/database/HistoryService";
-import { constants, createErrorObject, createResponse } from "../../utils";
+import { constants, createResponse } from "../../utils";
 import { BadRequestError } from "../../exceptions/httpError/BadRequestError";
 import { InternalServerError } from "../../exceptions/httpError/InternalServerError";
 
@@ -24,9 +24,7 @@ export class HistoryHandler {
       }
 
       if (
-        tokenPayload.role == "ER" ||
-        tokenPayload.role == "ADMIN" ||
-        tokenPayload.badges?.includes("HEAD_DIV")
+        tokenPayload.role == "ADMIN"
       ) {
         // can see all history
         result = await this.historyService.retrieveHistory(
@@ -35,17 +33,51 @@ export class HistoryHandler {
           checkIn,
           tokenPayload.headDivUnit
         );
-      } else if (
+      } else if (tokenPayload.role == "ER"){
+        result = await this.historyService.retrieveHistoryEr(
+          page - 1,
+          constants.HISTORY_ELEMENTS_PER_PAGE,
+          false
+        );
+      } 
+      else if (
         tokenPayload.role == "SUPERVISOR" &&
         tokenPayload.supervisorId
       ) {
-        // can see own supervisor history
-        result = await this.historyService.retrieveHistoryBySupervisors(
-          [tokenPayload.supervisorId],
-          page - 1,
-          constants.HISTORY_ELEMENTS_PER_PAGE,
-          checkIn
-        );
+        if(tokenPayload.badges?.includes("HEAD_DIV") && tokenPayload.badges?.includes("CEU")){
+          result = await this.historyService.retrieveHistoryBySupervisorCeu(
+            [tokenPayload.supervisorId],
+            page - 1,
+            constants.HISTORY_ELEMENTS_PER_PAGE,
+            true,
+            checkIn,
+          );
+        }
+        else if(tokenPayload.badges?.includes("HEAD_DIV")){
+          result = await this.historyService.retrieveHistoryBySupervisors(
+            [tokenPayload.supervisorId],
+            page - 1,
+            constants.HISTORY_ELEMENTS_PER_PAGE,
+            true
+          );
+        }
+        else if(tokenPayload.badges?.includes("CEU")){
+          result = await this.historyService.retrieveHistoryBySupervisorCeu(
+            [tokenPayload.supervisorId],
+            page - 1,
+            constants.HISTORY_ELEMENTS_PER_PAGE,
+            false,
+            checkIn
+          );
+        }else{
+          result = await this.historyService.retrieveHistoryBySupervisors(
+            [tokenPayload.supervisorId],
+            page - 1,
+            constants.HISTORY_ELEMENTS_PER_PAGE,
+            false
+          );
+        }
+        
       } else if (tokenPayload.role == "STUDENT" && tokenPayload.studentId) {
         // can see student history
         result = await this.historyService.retrieveHistoryByStudents(

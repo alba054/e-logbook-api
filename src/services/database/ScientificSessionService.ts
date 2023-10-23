@@ -238,6 +238,14 @@ export class ScientificSessionService {
           scientificSessionDone: payload.verified,
         },
       }),
+        this.historyModel.insertHistoryAsync(
+          "SCIENTIFIC_SESSION",
+          getUnixTimestamp(),
+          scientificSession.studentId ??'',
+          scientificSession.supervisorId,
+          id,
+          scientificSession.unitId??'',
+        ),
       // ...scientificAssesmentQuery,
     ]);
   }

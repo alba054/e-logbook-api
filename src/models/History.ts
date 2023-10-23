@@ -14,8 +14,110 @@ HISTORY_NAME_MAP.set("CHECK_IN", "Check-in");
 HISTORY_NAME_MAP.set("CHECK_OUT", "Check-out");
 
 export class History {
+ 
+ 
   static getHistoryName(type: HistoryType) {
     return HISTORY_NAME_MAP.get(type) ?? type;
+  }
+
+  async getHistoryBySupervisorCeu(  supervisorId: string[],
+    page: number = 0,
+    elemPerPage: number = constants.HISTORY_ELEMENTS_PER_PAGE,
+    status?: boolean,
+    checkin?: boolean) {
+    try {
+      if (checkin) {
+        return db.history.findMany({
+          where: {
+            OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }]
+          },
+          // skip: page * elemPerPage,
+          // take: elemPerPage,
+          orderBy: {
+            timestamp: "desc",
+          },
+          include: {
+            student: true,
+            supervisor: true,
+            Unit: true,
+          },
+        });
+      }
+      else if (status) {
+        return db.history.findMany({
+          where: {
+            OR: [
+              { OR: supervisorId.map(History.remapSupervisor) },
+              { OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }, {type: "ASSESMENT"},{type: "SGL"}, {type:"CST"}] },
+            ],
+          },
+          // skip: page * elemPerPage,
+          // take: elemPerPage,
+          orderBy: {
+            timestamp: "desc",
+          },
+          include: {
+            student: true,
+            supervisor: true,
+            Unit: true,
+          },
+        });
+      }
+      return db.history.findMany({
+        // skip: page * elemPerPage,
+        // take: elemPerPage,
+        where: {
+          OR: [
+            {OR: supervisorId.map(History.remapSupervisor)},
+            {OR: [{type: "ASSESMENT"},{type: "SGL"}, {type:"CST"}]},
+          ],
+        },
+        orderBy: {
+          timestamp: "desc",
+        },
+        include: {
+          student: true,
+          supervisor: true,
+          Unit: true,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(500, "failed to query history");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
+  async getHistoryByEr( 
+    page: number = 0,
+    elemPerPage: number = constants.HISTORY_ELEMENTS_PER_PAGE,
+    checkin?: boolean) {
+
+     try{
+      return db.history.findMany({
+        // skip: page * elemPerPage,
+        // take: elemPerPage,
+        where: {
+          type: 'WEEKLY_ASSESMENT',
+        },
+        orderBy: {
+          timestamp: "desc",
+        },
+        include: {
+          student: true,
+          supervisor: true,
+          Unit: true,
+        },
+      });
+     }catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(500, "failed to query history");
+      } else {
+        return createErrorObject(500);
+      }
+    }
   }
 
   async getHistory(
@@ -33,8 +135,8 @@ export class History {
               { OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }] },
             ],
           },
-          skip: page * elemPerPage,
-          take: elemPerPage,
+          // skip: page * elemPerPage,
+          // take: elemPerPage,
           orderBy: {
             timestamp: "desc",
           },
@@ -46,8 +148,8 @@ export class History {
         });
       }
       return db.history.findMany({
-        skip: page * elemPerPage,
-        take: elemPerPage,
+        // skip: page * elemPerPage,
+        // take: elemPerPage,
         orderBy: {
           timestamp: "desc",
         },
@@ -70,19 +172,19 @@ export class History {
     supervisorId: string[],
     page: number = 0,
     elemPerPage: number = constants.HISTORY_ELEMENTS_PER_PAGE,
-    checkin?: boolean
+    status?: boolean,
   ) {
     try {
-      if (checkin) {
+       if (status) {
         return db.history.findMany({
           where: {
-            AND: [
+            OR: [
               { OR: supervisorId.map(History.remapSupervisor) },
               { OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }] },
             ],
           },
-          skip: page * elemPerPage,
-          take: elemPerPage,
+          // skip: page * elemPerPage,
+          // take: elemPerPage,
           orderBy: {
             timestamp: "desc",
           },
@@ -94,8 +196,8 @@ export class History {
         });
       }
       return db.history.findMany({
-        skip: page * elemPerPage,
-        take: elemPerPage,
+        // skip: page * elemPerPage,
+        // take: elemPerPage,
         where: {
           OR: supervisorId.map(History.remapSupervisor),
         },
@@ -132,8 +234,8 @@ export class History {
               { OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }] },
             ],
           },
-          skip: page * elemPerPage,
-          take: elemPerPage,
+          // skip: page * elemPerPage,
+          // take: elemPerPage,
           orderBy: {
             timestamp: "desc",
           },
@@ -145,8 +247,8 @@ export class History {
         });
       }
       return db.history.findMany({
-        skip: page * elemPerPage,
-        take: elemPerPage,
+        // skip: page * elemPerPage,
+        // take: elemPerPage,
         where: {
           OR: studentId.map(History.remapStudent),
         },

@@ -6,23 +6,29 @@ import { DailyActivityService } from "../../services/database/DailyActivityServi
 import { StudentService } from "../../services/database/StudentService";
 import { WeeklyAssesmentService } from "../../services/database/WeeklyAssesmentService";
 import { constants, createResponse } from "../../utils";
-import { IStudentWeeklyAssesment } from "../../utils/dto/WeeklyAssesmentDTO";
+import { IStudentWeeklyAssesment, IWeeklyAssesment } from "../../utils/dto/WeeklyAssesmentDTO";
 import { IPutWeeklyAssesmentScore } from "../../utils/interfaces/WeeklyAssesment";
 import { AssesmentScoreSchema } from "../../validator/assesment/AssesmentSchema";
 import { Validator } from "../../validator/Validator";
 import { WeeklyAssesmentScorePayloadSchema } from "../../validator/weeklyAssesment/WeeklyAssesmentSchema";
+import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
+import { WeekService } from "../../services/database/WeekService";
 
 export class WeeklyAssesmentHandler {
   private weeklyAssesmentService: WeeklyAssesmentService;
   private dailyActivityService: DailyActivityService;
   private studentService: StudentService;
   private validator: Validator;
+  private weekService: WeekService;
+
 
   constructor() {
     this.weeklyAssesmentService = new WeeklyAssesmentService();
     this.dailyActivityService = new DailyActivityService();
     this.studentService = new StudentService();
     this.validator = new Validator();
+    this.weekService = new WeekService();
+
 
     this.getStudentWeeklyAssesmentsUnit =
       this.getStudentWeeklyAssesmentsUnit.bind(this);
@@ -54,6 +60,7 @@ export class WeeklyAssesmentHandler {
     next: NextFunction
   ) {
     const { id } = req.params;
+    const tokenPayload: ITokenPayload = res.locals.user;
     const payload: IPutWeeklyAssesmentScore = req.body;
 
     try {
@@ -66,7 +73,7 @@ export class WeeklyAssesmentHandler {
         throw new BadRequestError(validationResult.message);
       }
 
-      await this.weeklyAssesmentService.scoreWeelyAssesmentById(id, payload);
+      await this.weeklyAssesmentService.scoreWeelyAssesmentById(id, payload, tokenPayload);
 
       return res
         .status(200)
@@ -115,18 +122,42 @@ export class WeeklyAssesmentHandler {
           unitId
         );
 
-      return res.status(200).json(
-        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
-          studentName: weeklyAssesment[0]?.Student?.fullName,
-          studentId: weeklyAssesment[0]?.Student?.studentId,
-          unitName: weeklyAssesment[0]?.Unit?.name,
-          assesments: weeklyAssesment.map((w) => {
-            return {
+      let listWeeklyAssesment : IWeeklyAssesment[] = [];
+      for(const w of weeklyAssesment){
+        const student = await this.studentService.getStudentById(w.Student?.id ?? '');
+        let checkInTime: number | null;
+        let checkOutTime: number | null;
+
+        student?.CheckInCheckOut.forEach((check) => {
+          if(check.unitId == student.unitId){
+            checkInTime = check.checkInTime != null ? Number(check.checkInTime) : null;
+            checkOutTime = check.checkOutTime != null ? Number(check.checkOutTime) : null;
+          }
+        });
+        const weeks = await this.weekService.getWeeksByUnitId(
+         student?.unitId ?? ""
+        );
+
+        let fixWeek = weeks.filter((w)=>{
+          return (w.startDate)>=(checkInTime??0) && checkOutTime===null ? true: w.endDate<=(checkOutTime??0);
+        });
+
+        let startDate: number | null = null;
+        let endDate: number | null = null;
+        let weekNum : number = 0;
+        fixWeek.forEach((wd, index)=>{
+          if(w.weekId===wd.id){
+            weekNum = index+1;
+            startDate = Number(wd.startDate);
+            endDate = Number(wd.endDate);
+          }
+        });  
+        listWeeklyAssesment.push({
               attendNum: dailyActivities
-                .filter((a) => a.day?.week?.weekNum === w.weekNum)
+                .filter((a) => a.day?.week?.id === w.weekId)
                 .filter((a) => a.Activity?.activityStatus === "ATTEND").length,
               notAttendNum: dailyActivities
-                .filter((a) => a.day?.week?.weekNum === w.weekNum)
+                .filter((a) => a.day?.week?.id === w.weekId)
                 .filter(
                   (a) =>
                     a.Activity?.activityStatus === "NOT_ATTEND" ||
@@ -135,10 +166,19 @@ export class WeeklyAssesmentHandler {
                 ).length,
               score: w.score,
               verificationStatus: w.verificationStatus,
-              weekNum: w.weekNum,
+              weekNum: weekNum,
               id: w.id,
-            };
-          }),
+              startDate: startDate,
+              endDate: endDate,
+            } as IWeeklyAssesment);
+      }
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          studentName: weeklyAssesment[0]?.Student?.fullName,
+          studentId: weeklyAssesment[0]?.Student?.studentId,
+          unitName: weeklyAssesment[0]?.Unit?.name,
+          assesments: listWeeklyAssesment,
         } as IStudentWeeklyAssesment)
       );
     } catch (error) {

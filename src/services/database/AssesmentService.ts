@@ -72,14 +72,6 @@ export class AssesmentService {
             scientificAssesmentId,
           },
         }),
-        this.historyModel.insertHistoryAsync(
-          "SCIENTIFIC_ASSESMENT",
-          getUnixTimestamp(),
-          tokenPayload.studentId,
-          undefined,
-          scientificAssesmentId,
-          activeUnit?.activeUnit.activeUnit?.id
-        ),
       ]);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -102,17 +94,39 @@ export class AssesmentService {
         payload.type
       );
 
-    if (payload.type === "CBT") {
-      return this.assesmentModel.scoreCBT(
-        assesment?.cBTId ?? "",
-        payload.score
+    const history = await db.history.findFirst({
+      where: {
+        attachment: assesment?.id,
+      },
+    });
+    return db.$transaction(async (transaction) => {
+      if (payload.type === "CBT") {
+        await this.assesmentModel.scoreCBT(
+          assesment?.cBTId ?? "",
+          payload.score
+        );
+      } else if (payload.type === "OSCE") {
+        await this.assesmentModel.scoreOSCE(
+          assesment?.oSCEId ?? "",
+          payload.score
+        );
+      }
+      if (history !== null) {
+        await db.history.delete({
+          where: {
+            id: history.id,
+          },
+        });
+      }
+      await this.historyModel.insertHistoryAsync(
+        "ASSESMENT",
+        getUnixTimestamp(),
+        assesment?.studentId ?? "",
+        undefined,
+        assesment?.id,
+        assesment?.unitId ?? ""
       );
-    } else if (payload.type === "OSCE") {
-      return this.assesmentModel.scoreOSCE(
-        assesment?.oSCEId ?? "",
-        payload.score
-      );
-    }
+    });
   }
 
   async getAssesmentsByStudentIdAndUnitId(studentId: string, unitId: string) {
@@ -169,9 +183,36 @@ export class AssesmentService {
       return createErrorObject(400, "item's not found");
     }
 
-    return this.assesmentModel.verifyPersonalBehaviourGradeItemVerificationStatus(
-      payload
-    );
+    const history = await db.history.findFirst({
+      where: {
+        attachment: personalBehaviour.personalBehaviourId,
+      },
+    });
+    return db.$transaction(async (transaction) => {
+      await db.personalBehaviourGrade.update({
+        where: {
+          id: payload.id,
+        },
+        data: {
+          verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
+        },
+      });
+      if (history !== null) {
+        await db.history.delete({
+          where: {
+            id: history.id,
+          },
+        });
+      }
+      await this.historyModel.insertHistoryAsync(
+        "PERSONAL_BEHAVIOUR",
+        getUnixTimestamp(),
+        personalBehaviour.studentId ?? "",
+        tokenPayload.supervisorId,
+        personalBehaviour.personalBehaviourId ?? "",
+        personalBehaviour?.unitId ?? ""
+      );
+    });
   }
 
   async getPersonalBehaviourById(tokenPayload: ITokenPayload, id: string) {
@@ -223,18 +264,40 @@ export class AssesmentService {
       return createErrorObject(400, "data's not for you");
     }
 
-    return db.$transaction(
-      payload.scores.map((s) => {
-        return db.scientificAssesmentGrade.update({
+    const history = await db.history.findFirst({
+      where: {
+        attachment: miniCex.scientificAssesmentId,
+      },
+    });
+    return db.$transaction(async (transaction) => {
+      await Promise.all(
+        payload.scores.map((s) =>
+          db.scientificAssesmentGrade.update({
+            where: {
+              id: s.id,
+            },
+            data: {
+              score: s.score,
+            },
+          })
+        )
+      );
+      if (history !== null) {
+        await db.history.delete({
           where: {
-            id: s.id,
-          },
-          data: {
-            score: s.score,
+            id: history.id,
           },
         });
-      })
-    );
+      }
+      await this.historyModel.insertHistoryAsync(
+        "SCIENTIFIC_ASSESMENT",
+        getUnixTimestamp(),
+        miniCex.studentId ?? "",
+        tokenPayload.supervisorId,
+        miniCex.scientificAssesmentId ?? "",
+        miniCex?.unitId ?? ""
+      );
+    });
   }
 
   async getScientificAssesmentsByStudentIdAndUnitId(
@@ -341,22 +404,40 @@ export class AssesmentService {
       return createErrorObject(400, "data's not for you");
     }
 
-    return db.$transaction([
-      db.miniCexGrade.deleteMany({
+    const history = await db.history.findFirst({
+      where: {
+        attachment: miniCex.miniCexId,
+      },
+    });
+    return db.$transaction(async (transaction) => {
+      await db.miniCexGrade.deleteMany({
         where: {
           miniCexId: id,
         },
-      }),
-      db.miniCexGrade.createMany({
-        data: payload.scores.map((s) => {
-          return {
-            miniCexId: id,
-            score: s.score,
-            name: s.name,
-          };
-        }),
-      }),
-    ]);
+      });
+      await db.miniCexGrade.createMany({
+        data: payload.scores.map((s) => ({
+          miniCexId: id,
+          score: s.score,
+          name: s.name,
+        })),
+      });
+      if (history !== null) {
+        await db.history.delete({
+          where: {
+            id: history.id,
+          },
+        });
+      }
+      await this.historyModel.insertHistoryAsync(
+        "MINI_CEX",
+        getUnixTimestamp(),
+        miniCex.studentId ?? "",
+        tokenPayload.supervisorId,
+        miniCex.miniCexId ?? "",
+        miniCex?.unitId ?? ""
+      );
+    });
   }
 
   async getMiniCexsByStudentIdAndUnitId(tokenPayload: ITokenPayload) {
@@ -393,14 +474,17 @@ export class AssesmentService {
   }
 
   async getMiniCexsByUnitId(tokenPayload: ITokenPayload, id: string) {
-    const miniCex = await this.assesmentModel.getMiniCexByUnitId(id);
+    const miniCex = await this.assesmentModel.getMiniCexByUnitId(
+      tokenPayload,
+      id
+    );
 
     if (!miniCex) {
       return createErrorObject(404, "mini cex's not found");
     }
 
     if (
-      miniCex.studentId !== tokenPayload.studentId &&
+      miniCex.Student?.id !== tokenPayload.studentId &&
       miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
       miniCex?.Student?.supervisingSupervisorId !== tokenPayload.supervisorId &&
       miniCex?.Student?.academicSupervisorId !== tokenPayload.supervisorId
@@ -471,14 +555,6 @@ export class AssesmentService {
             miniCexId,
           },
         }),
-        this.historyModel.insertHistoryAsync(
-          "MINI_CEX",
-          getUnixTimestamp(),
-          tokenPayload.studentId,
-          undefined,
-          assesmentId,
-          activeUnit?.activeUnit.activeUnit?.id
-        ),
       ]);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
