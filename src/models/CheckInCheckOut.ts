@@ -270,9 +270,6 @@ export class CheckInCheckOut {
       where: {
         unitId,
         studentId,
-        checkOut: {
-          equals: null,
-        },
       },
     });
   }
