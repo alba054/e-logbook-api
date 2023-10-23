@@ -16,6 +16,22 @@ export class Sgl {
     this.historyModel = new History();
   }
 
+
+  async getSglsWithoutPage(unit?: string | undefined) {
+                           return db.sGL.findMany({
+      where: {
+        AND: [{ verificationStatus: "INPROCESS" }, { unitId: unit }],
+      },
+      include: {
+        topics: true,
+        Student: true,
+        Unit: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+  }
   async deleteSglById(id: string) {
     return db.sGL.delete({
         where: {
@@ -64,26 +80,16 @@ export class Sgl {
     ])
   }
 
-  async getSglsWithoutPage() {
+  async getSglsBySupervisorIdWithoutPage(
+    supervisorId: string | undefined,
+    unit?: string | undefined
+  ) {
     return db.sGL.findMany({
       where: {
-        verificationStatus: "INPROCESS",
-      },
-      include: {
-        topics: true,
-        Student: true,
-        Unit: true,
-      },
-      orderBy: {
-        updatedAt: "desc",
-      },
-    });
-  }
-
-  async getSglsBySupervisorIdWithoutPage(supervisorId: string | undefined) {
-    return db.sGL.findMany({
-      where: {
-        supervisorId: supervisorId === null ? undefined : supervisorId,
+        AND: [
+          { supervisorId: supervisorId === null ? undefined : supervisorId },
+          { unitId: unit },
+        ],
       },
       include: {
         topics: true,
@@ -172,14 +178,25 @@ export class Sgl {
     });
   }
 
-  async getSgls(name: any, nim: any, page: any, take: any) {
+  async getSgls(
+    name: any,
+    nim: any,
+    page: any,
+    take: any,
+    unit?: string | undefined
+  ) {
     return db.sGL.findMany({
       where: {
-        Student: {
-          fullName: { contains: name },
-          studentId: nim,
-        },
-        verificationStatus: "INPROCESS",
+        AND: [
+          {
+            Student: {
+              fullName: { contains: name },
+              studentId: nim,
+            },
+          },
+          { verificationStatus: "INPROCESS" },
+          { unitId: unit },
+        ],
       },
       include: {
         topics: true,
@@ -317,15 +334,21 @@ export class Sgl {
     name: any,
     nim: any,
     page: any,
-    take: any
+    take: any,
+    unit?: string | undefined
   ) {
     return db.sGL.findMany({
       where: {
-        supervisorId: supervisorId === null ? undefined : supervisorId,
-        Student: {
-          fullName: { contains: name },
-          studentId: nim,
-        },
+        AND: [
+          { supervisorId: supervisorId === null ? undefined : supervisorId },
+          {
+            Student: {
+              fullName: { contains: name },
+              studentId: nim,
+            },
+          },
+          { unitId: unit },
+        ],
       },
       include: {
         topics: true,

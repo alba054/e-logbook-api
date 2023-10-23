@@ -96,11 +96,17 @@ export class HistoryService {
     return await Promise.all(history.map(this.processHistoryResult));
   }
 
-  async retrieveHistory(page: number = 0, elemPerPage?: number, checkIn?: any) {
+  async retrieveHistory(
+    page: number = 0,
+    elemPerPage?: number,
+    checkIn?: any,
+    headDivUnit?: string | undefined
+  ) {
     const history = await this.historyModel.getHistory(
       page,
       elemPerPage,
-      checkIn
+      checkIn,
+      headDivUnit
     );
 
     if (history && "error" in history) {
