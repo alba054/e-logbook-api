@@ -10,8 +10,6 @@ import {
 import { History } from "./History";
 
 export class Cst {
- 
- 
   private historyModel: History;
 
   constructor() {
@@ -20,55 +18,55 @@ export class Cst {
 
   async deleteCstById(id: string) {
     return db.cST.delete({
-        where: {
-          id
-        },
-      });
+      where: {
+        id,
+      },
+    });
   }
 
   async ediCstById(id: string, payload: IPutCST) {
     return db.$transaction([
-      ...payload.topics?.map(t => {
+      ...(payload.topics?.map((t) => {
         return db.cstTopic.delete({
           where: {
-            id: t.oldId
-          }
-        })
-      }) ?? [],
-      ...payload.topics?.map(t => {
+            id: t.oldId,
+          },
+        });
+      }) ?? []),
+      ...(payload.topics?.map((t) => {
         return db.cstTopic.create({
           data: {
             id: t.oldId,
             CST: {
               connect: {
-                id
-              }
+                id,
+              },
             },
             topic: {
               connect: {
-                id: t.newId
-              }
-            }
-          }
-        })
-      }) ?? [],
+                id: t.newId,
+              },
+            },
+          },
+        });
+      }) ?? []),
       db.cST.update({
         where: {
-          id
+          id,
         },
         data: {
           createdAt: payload.date ? new Date(payload.date) : new Date(),
           endTime: payload.endTime,
-          startTime: payload.startTime,     
-        }
+          startTime: payload.startTime,
+        },
       }),
-    ])
+    ]);
   }
 
-  async getCstsWithoutPage() {
+  async getCstsWithoutPage(unit?: string | undefined) {
     return db.cST.findMany({
       where: {
-        verificationStatus: "INPROCESS",
+        AND: [{ verificationStatus: "INPROCESS" }, { unitId: unit }],
       },
       include: {
         topics: true,
@@ -81,11 +79,17 @@ export class Cst {
     });
   }
 
-  async getCstsBySupervisorIdWithoutPage(supervisorId: string | undefined) {
+  async getCstsBySupervisorIdWithoutPage(
+    supervisorId: string | undefined,
+    unit?: string | undefined
+  ) {
     return db.cST.findMany({
       where: {
-        supervisorId: supervisorId === null ? undefined : supervisorId,
-        verificationStatus: "INPROCESS",
+        AND: [
+          { supervisorId: supervisorId === null ? undefined : supervisorId },
+          { verificationStatus: "INPROCESS" },
+          { unitId: unit },
+        ],
       },
       include: {
         topics: true,
@@ -177,14 +181,25 @@ export class Cst {
     });
   }
 
-  async getCsts(name: any, nim: any, page: any, take: any) {
+  async getCsts(
+    name: any,
+    nim: any,
+    page: any,
+    take: any,
+    unit?: string | undefined
+  ) {
     return db.cST.findMany({
       where: {
-        Student: {
-          fullName: { contains: name },
-          studentId: nim,
-        },
-        verificationStatus: "INPROCESS",
+        AND: [
+          {
+            Student: {
+              fullName: { contains: name },
+              studentId: nim,
+            },
+          },
+          { verificationStatus: "INPROCESS" },
+          { unitId: unit },
+        ],
       },
       include: {
         topics: true,
@@ -201,30 +216,28 @@ export class Cst {
 
   async verifyCstById(id: string, payload: IPutCstTopicVerificationStatus) {
     try {
-        const cstSelect = await db.cST.findUnique(
-        {
-          where: {
-            id,
-          }
-        }
-      );
-      return db.$transaction([
-        db.cST.update({
+      const cstSelect = await db.cST.findUnique({
         where: {
           id,
         },
-        data: {
-          verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
-        },
-      }),
-       this.historyModel.insertHistoryAsync(
-            "CST",
-            getUnixTimestamp(),
-            cstSelect?.studentId ?? '',
-            cstSelect?.supervisorId ?? '',
+      });
+      return db.$transaction([
+        db.cST.update({
+          where: {
             id,
-            cstSelect?.unitId?? ''
-          ),
+          },
+          data: {
+            verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
+          },
+        }),
+        this.historyModel.insertHistoryAsync(
+          "CST",
+          getUnixTimestamp(),
+          cstSelect?.studentId ?? "",
+          cstSelect?.supervisorId ?? "",
+          id,
+          cstSelect?.unitId ?? ""
+        ),
       ]);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -248,7 +261,7 @@ export class Cst {
         },
         Student: true,
         supervisor: true,
-        Unit: true
+        Unit: true,
       },
     });
   }
@@ -320,16 +333,22 @@ export class Cst {
     name: any,
     nim: any,
     page: any,
-    take: any
+    take: any,
+    unit?: string | undefined
   ) {
     return db.cST.findMany({
       where: {
-        supervisorId: supervisorId === null ? undefined : supervisorId,
-        Student: {
-          fullName: { contains: name },
-          studentId: nim,
-        },
-        verificationStatus: "INPROCESS",
+        AND: [
+          { supervisorId: supervisorId === null ? undefined : supervisorId },
+          {
+            Student: {
+              fullName: { contains: name },
+              studentId: nim,
+            },
+          },
+          { verificationStatus: "INPROCESS" },
+          { unitId: unit },
+        ],
       },
       include: {
         topics: true,

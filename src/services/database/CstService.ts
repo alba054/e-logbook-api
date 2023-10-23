@@ -12,12 +12,10 @@ import {
 import { Cst } from "../../models/Cst";
 import { History } from "../../models/History";
 
-
 export class CstService {
   private studentService: StudentService;
   private cstModel: Cst;
   private historyModel: History;
-
 
   constructor() {
     this.studentService = new StudentService();
@@ -36,7 +34,7 @@ export class CstService {
   }
 
   async deleteSglById(id: string, tokenPayload: ITokenPayload) {
-     const cst = await this.cstModel.getCstById(id);
+    const cst = await this.cstModel.getCstById(id);
 
     if (!cst) {
       return createErrorObject(404, "cst's not found");
@@ -48,11 +46,11 @@ export class CstService {
 
     return this.cstModel.deleteCstById(id);
   }
-  
+
   async editCstById(id: string, tokenPayload: ITokenPayload, payload: IPutCST) {
     const cst = await this.cstModel.getCstById(id);
 
-     if (!cst) {
+    if (!cst) {
       return createErrorObject(404, "cst topic's not found");
     }
 
@@ -66,12 +64,16 @@ export class CstService {
     return this.cstModel.ediCstById(id, payload);
   }
 
-  async getCstsBySupervisorWithoutPage(tokenPayload: ITokenPayload) {
+  async getCstsBySupervisorWithoutPage(
+    tokenPayload: ITokenPayload,
+    unit?: string | undefined
+  ) {
     if (tokenPayload.badges?.includes(constants.CEU_BADGE)) {
-      return this.cstModel.getCstsWithoutPage();
+      return this.cstModel.getCstsWithoutPage(unit);
     }
     return this.cstModel.getCstsBySupervisorIdWithoutPage(
-      tokenPayload.supervisorId
+      tokenPayload.supervisorId,
+      unit
     );
   }
 
@@ -113,7 +115,6 @@ export class CstService {
           cstDone: payload.verified,
         },
       }),
-
     ]);
   }
 
@@ -183,13 +184,13 @@ export class CstService {
         },
       }),
       this.historyModel.insertHistoryAsync(
-          "CST",
-          getUnixTimestamp(),
-          Cst?.studentId ?? '',
-          Cst?.supervisorId ?? '',
-          id,
-          Cst?.unitId?? ''
-        ),
+        "CST",
+        getUnixTimestamp(),
+        Cst?.studentId ?? "",
+        Cst?.supervisorId ?? "",
+        id,
+        Cst?.unitId ?? ""
+      ),
     ]);
   }
 
@@ -254,17 +255,19 @@ export class CstService {
     name: any,
     nim: any,
     page: any,
-    take: any
+    take: any,
+    unit?: string | undefined
   ) {
     if (tokenPayload.badges?.includes(constants.CEU_BADGE)) {
-      return this.cstModel.getCsts(name, nim, page, take);
+      return this.cstModel.getCsts(name, nim, page, take, unit);
     }
     return this.cstModel.getCstsBySupervisorId(
       tokenPayload.supervisorId,
       name,
       nim,
       page,
-      take
+      take,
+      unit
     );
   }
 
