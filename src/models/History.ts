@@ -21,13 +21,17 @@ export class History {
   async getHistory(
     page: number = 0,
     elemPerPage: number = constants.HISTORY_ELEMENTS_PER_PAGE,
-    checkin?: boolean
+    checkin?: boolean,
+    headDivUnit?: string | undefined
   ) {
     try {
       if (checkin) {
         return db.history.findMany({
           where: {
-            OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }],
+            AND: [
+              { unitId: headDivUnit },
+              { OR: [{ type: "CHECK_IN" }, { type: "CHECK_OUT" }] },
+            ],
           },
           skip: page * elemPerPage,
           take: elemPerPage,

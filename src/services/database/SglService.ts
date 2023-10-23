@@ -19,12 +19,16 @@ export class SglService {
     this.sglModel = new Sgl();
   }
 
-  async getSglsBySupervisorWithoutPage(tokenPayload: ITokenPayload) {
+  async getSglsBySupervisorWithoutPage(
+    tokenPayload: ITokenPayload,
+    unit?: string | undefined
+  ) {
     if (tokenPayload.badges?.includes(constants.CEU_BADGE)) {
-      return this.sglModel.getSglsWithoutPage();
+      return this.sglModel.getSglsWithoutPage(unit);
     }
     return this.sglModel.getSglsBySupervisorIdWithoutPage(
-      tokenPayload.supervisorId
+      tokenPayload.supervisorId,
+      unit
     );
   }
 
@@ -199,17 +203,19 @@ export class SglService {
     name: any,
     nim: any,
     page: any,
-    take: any
+    take: any,
+    unit?: string | undefined
   ) {
     if (tokenPayload.badges?.includes(constants.CEU_BADGE)) {
-      return this.sglModel.getSgls(name, nim, page, take);
+      return this.sglModel.getSgls(name, nim, page, take, unit);
     }
     return this.sglModel.getSglsBySupervisorId(
       tokenPayload.supervisorId,
       name,
       nim,
       page,
-      take
+      take,
+      unit
     );
   }
 

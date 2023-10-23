@@ -105,6 +105,7 @@ export class BasicAuthMiddleware {
           studentId: user.studentId,
           userId: user.id,
           supervisorId: user.supervisorId,
+          headDivUnit: user.supervisor?.unitId,
         } as ITokenPayload;
 
         next();

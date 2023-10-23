@@ -304,13 +304,14 @@ export class SglHandler {
 
   async getSgls(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
-    const { name, nim, page } = req.query;
+    const { name, nim, page, unit } = req.query;
 
     let result: any;
 
     if (!page) {
       result = await this.sglService.getSglsBySupervisorWithoutPage(
-        tokenPayload
+        tokenPayload,
+        String(unit)
       );
     } else {
       result = await this.sglService.getSglsBySupervisor(
@@ -318,7 +319,8 @@ export class SglHandler {
         name,
         nim,
         parseInt(String(page ?? "1")),
-        constants.HISTORY_ELEMENTS_PER_PAGE
+        constants.HISTORY_ELEMENTS_PER_PAGE,
+        String(unit)
       );
     }
 

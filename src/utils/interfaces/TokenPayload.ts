@@ -6,4 +6,5 @@ export interface ITokenPayload {
   readonly studentId?: string;
   readonly supervisorId?: string;
   readonly userId: string;
+  readonly headDivUnit?: string;
 }

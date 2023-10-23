@@ -32,7 +32,8 @@ export class HistoryHandler {
         result = await this.historyService.retrieveHistory(
           page - 1,
           constants.HISTORY_ELEMENTS_PER_PAGE,
-          checkIn
+          checkIn,
+          tokenPayload.headDivUnit
         );
       } else if (
         tokenPayload.role == "SUPERVISOR" &&
