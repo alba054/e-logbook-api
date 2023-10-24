@@ -19,7 +19,10 @@ export class Sgl {
   async getSglsWithoutPage(unit?: string | undefined) {
     return db.sGL.findMany({
       where: {
-        AND: [{ verificationStatus: "INPROCESS" }, { unitId: unit }],
+        AND: [
+          { verificationStatus: "INPROCESS" },
+          { unitId: unit === "" ? undefined : unit },
+        ],
       },
       include: {
         topics: true,
@@ -86,7 +89,7 @@ export class Sgl {
       where: {
         AND: [
           { supervisorId: supervisorId === null ? undefined : supervisorId },
-          { unitId: unit },
+          { unitId: unit === "" ? undefined : unit },
         ],
       },
       include: {

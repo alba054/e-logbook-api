@@ -442,7 +442,7 @@ export class CstHandler {
     if (!page) {
       result = await this.cstService.getCstsBySupervisorWithoutPage(
         tokenPayload,
-        String(unit)
+        String(unit ?? "")
       );
     } else {
       result = await this.cstService.getCstsBySupervisor(
@@ -451,7 +451,7 @@ export class CstHandler {
         nim,
         parseInt(String(page ?? "1")),
         constants.HISTORY_ELEMENTS_PER_PAGE,
-        String(unit)
+        String(unit ?? "")
       );
     }
 
