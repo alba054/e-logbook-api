@@ -66,7 +66,10 @@ export class Cst {
   async getCstsWithoutPage(unit?: string | undefined) {
     return db.cST.findMany({
       where: {
-        AND: [{ verificationStatus: "INPROCESS" }, { unitId: unit }],
+        AND: [
+          { verificationStatus: "INPROCESS" },
+          { unitId: unit === "" ? undefined : unit },
+        ],
       },
       include: {
         topics: true,
@@ -88,7 +91,7 @@ export class Cst {
         AND: [
           { supervisorId: supervisorId === null ? undefined : supervisorId },
           { verificationStatus: "INPROCESS" },
-          { unitId: unit },
+          { unitId: unit === "" ? undefined : unit },
         ],
       },
       include: {
