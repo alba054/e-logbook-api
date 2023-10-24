@@ -25,7 +25,6 @@ export class DailyActivityService {
     this.historyModel = new History();
   }
 
-
   async getActivitiesByWeekIdStudentIdUnitId(
     weekId: string,
     tokenPayload: ITokenPayload
@@ -41,8 +40,14 @@ export class DailyActivityService {
     );
   }
 
-  async getActivitiesBySupervisorId(supervisorId: string | undefined) {
-    return this.dailyActivityModel.getActivitiesBySupervisor(supervisorId);
+  async getActivitiesBySupervisorId(
+    supervisorId: string | undefined,
+    unit?: string | undefined
+  ) {
+    return this.dailyActivityModel.getActivitiesBySupervisor(
+      supervisorId,
+      unit
+    );
   }
 
   async getDailyActivitiesByStudentNimAndUnitId(

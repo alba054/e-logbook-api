@@ -31,12 +31,22 @@ export class DailyActivity {
     });
   }
 
-  async getActivitiesBySupervisor(supervisorId: string | undefined) {
+  async getActivitiesBySupervisor(
+    supervisorId: string | undefined,
+    unit?: string | undefined
+  ) {
     return db.dailyActivity.findMany({
       where: {
-        Activity: {
-          supervisorId,
-        },
+        AND: [
+          {
+            Activity: {
+              supervisorId,
+            },
+          },
+          {
+            unitId: unit,
+          },
+        ],
       },
       include: {
         Unit: true,
@@ -177,7 +187,7 @@ export class DailyActivity {
         },
       },
       orderBy: {
-        day: {  
+        day: {
           week: {
             weekNum: "asc",
           },
@@ -240,12 +250,12 @@ export class DailyActivity {
           include: {
             location: true,
             ActivityName: true,
-          }
+          },
         },
         Student: true,
-        
+
         Unit: true,
-        day: { include: { week: true} },
+        day: { include: { week: true } },
       },
     });
   }

@@ -49,10 +49,12 @@ export class DailyActivityHandler {
 
   async getActivities(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
+    const { unit } = req.query;
 
     const activities =
       await this.dailyActivityService.getActivitiesBySupervisorId(
-        tokenPayload.supervisorId
+        tokenPayload.supervisorId,
+        String(unit ?? "")
       );
 
     let listActivities: IListActivities[] = [];
