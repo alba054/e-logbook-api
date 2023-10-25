@@ -23,7 +23,7 @@ export class CheckInCheckOut {
         },
         data: {
           countCheckIn: {
-            increment: count,
+            set: count,
           },
         },
       });
@@ -103,23 +103,24 @@ export class CheckInCheckOut {
         studentId ?? "",
         unitId ?? "",
         "VERIFIED",
+        true,
         userId
       );
       if (lastCheckin === null) {
         return createErrorObject(404, "cannot find last check-out");
       }
+      // (
+      // lastCheckin.caseDone &&
+      // lastCheckin.cstDone &&
+      // lastCheckin.sglDone &&
+      // lastCheckin.skillDone &&
+      // lastCheckin.dailyActiviyDone &&
+      // lastCheckin.clinicalRecordDone &&
+      // lastCheckin.selfReflectionDone &&
+      // lastCheckin.scientificSessionDone
 
-      if (
-        // lastCheckin.caseDone &&
-        // lastCheckin.cstDone &&
-        // lastCheckin.sglDone &&
-        // lastCheckin.skillDone &&
-        // lastCheckin.dailyActiviyDone &&
-        // lastCheckin.clinicalRecordDone &&
-        // lastCheckin.selfReflectionDone &&
-        // lastCheckin.scientificSessionDone
-        true
-      ) {
+      // )
+      else {
         await this.historyModel.insertHistory(
           "CHECK_OUT",
           getUnixTimestamp(),
@@ -138,8 +139,6 @@ export class CheckInCheckOut {
           },
         });
       }
-
-      return createErrorObject(400, "cannot checkout finish all activities");
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to update in process checkout");
@@ -212,7 +211,8 @@ export class CheckInCheckOut {
       const lastCheckin = await this.getLastCheckInByUnitIdAndStudentId(
         studentId,
         unitId,
-        "VERIFIED"
+        "VERIFIED",
+        false
       );
       if (lastCheckin === null) {
         return createErrorObject(404, "cannot find last check-out");
@@ -278,15 +278,23 @@ export class CheckInCheckOut {
     studentId: string,
     unitId: string,
     checkInStatus: "VERIFIED" | "UNVERIFIED" | "INPROCESS",
+    isCheckOut: boolean,
     userId: string | undefined = undefined
   ) {
+    const whereClause: any = {
+      unitId,
+      studentId,
+      // userId, // userId tidak digunakan dalam kondisi ini
+      checkInStatus,
+    };
+    if (isCheckOut) {
+      whereClause.NOT = {
+        checkOutTime: null,
+      };
+    }
+
     return db.checkInCheckOut.findFirst({
-      where: {
-        unitId,
-        studentId,
-        // userId,
-        checkInStatus,
-      },
+      where: whereClause,
       orderBy: {
         checkInTime: "desc",
       },
