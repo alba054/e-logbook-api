@@ -44,7 +44,7 @@ export class DailyActivity {
             },
           },
           {
-            unitId: unit,
+            unitId: unit === "" ? undefined : unit,
           },
         ],
       },
