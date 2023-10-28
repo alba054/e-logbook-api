@@ -484,6 +484,20 @@ export class StudentHandler {
             check.checkInTime != null ? Number(check.checkInTime) : null;
           checkOutTime =
             check.checkOutTime != null ? Number(check.checkOutTime) : null;
+          if (checkOutTime !== null) {
+            let temp = new Date(checkOutTime * 1000);
+            const dayOfWeek = temp.getDay();
+            if (dayOfWeek === 1) {
+              checkOutTime = temp.getTime() / 1000;
+            } else {
+              temp = new Date(
+                temp.getTime() +
+                  7 * 24 * 60 * 60 * 1000 -
+                  dayOfWeek * 24 * 60 * 60 * 1000
+              );
+              checkOutTime = temp.getTime() / 1000;
+            }
+          }
         }
       });
       const weeks = await this.weekService.getWeeksByUnitId(
@@ -493,7 +507,7 @@ export class StudentHandler {
       let fixWeek = weeks.filter((w) => {
         return w.startDate >= (checkInTime ?? 0) && checkOutTime === null
           ? true
-          : w.endDate <= (checkOutTime ?? 0);
+          : w.endDate < (checkOutTime ?? 0);
       });
 
       let startDate: number | null = null;
@@ -908,6 +922,20 @@ export class StudentHandler {
           check.checkInTime != null ? Number(check.checkInTime) : null;
         checkOutTime =
           check.checkOutTime != null ? Number(check.checkOutTime) : null;
+        if (checkOutTime !== null) {
+          let temp = new Date(checkOutTime * 1000);
+          const dayOfWeek = temp.getDay();
+          if (dayOfWeek === 1) {
+            checkOutTime = temp.getTime() / 1000;
+          } else {
+            temp = new Date(
+              temp.getTime() +
+                7 * 24 * 60 * 60 * 1000 -
+                dayOfWeek * 24 * 60 * 60 * 1000
+            );
+            checkOutTime = temp.getTime() / 1000;
+          }
+        }
       }
     });
 
@@ -1017,7 +1045,7 @@ export class StudentHandler {
           w.startDate >= (checkInTime ?? 0)) &&
           checkOutTime === null
           ? true
-          : w.endDate <= (checkOutTime ?? 0);
+          : w.endDate < (checkOutTime ?? 0);
       })
       .map((w, index) => {
         return {
