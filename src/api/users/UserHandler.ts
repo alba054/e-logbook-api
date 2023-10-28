@@ -528,6 +528,37 @@ export class UserHandler {
     );
   }
 
+  async checkAccessToken(req: Request, res: Response, next: NextFunction) {
+    const { accessToken } = req.body;
+
+    try {
+      if (!accessToken) {
+        throw new BadRequestError(
+          "Provide an access token in the request body"
+        );
+      }
+
+      if (!config.config.ACCESS_SECRET_KEY) {
+        throw new InternalServerError("Access secret key is not configured");
+      }
+
+      const decoded = await this.authenticationService.verifyToken(
+        accessToken,
+        config.config.ACCESS_SECRET_KEY
+      );
+
+      if (decoded && "error" in decoded) {
+        throw new BadRequestError(decoded.message as string);
+      }
+
+      return res
+        .status(200)
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, decoded));
+    } catch (error) {
+      return next(error);
+    }
+  }
+
   async postRefreshToken(req: Request, res: Response, next: NextFunction) {
     const { refreshToken } = req.body;
 

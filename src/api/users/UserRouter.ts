@@ -65,6 +65,11 @@ export class UserRouter {
       this.path + "/refresh-token",
       this.userHandler.postRefreshToken
     );
+    //check access token
+    this.router.get(
+      this.path + "/access-token",
+      this.userHandler.checkAccessToken
+    );
 
     this.router
       .route(this.path + "/pic")
