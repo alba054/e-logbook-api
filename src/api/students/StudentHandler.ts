@@ -1222,6 +1222,7 @@ export class StudentHandler {
             skillTypeId: c.skillTypeId,
             skillType: c.competencyType,
             verificationStatus: c.verificationStatus,
+            supervisorName: c.supervisor.fullname,
           };
         }),
       } as IStudentSkills)
@@ -1260,6 +1261,7 @@ export class StudentHandler {
             caseType: c.competencyType,
             caseTypeId: c.caseTypeId,
             verificationStatus: c.verificationStatus,
+            supervisorName: c.supervisor.fullname,
           };
         }),
       } as IStudentCases)
