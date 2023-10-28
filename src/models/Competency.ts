@@ -85,6 +85,7 @@ export class Competency {
       include: {
         skill: true,
         case: true,
+        supervisor: true,
       },
       orderBy: {
         updatedAt: "desc",
@@ -370,6 +371,7 @@ export class Competency {
       include: {
         Student: true,
         skill: true,
+        supervisor: true,
       },
       orderBy: {
         updatedAt: "desc",
@@ -390,6 +392,7 @@ export class Competency {
       include: {
         Student: true,
         case: true,
+        supervisor: true,
       },
       orderBy: {
         updatedAt: "desc",
