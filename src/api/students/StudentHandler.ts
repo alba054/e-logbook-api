@@ -1720,6 +1720,11 @@ export class StudentHandler {
         throw new BadRequestError(testValidate.message);
       }
 
+      const activeUnit = await this.studentService.getActiveUnit(studentId);
+      if (activeUnit?.checkInCheckOutUnit?.checkOutStatus !== "VERIFIED") {
+        throw new BadRequestError("Check-out status not verified");
+      }
+
       const result = await this.studentService.setActiveUnit(
         studentId,
         payload
