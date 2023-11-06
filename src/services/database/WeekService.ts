@@ -9,7 +9,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 export class WeekService {
   private weekModel: Week;
   private dayModel: Day;
-  
+
   constructor() {
     this.weekModel = new Week();
     this.dayModel = new Day();
@@ -102,6 +102,16 @@ export class WeekService {
 
     try {
       const generatedDays = generateDay(payload.startDate, payload.endDate);
+      const allWeeks = await this.getWeeksByUnitId(payload.unitId);
+
+      for (const week of allWeeks) {
+        if (
+          payload.startDate >= week.startDate &&
+          payload.startDate <= week.endDate
+        ) {
+          throw createErrorObject(400, "Cannot duplicate week");
+        }
+      }
 
       return db.$transaction([
         db.week.create({
