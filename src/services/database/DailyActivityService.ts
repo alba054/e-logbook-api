@@ -243,10 +243,18 @@ export class DailyActivityService {
     }
 
     if (dailyActivityActivity) {
-      return this.dailyActivityModel.editDailyActivityActivityById(
-        dailyActivityActivity.id,
-        payload
-      );
+      if (dailyActivityActivity.Activity === null) {
+        return this.dailyActivityModel.addActivityDailyActivityById(
+          dailyActivityActivity.id,
+          uuidv4(),
+          payload
+        );
+      } else {
+        return this.dailyActivityModel.editDailyActivityActivityById(
+          dailyActivityActivity.id,
+          payload
+        );
+      }
     }
 
     return this.dailyActivityModel.postDailyActivity(

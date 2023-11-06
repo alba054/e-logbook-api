@@ -196,6 +196,41 @@ export class DailyActivity {
     });
   }
 
+  async addActivityDailyActivityById(
+    id: string,
+    activityId: string,
+    payload: IPutDailyActivityActivity
+  ) {
+    try {
+      return db.dailyActivity.update({
+        where: {
+          id,
+        },
+        data: {
+          Activity: {
+            create: {
+              id: activityId,
+              activityLocationId: payload.locationId,
+              activityNameId: payload.activityNameId,
+              activityStatus: payload.activityStatus,
+              detail: payload.detail,
+              supervisorId: payload.supervisorId,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(
+          400,
+          "failed to update daily activity activity"
+        );
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async editDailyActivityActivityById(
     id: string,
     payload: IPutDailyActivityActivity
