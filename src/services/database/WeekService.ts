@@ -109,7 +109,7 @@ export class WeekService {
           payload.startDate >= week.startDate &&
           payload.startDate <= week.endDate
         ) {
-          throw createErrorObject(400, "Cannot duplicate week");
+          throw createErrorObject(400, "Week already added");
         }
       }
 

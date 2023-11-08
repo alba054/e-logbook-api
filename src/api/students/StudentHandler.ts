@@ -1155,7 +1155,7 @@ export class StudentHandler {
       const result =
         await this.dailyActivityService.getActivitiesByWeekIdStudentIdUnitId(
           id,
-          tokenPayload
+          tokenPayload.studentId ??''
         );
 
       return res.status(200).json(
@@ -1721,7 +1721,10 @@ export class StudentHandler {
       }
 
       const activeUnit = await this.studentService.getActiveUnit(studentId);
-      if (activeUnit!==null && activeUnit?.checkInCheckOutUnit?.checkOutStatus !== "VERIFIED") {
+      if (
+        activeUnit !== null &&
+        activeUnit?.checkInCheckOutUnit?.checkOutStatus !== "VERIFIED"
+      ) {
         throw new BadRequestError("Check-out status not verified");
       }
 
