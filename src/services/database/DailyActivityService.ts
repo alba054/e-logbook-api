@@ -27,10 +27,10 @@ export class DailyActivityService {
 
   async getActivitiesByWeekIdStudentIdUnitId(
     weekId: string,
-    tokenPayload: ITokenPayload
+    studentId: string,
   ) {
     const student = await this.studentService.getStudentById(
-      tokenPayload.studentId ?? ""
+      studentId ?? ""
     );
 
     return this.dailyActivityModel.getActivitiesByWeekIdAndStudentIdAndUnitId(

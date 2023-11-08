@@ -7,10 +7,12 @@ import { studentPersonalBehaviourService } from "./StudentPersonalBehaviourServi
 import { StudentOsceAndCBTService } from "./StudentOsceAndCBTService";
 import { History } from "../../models/History";
 import db from "../../database";
+import { DailyActivityService } from "../database/DailyActivityService";
 
 export class StudentCheckInCheckOutService {
   private studentModel: Student;
   private checkInCheckOutModel: CheckInCheckOut;
+  private dailyActivityService: DailyActivityService;
   private studentDailyActivityService: StudentDailyActivityService;
   private studentPersonalBehaviourService: studentPersonalBehaviourService;
   studentOsceAndCBTService: StudentOsceAndCBTService;
@@ -19,6 +21,7 @@ export class StudentCheckInCheckOutService {
   constructor() {
     this.studentModel = new Student();
     this.historyModel = new History();
+    this.dailyActivityService = new DailyActivityService();
     this.checkInCheckOutModel = new CheckInCheckOut();
     this.studentDailyActivityService = new StudentDailyActivityService();
     this.studentPersonalBehaviourService =
@@ -42,6 +45,24 @@ export class StudentCheckInCheckOutService {
 
     if (!id) {
       return createErrorObject(400, "cannot checkout empty unit");
+    }
+
+    const dailyActivities =
+      await this.dailyActivityService.getActivitiesByWeekIdStudentIdUnitId(
+        id,
+        studentId
+      );
+
+    var isVerify: boolean = true;
+    for (let index = 0; index < dailyActivities.length; index++) {
+      const temp = dailyActivities[index].Activity;
+      const notVerify =
+        temp?.activityStatus == "ATTEND" &&
+        temp?.verificationStatus == "INPROCESS";
+      if (notVerify) {
+        isVerify = false;
+        return createErrorObject(400, "all daily activity must be verified");
+      }
     }
 
     return await this.checkInCheckOutModel.updateCheckOutCheckInCheckOutUnit(
