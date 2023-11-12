@@ -167,7 +167,7 @@ export class CheckInCheckOut {
       where: {
         checkOut: true,
         checkOutStatus: "INPROCESS",
-        userId,
+        // userId,
         unitId: unitId === null ? undefined : unitId,
       },
       include: {
