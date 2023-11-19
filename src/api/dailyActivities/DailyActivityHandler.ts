@@ -469,17 +469,23 @@ export class DailyActivityHandler {
                   sickNum: d.activities.filter(
                     (a: any) => a.Activity?.activityStatus === "SICK"
                   ).length,
-                  activitiesStatus: d.activities?.map((d: any) => {
-                    return {
-                      id: d.id,
-                      day: d.day?.day,
-                      location: d.Activity?.location?.name,
-                      detail: d.Activity?.detail,
-                      activityStatus: d.Activity?.activityStatus,
-                      activityName: d.Activity?.ActivityName?.name,
-                      verificationStatus: d.verificationStatus,
-                    };
-                  }),
+                  activitiesStatus: d.activities
+                    .filter(
+                      (a: any) =>
+                        a.Activity !== null &&
+                        a.Activity?.activityStatus !== null
+                    )
+                    .map((d: any) => {
+                      return {
+                        id: d.id,
+                        day: d.day?.day,
+                        location: d.Activity?.location?.name,
+                        detail: d.Activity?.detail,
+                        activityStatus: d.Activity?.activityStatus,
+                        activityName: d.Activity?.ActivityName?.name,
+                        verificationStatus: d.verificationStatus,
+                      };
+                    }),
                   dailyActivityId: "",
                   verificationStatus: "",
                 };
@@ -512,11 +518,11 @@ export class DailyActivityHandler {
 
       let fixDailyActivities: IDailyActivities[] = [];
       response.dailyActivities.forEach((activities) => {
-        weeks.forEach((week) => {
-          if (week.id == activities.weekId) {
+        fixWeek.forEach((week) => {
+          if (week.id === activities.weekId) {
             fixDailyActivities.push({
-              weekId: activities.weekId,
-              weekName: week.weekNum,
+              weekId: week.id,
+              weekName: week.weekName,
               attendNum: activities.attendNum,
               notAttendNum: activities.notAttendNum,
               sickNum: activities.sickNum,
@@ -533,10 +539,11 @@ export class DailyActivityHandler {
         weeks: fixWeek,
         dailyActivities: fixDailyActivities,
       };
-
       return res
         .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, response));
+        .json(
+          createResponse(constants.SUCCESS_RESPONSE_MESSAGE, modifResponse)
+        );
     } catch (error) {
       return next(error);
     }
