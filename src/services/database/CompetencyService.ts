@@ -17,12 +17,51 @@ import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 import { StudentService } from "./StudentService";
 import { History } from "../../models/History";
 
-
 export class CompetencyService {
+  async deleteSkillById(id: string, tokenPayload: ITokenPayload) {
+    const skill = await this.competencyModel.getSkillById(id);
+
+    if (!skill) {
+      return createErrorObject(404, "skill not found");
+    }
+
+    if (
+      skill.supervisorId !== tokenPayload.supervisorId &&
+      skill.studentId !== tokenPayload.studentId
+    ) {
+      return createErrorObject(400, "skill not for you");
+    }
+
+    db.competency.delete({
+      where: {
+        id,
+      },
+    });
+  }
+  async deleteCaseById(id: string, tokenPayload: ITokenPayload) {
+    const cases = await this.competencyModel.getCaseById(id);
+
+    if (!cases) {
+      return createErrorObject(404, "cases not found");
+    }
+
+    if (
+      cases.supervisorId !== tokenPayload.supervisorId &&
+      cases.studentId !== tokenPayload.studentId
+    ) {
+      return createErrorObject(400, "cases not for you");
+    }
+
+    db.competency.delete({
+      where: {
+        id,
+      },
+    });
+  }
   private studentService: StudentService;
   private competencyModel: Competency;
   private historyModel: History;
-  
+
   constructor() {
     this.competencyModel = new Competency();
     this.historyModel = new History();
@@ -238,14 +277,14 @@ export class CompetencyService {
           caseDone: payload.verified,
         },
       }),
-       this.historyModel.insertHistoryAsync(
-            "CASE",
-            getUnixTimestamp(),
-            skill?.studentId??'',
-            skill?.supervisorId,
-            id,
-            skill?.unitId??''
-        ),
+      this.historyModel.insertHistoryAsync(
+        "CASE",
+        getUnixTimestamp(),
+        skill?.studentId ?? "",
+        skill?.supervisorId,
+        id,
+        skill?.unitId ?? ""
+      ),
     ]);
   }
 
@@ -570,12 +609,12 @@ export class CompetencyService {
         },
       }),
       this.historyModel.insertHistoryAsync(
-            "SKILL",
-            getUnixTimestamp(),
-            skill?.studentId??'',
-            skill?.supervisorId,
-            id,
-            skill?.unitId??''
+        "SKILL",
+        getUnixTimestamp(),
+        skill?.studentId ?? "",
+        skill?.supervisorId,
+        id,
+        skill?.unitId ?? ""
       ),
     ]);
   }

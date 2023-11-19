@@ -62,6 +62,10 @@ export class ScientificSessionRouter {
           constants.DPK_ROLE,
         ]),
         this.scientificSessionHandler.putVerificationStatusScientificSession
+      )
+      .delete(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.scientificSessionHandler.deleteScientificSession
       );
 
     // * get scientific session attachment
