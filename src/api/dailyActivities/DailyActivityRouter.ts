@@ -74,7 +74,7 @@ export class DailyActivityRouter {
 
     // * get activities on week
     this.router
-      .route(this.path + "/students/:studentId/daily-activities/weeks/:id")
+      .route(this.path + "/students/:studentId/weeks/:id")
       .get(
         AuthorizationBearer.authorize([
           constants.DPK_ROLE,
