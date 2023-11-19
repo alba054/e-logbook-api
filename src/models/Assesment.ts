@@ -329,11 +329,28 @@ export class Assesment {
     studentId: string | null,
     unitId: string | null
   ) {
-    return db.assesment.findMany({
+    return db.assesment.findFirst({
       where: {
         studentId: studentId === null ? undefined : studentId,
         unitId: unitId === null ? undefined : unitId,
         type: "SCIENTIFIC_ASSESMENT",
+      },
+      include: {
+        Student: true,
+        ScientificAssesment: {
+          include: {
+            location: {
+              include: {
+                Activity: true,
+              },
+            },
+            grades: {
+              include: {
+                gradeItem: true,
+              },
+            },
+          },
+        },
       },
     });
   }

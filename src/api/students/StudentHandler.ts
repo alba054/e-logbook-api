@@ -160,9 +160,6 @@ export class StudentHandler {
 
   async getStudentStatistics(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
-    // const activeUnit = await this.studentService.getActiveUnit(
-    //   tokenPayload.studentId ?? ""
-    // );
     try {
       const student = await this.studentService.getStudentById(
         tokenPayload.studentId
@@ -228,9 +225,8 @@ export class StudentHandler {
       }
 
       const scientificAssesment =
-        await this.assesmentService.getScientificAssesmentByUnitId(
-          tokenPayload,
-          activeUnit?.activeUnit.activeUnit?.id ?? ""
+        await this.assesmentService.getScientificAssesmentByStudentIdAndUnitId(
+          tokenPayload.studentId ?? ""
         );
 
       if (scientificAssesment && "error" in scientificAssesment) {
@@ -246,7 +242,7 @@ export class StudentHandler {
 
       // * grade will be zero if no scientificAssesmentgrade
       let saGrade = 0;
-      if (scientificAssesment.ScientificAssesment?.grades) {
+      if (scientificAssesment?.ScientificAssesment?.grades) {
         scientificAssesment.ScientificAssesment?.grades.forEach((g) => {
           saGrade += g.score ?? 0;
         });
@@ -401,12 +397,12 @@ export class StudentHandler {
             supervisingDPKId: miniCex.Student?.supervisingSupervisorId,
           },
           scientificAssesement: {
-            id: scientificAssesment.scientificAssesmentId,
-            studentId: scientificAssesment.Student?.studentId,
-            studentName: scientificAssesment.Student?.fullName,
-            case: scientificAssesment.ScientificAssesment?.title,
-            location: scientificAssesment.ScientificAssesment?.location?.name,
-            scores: scientificAssesment.ScientificAssesment?.grades.map((g) => {
+            id: scientificAssesment?.scientificAssesmentId,
+            studentId: scientificAssesment?.Student?.studentId,
+            studentName: scientificAssesment?.Student?.fullName,
+            case: scientificAssesment?.ScientificAssesment?.title,
+            location: scientificAssesment?.ScientificAssesment?.location?.name,
+            scores: scientificAssesment?.ScientificAssesment?.grades.map((g) => {
               return {
                 name: g.gradeItem.name,
                 score: g.score,
@@ -847,7 +843,7 @@ export class StudentHandler {
 
     const result =
       await this.assesmentService.getScientificAssesmentsByStudentIdAndUnitId(
-        tokenPayload
+        tokenPayload.studentId ?? ""
       );
 
     const student = await this.studentService.getStudentById(
@@ -1155,7 +1151,7 @@ export class StudentHandler {
       const result =
         await this.dailyActivityService.getActivitiesByWeekIdStudentIdUnitId(
           id,
-          tokenPayload.studentId ??''
+          tokenPayload.studentId ?? ""
         );
 
       return res.status(200).json(

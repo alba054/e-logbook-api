@@ -300,17 +300,28 @@ export class AssesmentService {
     });
   }
 
-  async getScientificAssesmentsByStudentIdAndUnitId(
-    tokenPayload: ITokenPayload
-  ) {
-    const activeUnit = await this.studentService.getActiveUnit(
-      tokenPayload.studentId ?? ""
-    );
+  async getScientificAssesmentsByStudentIdAndUnitId(studentId: string) {
+    const activeUnit = await this.studentService.getActiveUnit(studentId);
 
     return this.assesmentModel.getScientificAssesmentsByStudentIdAndUnitId(
-      tokenPayload.studentId,
+      studentId,
       activeUnit?.activeUnit.activeUnit?.id
     );
+  }
+
+  async getScientificAssesmentByStudentIdAndUnitId(studentId: string) {
+    const activeUnit = await this.studentService.getActiveUnit(studentId);
+
+    const miniCex =
+      this.assesmentModel.getScientificAssesmentByStudentIdAndUnitId(
+        studentId,
+        activeUnit?.activeUnit.activeUnit?.id ?? ""
+      );
+    if (!miniCex) {
+      return createErrorObject(404, "scientific assesment's not found");
+    }
+
+    return miniCex;
   }
 
   async getScientificAssesmentByUnitId(
@@ -324,7 +335,6 @@ export class AssesmentService {
     if (!miniCex) {
       return createErrorObject(404, "scientific assesment's not found");
     }
-
     if (
       miniCex.studentId !== tokenPayload.studentId &&
       miniCex?.Student?.examinerSupervisorId !== tokenPayload.supervisorId &&
