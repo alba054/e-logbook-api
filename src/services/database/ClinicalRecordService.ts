@@ -38,7 +38,7 @@ export class ClinicalRecordService {
       return createErrorObject(400, "clinical record's not for you");
     }
 
-    db.clinicalRecord.delete({
+    return db.clinicalRecord.delete({
       where: {
         id,
       },

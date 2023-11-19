@@ -44,7 +44,7 @@ export class ScientificSessionService {
       return createErrorObject(400, "scientificSession not for you");
     }
 
-    db.scientificSession.delete({
+    return db.scientificSession.delete({
       where: {
         id,
       },
