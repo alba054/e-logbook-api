@@ -32,7 +32,7 @@ export class CompetencyService {
       return createErrorObject(400, "skill not for you");
     }
 
-    db.competency.delete({
+    return db.competency.delete({
       where: {
         id,
       },
@@ -52,7 +52,7 @@ export class CompetencyService {
       return createErrorObject(400, "cases not for you");
     }
 
-    db.competency.delete({
+    return db.competency.delete({
       where: {
         id,
       },
