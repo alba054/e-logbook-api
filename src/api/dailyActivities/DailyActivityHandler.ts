@@ -45,8 +45,51 @@ export class DailyActivityHandler {
     this.putVerificationStatusOfDailyActivities =
       this.putVerificationStatusOfDailyActivities.bind(this);
     this.getActivities = this.getActivities.bind(this);
+    this.getStudentActivities = this.getStudentActivities.bind(this);
   }
+  async getStudentActivities(req: Request, res: Response, next: NextFunction) {
+    const { studentId, id } = req.params;
+    try {
+      const days = await this.weekService.getDaysByWeekId(id);
 
+      const result =
+        await this.dailyActivityService.getActivitiesByWeekIdStudentIdUnitId(
+          id,
+          studentId ?? ""
+        );
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          days: days?.Day.map((d) => {
+            return {
+              day: d.day,
+              id: d.id,
+            };
+          }),
+          alpha: result.filter((a) => a.Activity?.activityStatus !== "ATTEND")
+            .length,
+          attend: result.filter((a) => a.Activity?.activityStatus === "ATTEND")
+            .length,
+          weekName: days?.weekNum,
+          activities: result.map((a) => {
+            return {
+              activityStatus: a.Activity?.activityStatus,
+              day: a.day?.day,
+              verificationStatus: a.verificationStatus,
+              activityName: a.Activity?.ActivityName?.name,
+              detail: a.Activity?.detail,
+              location: a.Activity?.location?.name,
+              id: a.id,
+              supervisorId: a.Activity?.supervisorId,
+              supervisorName: a.Activity?.supervisor?.fullname,
+            } as IActivitiesDetail;
+          }),
+        } as IListActivitiesPerWeek)
+      );
+    } catch (error) {
+      return next(error);
+    }
+  }
   async getActivities(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
     const { unit } = req.query;
