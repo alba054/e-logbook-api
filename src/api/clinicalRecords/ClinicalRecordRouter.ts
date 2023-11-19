@@ -62,6 +62,10 @@ export class ClinicalRecordRouter {
           constants.DPK_ROLE,
         ]),
         this.clinicalRecordHandler.putVerificationStatusClinicalRecord
+      )
+      .delete(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.clinicalRecordHandler.deleteClinicalRecord
       );
     // * get clinical record attachment
     this.router

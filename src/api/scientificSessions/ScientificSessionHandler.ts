@@ -37,8 +37,46 @@ export class ScientificSessionHandler {
     this.getAttachmentFile = this.getAttachmentFile.bind(this);
     this.putFeedbackOfScientificSession =
       this.putFeedbackOfScientificSession.bind(this);
+    this.deleteScientificSession = this.deleteScientificSession.bind(this);
   }
 
+  async deleteScientificSession(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const { id } = req.params;
+    try {
+      const result =
+        await this.scientificSessionService.deleteScientificSessionById(
+          id,
+          tokenPayload
+        );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "success delete clinical record"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
+  }
   async putFeedbackOfScientificSession(
     req: Request,
     res: Response,
@@ -216,7 +254,12 @@ export class ScientificSessionHandler {
 
       return res
         .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "success verify scientific session"));
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "success verify scientific session"
+          )
+        );
     } catch (error) {
       return next(error);
     }

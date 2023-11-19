@@ -35,6 +35,41 @@ export class ClinicalRecordHandler {
       this.putVerificationStatusClinicalRecord.bind(this);
     this.putFeedbackOfClinicalRecord =
       this.putFeedbackOfClinicalRecord.bind(this);
+    this.deleteClinicalRecord = this.deleteClinicalRecord.bind(this);
+  }
+
+  async deleteClinicalRecord(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const { id } = req.params;
+    try {
+      const clinicalRecord =
+        await this.clinicalRecordService.deleteClinicalRecordById(
+          id,
+          tokenPayload
+        );
+
+      if (clinicalRecord && "error" in clinicalRecord) {
+        switch (clinicalRecord.error) {
+          case 400:
+            throw new BadRequestError(clinicalRecord.message);
+          case 404:
+            throw new NotFoundError(clinicalRecord.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "success delete clinical record"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async putFeedbackOfClinicalRecord(

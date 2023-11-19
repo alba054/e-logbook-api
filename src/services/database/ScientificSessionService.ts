@@ -29,7 +29,27 @@ export class ScientificSessionService {
       new ScientificAssesmentGradeItemService();
     this.historyModel = new History();
   }
+  async deleteScientificSessionById(id: string, tokenPayload: ITokenPayload) {
+    const scientificSession =
+      await this.scientificSessionModel.getScientificSessionById(id);
 
+    if (!scientificSession) {
+      return createErrorObject(404, "scientificSession not found");
+    }
+
+    if (
+      scientificSession.supervisorId !== tokenPayload.supervisorId &&
+      scientificSession.studentId !== tokenPayload.studentId
+    ) {
+      return createErrorObject(400, "scientificSession not for you");
+    }
+
+    db.scientificSession.delete({
+      where: {
+        id,
+      },
+    });
+  }
   async getSubmittedScientificSessionsWithoutPage(
     supervisorId: string | undefined
   ) {
@@ -238,14 +258,14 @@ export class ScientificSessionService {
           scientificSessionDone: payload.verified,
         },
       }),
-        this.historyModel.insertHistoryAsync(
-          "SCIENTIFIC_SESSION",
-          getUnixTimestamp(),
-          scientificSession.studentId ??'',
-          scientificSession.supervisorId,
-          id,
-          scientificSession.unitId??'',
-        ),
+      this.historyModel.insertHistoryAsync(
+        "SCIENTIFIC_SESSION",
+        getUnixTimestamp(),
+        scientificSession.studentId ?? "",
+        scientificSession.supervisorId,
+        id,
+        scientificSession.unitId ?? ""
+      ),
       // ...scientificAssesmentQuery,
     ]);
   }

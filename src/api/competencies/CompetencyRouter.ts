@@ -108,6 +108,10 @@ export class CompetencyRouter {
           constants.DPK_ROLE,
         ]),
         this.handler.putVerificationStatusSkill
+      )
+      .delete(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.handler.deleteSkill
       );
 
     // * verify case by id
@@ -119,6 +123,10 @@ export class CompetencyRouter {
           constants.DPK_ROLE,
         ]),
         this.handler.putVerificationStatusCase
+      )
+      .delete(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.handler.deleteCase
       );
 
     return this.router;

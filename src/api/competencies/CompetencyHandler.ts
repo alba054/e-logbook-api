@@ -56,6 +56,73 @@ export class CompetencyHandler {
       this.putVerificationStatusSkill.bind(this);
     this.putVerificationStatusCase = this.putVerificationStatusCase.bind(this);
     this.getCompetencies = this.getCompetencies.bind(this);
+    this.deleteSkill = this.deleteSkill.bind(this);
+    this.deleteCase = this.deleteCase.bind(this);
+  }
+
+  async deleteCase(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const { id } = req.params;
+    try {
+      const result = await this.competencyService.deleteCaseById(
+        id,
+        tokenPayload
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "success delete case"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
+  }
+  async deleteSkill(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const { id } = req.params;
+    try {
+      const result = await this.competencyService.deleteSkillById(
+        id,
+        tokenPayload
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "success delete case"
+          )
+        );
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async getCompetencies(req: Request, res: Response, next: NextFunction) {
@@ -149,7 +216,9 @@ export class CompetencyHandler {
 
       return res
         .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "Success verify"));
+        .json(
+          createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "Success verify")
+        );
     } catch (error) {
       return next(error);
     }
@@ -200,7 +269,12 @@ export class CompetencyHandler {
 
       return res
         .status(200)
-        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, "Success Verify Skills"));
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "Success Verify Skills"
+          )
+        );
     } catch (error) {
       return next(error);
     }

@@ -23,6 +23,28 @@ export class ClinicalRecordService {
     this.historyModel = new History();
   }
 
+  async deleteClinicalRecordById(id: string, tokenPayload: ITokenPayload) {
+    const clinicalRecord =
+      await this.clinicalRecordModel.getClinicalRecordsById(id);
+
+    if (!clinicalRecord) {
+      return createErrorObject(404, "clinical record's not found");
+    }
+
+    if (
+      clinicalRecord.supervisorId !== tokenPayload.supervisorId &&
+      clinicalRecord.studentId !== tokenPayload.studentId
+    ) {
+      return createErrorObject(400, "clinical record's not for you");
+    }
+
+    db.clinicalRecord.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
   async getSubmittedClinicalRecordsWithoutPage(
     supervisorId: string | undefined
   ) {
@@ -135,13 +157,13 @@ export class ClinicalRecordService {
         },
       }),
       this.historyModel.insertHistoryAsync(
-          "CLINICAL_RECORD",
-          getUnixTimestamp(),
-          clinicalRecord.studentId ??'',
-          clinicalRecord.supervisorId,
-          id,
-          clinicalRecord.unitId??'',
-        ),
+        "CLINICAL_RECORD",
+        getUnixTimestamp(),
+        clinicalRecord.studentId ?? "",
+        clinicalRecord.supervisorId,
+        id,
+        clinicalRecord.unitId ?? ""
+      ),
     ]);
 
     // return this.clinicalRecordModel.changeVerificationStatusClinicalRecordById(
