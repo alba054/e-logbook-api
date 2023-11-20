@@ -402,14 +402,16 @@ export class StudentHandler {
             studentName: scientificAssesment?.Student?.fullName,
             case: scientificAssesment?.ScientificAssesment?.title,
             location: scientificAssesment?.ScientificAssesment?.location?.name,
-            scores: scientificAssesment?.ScientificAssesment?.grades.map((g) => {
-              return {
-                name: g.gradeItem.name,
-                score: g.score,
-                id: g.id,
-                type: g.gradeItem.scientificGradeType,
-              };
-            }),
+            scores: scientificAssesment?.ScientificAssesment?.grades.map(
+              (g) => {
+                return {
+                  name: g.gradeItem.name,
+                  score: g.score,
+                  id: g.id,
+                  type: g.gradeItem.scientificGradeType,
+                };
+              }
+            ),
             saGrade,
             academicSupervisorId: miniCex.Student?.academicSupervisorId,
             examinerDPKId: miniCex.Student?.examinerSupervisorId,
@@ -466,59 +468,68 @@ export class StudentHandler {
         activeUnit?.activeUnit.activeUnit?.id ?? ""
       );
 
-    let listWeeklyAssesment: IWeeklyAssesment[] = [];
-    for (const w of weeklyAssesment) {
-      const student = await this.studentService.getStudentById(
-        w.Student?.id ?? ""
-      );
-      let checkInTime: number | null;
-      let checkOutTime: number | null;
+    let checkInTime: number | null;
+    let checkOutTime: number | null;
 
-      student?.CheckInCheckOut.forEach((check) => {
-        if (check.unitId == student.unitId) {
-          checkInTime =
-            check.checkInTime != null ? Number(check.checkInTime) : null;
-          checkOutTime =
-            check.checkOutTime != null ? Number(check.checkOutTime) : null;
-          if (checkOutTime !== null) {
-            let temp = new Date(checkOutTime * 1000);
-            const dayOfWeek = temp.getDay();
-            if (dayOfWeek === 1) {
-              checkOutTime = temp.getTime() / 1000;
-            } else {
-              temp = new Date(
-                temp.getTime() +
-                  7 * 24 * 60 * 60 * 1000 -
-                  dayOfWeek * 24 * 60 * 60 * 1000
-              );
-              checkOutTime = temp.getTime() / 1000;
-            }
+    student?.CheckInCheckOut.forEach((check) => {
+      if (check.unitId == student.unitId) {
+        checkInTime =
+          check.checkInTime != null ? Number(check.checkInTime) : null;
+        checkOutTime =
+          check.checkOutTime != null ? Number(check.checkOutTime) : null;
+        if (checkOutTime !== null) {
+          let temp = new Date(checkOutTime * 1000);
+          const dayOfWeek = temp.getDay();
+          if (dayOfWeek === 1) {
+            checkOutTime = temp.getTime() / 1000;
+          } else {
+            temp = new Date(
+              temp.getTime() +
+                7 * 24 * 60 * 60 * 1000 -
+                dayOfWeek * 24 * 60 * 60 * 1000
+            );
+            checkOutTime = temp.getTime() / 1000;
           }
         }
-      });
-      const weeks = await this.weekService.getWeeksByUnitId(
-        student?.unitId ?? ""
-      );
+      }
+    });
+    const weeks = await this.weekService.getWeeksByUnitId(
+      student?.unitId ?? ""
+    );
 
-      let fixWeek = weeks.filter((w) => {
+    let fixWeek = weeks
+      .filter((w) => {
         return (
           (((checkInTime ?? 0) >= w.startDate &&
             (checkInTime ?? 0) <= w.endDate) ||
             w.startDate >= (checkInTime ?? 0)) &&
           (checkOutTime === null ? true : w.endDate < (checkOutTime ?? 0))
         );
+      })
+      .map((w, index) => {
+        return {
+          endDate: w.endDate,
+          startDate: w.startDate,
+          unitId: w.unitId ?? "",
+          weekName: index + 1,
+          status: w.status,
+          id: w.id,
+        };
       });
 
+    let listWeeklyAssesment: IWeeklyAssesment[] = [];
+    let weekNum: number = 0;
+    weeklyAssesment.sort((a, b) => a.weekNum - b.weekNum);
+    fixWeek.sort((a, b) => a.weekName - b.weekName);
+    for (const w of weeklyAssesment) {
       let startDate: number | null = null;
       let endDate: number | null = null;
-      let weekNum: number = 0;
-      fixWeek.forEach((wd, index) => {
-        if (w.weekId === wd.id) {
-          weekNum = index + 1;
-          startDate = Number(wd.startDate);
-          endDate = Number(wd.endDate);
-        }
-      });
+
+      if (weekNum <= fixWeek.length - 1) {
+        startDate = Number(fixWeek[weekNum].startDate);
+        endDate = Number(fixWeek[weekNum].endDate);
+      }
+      weekNum += 1;
       listWeeklyAssesment.push({
         attendNum: dailyActivities
           .filter((a) => a.day?.week?.id === w.weekId)
