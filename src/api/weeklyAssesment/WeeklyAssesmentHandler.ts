@@ -171,15 +171,13 @@ export class WeeklyAssesmentHandler {
       });
 
       //Add WeekNum ke Weekly Assessment
-      let weekNumIndex = 1;
+      let weekNumIndex = 0;
       let listWeeklyAssesment: IWeeklyAssesment[] = [];
       for (const w of weeklyAssesment) {
         let startDate: number = 0;
         let endDate: number = 0;
-        let weekNum: number = 0;
         fixWeek.forEach((wd) => {
-          if (w.weekId === wd.id) {
-            weekNum = weekNumIndex;
+          if (w.weekId === wd.id || w.weekNum === wd.weekNum) {
             startDate = Number(wd.startDate);
             endDate = Number(wd.endDate);
             weekNumIndex += 1;
@@ -199,7 +197,7 @@ export class WeeklyAssesmentHandler {
             ).length,
           score: w.score,
           verificationStatus: w.verificationStatus,
-          weekNum: weekNum,
+          weekNum: weekNumIndex,
           id: w.id,
           startDate: startDate,
           endDate: endDate,
