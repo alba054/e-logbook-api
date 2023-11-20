@@ -161,28 +161,39 @@ export class WeeklyAssesmentHandler {
         student?.unitId ?? ""
       );
 
-      let fixWeek = weeks.filter((w) => {
-        return (
-          (((checkInTime ?? 0) >= w.startDate &&
-            (checkInTime ?? 0) <= w.endDate) ||
-            w.startDate >= (checkInTime ?? 0)) &&
-          (checkOutTime === null ? true : w.endDate < (checkOutTime ?? 0))
-        );
-      });
+      let fixWeek = weeks
+        .filter((w) => {
+          return (
+            (((checkInTime ?? 0) >= w.startDate &&
+              (checkInTime ?? 0) <= w.endDate) ||
+              w.startDate >= (checkInTime ?? 0)) &&
+            (checkOutTime === null ? true : w.endDate < (checkOutTime ?? 0))
+          );
+        })
+        .map((w, index) => {
+          return {
+            endDate: w.endDate,
+            startDate: w.startDate,
+            unitId: w.unitId ?? "",
+            weekName: index + 1,
+            status: w.status,
+            id: w.id,
+          };
+        });
 
       //Add WeekNum ke Weekly Assessment
       let weekNumIndex = 0;
       let listWeeklyAssesment: IWeeklyAssesment[] = [];
+      weeklyAssesment.sort((a, b) => a.weekNum - b.weekNum);
+      fixWeek.sort((a, b) => a.weekName - b.weekName);
       for (const w of weeklyAssesment) {
         let startDate: number = 0;
         let endDate: number = 0;
-        fixWeek.forEach((wd) => {
-          if (w.weekId === wd.id || w.weekNum === wd.weekNum) {
-            startDate = Number(wd.startDate);
-            endDate = Number(wd.endDate);
-            weekNumIndex += 1;
-          }
-        });
+        if (weekNumIndex <= fixWeek.length - 1) {
+          startDate = Number(fixWeek[weekNumIndex].startDate);
+          endDate = Number(fixWeek[weekNumIndex].endDate);
+        }
+        weekNumIndex += 1;
         listWeeklyAssesment.push({
           attendNum: dailyActivities
             .filter((a) => a.day?.week?.id === w.weekId)
