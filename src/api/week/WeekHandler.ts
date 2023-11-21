@@ -68,18 +68,19 @@ export class WeekHandler {
     const { id } = req.params;
 
     try {
-      const testError = await this.weekService.deleteWeek(id);
+      //! Enable Again
+      // const testError = await this.weekService.deleteWeek(id);
 
-      if (testError && "error" in testError) {
-        switch (testError.error) {
-          case 400:
-            throw new BadRequestError(testError.message);
-          case 404:
-            throw new NotFoundError(testError.message);
-          default:
-            throw new InternalServerError();
-        }
-      }
+      // if (testError && "error" in testError) {
+      //   switch (testError.error) {
+      //     case 400:
+      //       throw new BadRequestError(testError.message);
+      //     case 404:
+      //       throw new NotFoundError(testError.message);
+      //     default:
+      //       throw new InternalServerError();
+      //   }
+      // }
 
       return res
         .status(200)
