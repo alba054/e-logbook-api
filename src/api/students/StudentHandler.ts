@@ -1730,6 +1730,7 @@ export class StudentHandler {
       const activeUnit = await this.studentService.getActiveUnit(studentId);
       if (
         activeUnit !== null &&
+        activeUnit?.checkInCheckOutUnit?.checkInTime !== null &&
         activeUnit?.checkInCheckOutUnit?.checkOutStatus !== "VERIFIED"
       ) {
         throw new BadRequestError("Check-out status not verified");
