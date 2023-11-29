@@ -105,10 +105,7 @@ export class WeekService {
       const allWeeks = await this.getWeeksByUnitId(payload.unitId);
 
       for (const week of allWeeks) {
-        if (
-          payload.startDate >= week.startDate &&
-          payload.startDate <= week.endDate
-        ) {
+        if (payload.startDate.toString() === week.startDate.toString()) {
           throw createErrorObject(400, "Week already added");
         }
       }
