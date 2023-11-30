@@ -51,12 +51,49 @@ export class DailyActivityHandler {
     const { studentId, id } = req.params;
     try {
       const days = await this.weekService.getDaysByWeekId(id);
-
       const result =
         await this.dailyActivityService.getActivitiesByWeekIdStudentIdUnitId(
           id,
           studentId ?? ""
         );
+
+      //! remove it after fix
+      // Remove duplicates and keep the latest created activity for each day
+      const unprocessActivities = result.map((a) => {
+        return {
+          activityStatus: a.Activity?.activityStatus,
+          verificationStatus: a.verificationStatus,
+          activityName: a.Activity?.ActivityName?.name,
+          detail: a.Activity?.detail,
+          location: a.Activity?.location?.name,
+          createdAt: a.Activity?.createdAt,
+          day: a.day?.day,
+          supervisorId: a.Activity?.supervisorId,
+          supervisorName: a.Activity?.supervisor?.fullname,
+        } as IActivitiesDetail;
+      });
+      const uniqueActivitiesByDay: { [dayKey: string]: IActivitiesDetail } = {};
+      for (const activity of unprocessActivities) {
+        const dayKey = activity.day;
+
+        if (dayKey) {
+          if (
+            !uniqueActivitiesByDay[dayKey] ||
+            (activity.createdAt &&
+              activity.createdAt > uniqueActivitiesByDay[dayKey].createdAt)
+          ) {
+            uniqueActivitiesByDay[dayKey] = activity;
+          }
+        }
+      }
+      const uniqueActivitiesList: IActivitiesDetail[] = [];
+      for (const dayKey in uniqueActivitiesByDay) {
+        uniqueActivitiesList.push(uniqueActivitiesByDay[dayKey]);
+      }
+
+      const attend = uniqueActivitiesList.filter(
+        (a) => a.activityStatus === "ATTEND" || a.activityStatus === "HOLIDAY"
+      ).length;
 
       return res.status(200).json(
         createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
@@ -66,24 +103,10 @@ export class DailyActivityHandler {
               id: d.id,
             };
           }),
-          alpha: result.filter((a) => a.Activity?.activityStatus !== "ATTEND")
-            .length,
-          attend: result.filter((a) => a.Activity?.activityStatus === "ATTEND")
-            .length,
+          alpha: uniqueActivitiesList.length - attend,
+          attend: attend,
           weekName: days?.weekNum,
-          activities: result.map((a) => {
-            return {
-              activityStatus: a.Activity?.activityStatus,
-              day: a.day?.day,
-              verificationStatus: a.verificationStatus,
-              activityName: a.Activity?.ActivityName?.name,
-              detail: a.Activity?.detail,
-              location: a.Activity?.location?.name,
-              id: a.id,
-              supervisorId: a.Activity?.supervisorId,
-              supervisorName: a.Activity?.supervisor?.fullname,
-            } as IActivitiesDetail;
-          }),
+          activities: uniqueActivitiesList,
         } as IListActivitiesPerWeek)
       );
     } catch (error) {
