@@ -1165,6 +1165,38 @@ export class StudentHandler {
           tokenPayload.studentId ?? ""
         );
 
+      //! remove it after fix
+      // Remove duplicates and keep the latest created activity for each day
+      const unprocessActivities = result.map((a) => {
+        return {
+          activityStatus: a.Activity?.activityStatus,
+          verificationStatus: a.verificationStatus,
+          activityName: a.Activity?.ActivityName?.name,
+          detail: a.Activity?.detail,
+          location: a.Activity?.location?.name,
+          createdAt: a.Activity?.createdAt,
+          day: a.day?.day,
+          supervisorId: a.Activity?.supervisorId,
+          supervisorName: a.Activity?.supervisor?.fullname,
+        } as IActivitiesDetail;
+      });
+      const activityMap = new Map();
+      // Filter out duplicates and keep the latest activity for each day
+      for (const activity of unprocessActivities) {
+        if (
+          !activityMap.has(activity.day) ||
+          activityMap.get(activity.day).createdAt < activity.createdAt
+        ) {
+          activityMap.set(activity.day, activity);
+        }
+      }
+      // Convert map values back to array
+      const uniqueActivitiesList = Array.from(activityMap.values());
+
+      const attend = uniqueActivitiesList.filter(
+        (a) => a.activityStatus === "ATTEND" || a.activityStatus === "HOLIDAY"
+      ).length;
+
       return res.status(200).json(
         createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
           days: days?.Day.map((d) => {
@@ -1173,24 +1205,10 @@ export class StudentHandler {
               id: d.id,
             };
           }),
-          alpha: result.filter((a) => a.Activity?.activityStatus !== "ATTEND")
-            .length,
-          attend: result.filter((a) => a.Activity?.activityStatus === "ATTEND")
-            .length,
+          alpha: uniqueActivitiesList.length - attend,
+          attend: attend,
           weekName: days?.weekNum,
-          activities: result.map((a) => {
-            return {
-              activityStatus: a.Activity?.activityStatus,
-              day: a.day?.day,
-              verificationStatus: a.verificationStatus,
-              activityName: a.Activity?.ActivityName?.name,
-              detail: a.Activity?.detail,
-              location: a.Activity?.location?.name,
-              id: a.id,
-              supervisorId: a.Activity?.supervisorId,
-              supervisorName: a.Activity?.supervisor?.fullname,
-            } as IActivitiesDetail;
-          }),
+          activities: uniqueActivitiesList,
         } as IListActivitiesPerWeek)
       );
     } catch (error) {
