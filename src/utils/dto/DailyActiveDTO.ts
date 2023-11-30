@@ -1,3 +1,5 @@
+import { Activity, Day } from "@prisma/client";
+
 export interface IListActivitiesPerWeek {
   weekName: number;
   attend: number;
@@ -15,11 +17,17 @@ export interface IActivitiesDetail {
   day: string | any;
   location?: string | any;
   detail?: string | any;
+  createdAt?: number | any;
   activityStatus: "SICK" | "ATTEND" | "NOT_ATTEND" | "HOLIDAY" | any;
   activityName?: string | any;
   verificationStatus?: "INPROCESS" | "VERIFIED" | "UNVERIFIED" | any;
   supervisorId?: string | any;
   supervisorName?: string | any;
+}
+
+export interface ITempDailyActivityPerWeek {
+  activity : Activity,
+  day: Day,
 }
 
 export interface IStudentDailyActivities {
