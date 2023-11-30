@@ -25,7 +25,6 @@ export class DailyActivity {
             supervisor: true,
           },
         },
-
         day: true,
       },
     });
