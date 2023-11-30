@@ -187,49 +187,51 @@ export class WeeklyAssesmentHandler {
       let listWeeklyAssesment: IWeeklyAssesment[] = [];
       weeklyAssesment.sort((a, b) => a.weekNum - b.weekNum);
       fixWeek.sort((a, b) => a.weekName - b.weekName);
-      for (const w of weeklyAssesment) {
+      for (let i = 0; i < weeklyAssesment.length; i++) {
+        const w = weeklyAssesment[i];
         let startDate: number = 0;
         let endDate: number = 0;
-        if (weekNumIndex <= fixWeek.length - 1) {
+
+        if (weekNumIndex < fixWeek.length) {
           startDate = Number(fixWeek[weekNumIndex].startDate);
           endDate = Number(fixWeek[weekNumIndex].endDate);
         }
-        weekNumIndex += 1;
 
-        const unprocessActivities = dailyActivities.map((a) => {
-          return {
-            activityStatus: a.Activity?.activityStatus,
-            createdAt: a.Activity?.createdAt,
-            weekId: a.day?.week?.id,
-            day: a.day?.day,
-          } as IActivityDetail;
-        });
+        weekNumIndex++;
+
+        const unprocessedActivities = dailyActivities.map((a) => ({
+          activityStatus: a.Activity?.activityStatus,
+          createdAt: a.Activity?.createdAt,
+          weekId: a.day?.week?.id,
+          day: a.day?.day,
+        })) as IActivityDetail[];
+
         const activityMap = new Map();
-        for (const activity of unprocessActivities) {
+
+        for (const activity of unprocessedActivities) {
           if (
             !activityMap.has(activity.day) ||
-            activityMap.get(activity.day).createdAt < activity.createdAt
+            (activityMap.get(activity.day).createdAt || 0) <
+              (activity.createdAt || 0)
           ) {
             activityMap.set(activity.day, activity);
           }
         }
-        // Convert map values back to array
+
         const uniqueActivitiesList = Array.from(activityMap.values());
-        const attend = uniqueActivitiesList
-          .filter((a) => a.weekId === w.weekId)
-          .filter(
-            (a) =>
-              a.activityStatus === "ATTEND" || a.activityStatus === "HOLIDAY"
-          ).length;
+        const weekConfirm = uniqueActivitiesList.filter(
+          (a) => a.weekId === w.weekId
+        );
+        const attend = weekConfirm.filter(
+          (a) => a.activityStatus === "ATTEND" || a.activityStatus === "HOLIDAY"
+        ).length;
 
         listWeeklyAssesment.push({
           attendNum: attend,
-          notAttendNum:
-            dailyActivities.filter((a) => a.day?.week?.id === w.weekId).length -
-            attend,
+          notAttendNum: weekConfirm.length - attend,
           score: w.score,
           verificationStatus: w.verificationStatus,
-          weekNum: weekNumIndex,
+          weekNum: i + 1, // Update weekNum index
           id: w.id,
           startDate: startDate,
           endDate: endDate,
