@@ -15,3 +15,10 @@ export interface IWeeklyAssesment {
   endDate: number | null;
   score: number;
 }
+
+export interface IActivityDetail {
+  day: string | any;
+  createdAt?: number | any;
+  activityStatus: "SICK" | "ATTEND" | "NOT_ATTEND" | "HOLIDAY" | any;
+  weekId: string;
+}

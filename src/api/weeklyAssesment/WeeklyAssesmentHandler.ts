@@ -7,6 +7,7 @@ import { StudentService } from "../../services/database/StudentService";
 import { WeeklyAssesmentService } from "../../services/database/WeeklyAssesmentService";
 import { constants, createResponse } from "../../utils";
 import {
+  IActivityDetail,
   IStudentWeeklyAssesment,
   IWeeklyAssesment,
 } from "../../utils/dto/WeeklyAssesmentDTO";
@@ -194,18 +195,38 @@ export class WeeklyAssesmentHandler {
           endDate = Number(fixWeek[weekNumIndex].endDate);
         }
         weekNumIndex += 1;
+
+        const unprocessActivities = dailyActivities.map((a) => {
+          return {
+            activityStatus: a.Activity?.activityStatus,
+            createdAt: a.Activity?.createdAt,
+            weekId: a.day?.week?.id,
+            day: a.day?.day,
+          } as IActivityDetail;
+        });
+        const activityMap = new Map();
+        for (const activity of unprocessActivities) {
+          if (
+            !activityMap.has(activity.day) ||
+            activityMap.get(activity.day).createdAt < activity.createdAt
+          ) {
+            activityMap.set(activity.day, activity);
+          }
+        }
+        // Convert map values back to array
+        const uniqueActivitiesList = Array.from(activityMap.values());
+        const attend = uniqueActivitiesList
+          .filter((a) => a.weekId === w.weekId)
+          .filter(
+            (a) =>
+              a.activityStatus === "ATTEND" || a.activityStatus === "HOLIDAY"
+          ).length;
+
         listWeeklyAssesment.push({
-          attendNum: dailyActivities
-            .filter((a) => a.day?.week?.id === w.weekId)
-            .filter((a) => a.Activity?.activityStatus === "ATTEND").length,
-          notAttendNum: dailyActivities
-            .filter((a) => a.day?.week?.id === w.weekId)
-            .filter(
-              (a) =>
-                a.Activity?.activityStatus === "NOT_ATTEND" ||
-                a.Activity?.activityStatus === "SICK" ||
-                a.Activity?.activityStatus === "HOLIDAY"
-            ).length,
+          attendNum: attend,
+          notAttendNum:
+            dailyActivities.filter((a) => a.day?.week?.id === w.weekId).length -
+            attend,
           score: w.score,
           verificationStatus: w.verificationStatus,
           weekNum: weekNumIndex,
