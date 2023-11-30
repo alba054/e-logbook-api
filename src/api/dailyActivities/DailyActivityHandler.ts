@@ -72,24 +72,18 @@ export class DailyActivityHandler {
           supervisorName: a.Activity?.supervisor?.fullname,
         } as IActivitiesDetail;
       });
-      const uniqueActivitiesByDay: { [dayKey: string]: IActivitiesDetail } = {};
+      const activityMap = new Map();
+      // Filter out duplicates and keep the latest activity for each day
       for (const activity of unprocessActivities) {
-        const dayKey = activity.day;
-
-        if (dayKey) {
-          if (
-            !uniqueActivitiesByDay[dayKey] ||
-            (activity.createdAt &&
-              activity.createdAt > uniqueActivitiesByDay[dayKey].createdAt)
-          ) {
-            uniqueActivitiesByDay[dayKey] = activity;
-          }
+        if (
+          !activityMap.has(activity.day) ||
+          activityMap.get(activity.day).createdAt < activity.createdAt
+        ) {
+          activityMap.set(activity.day, activity);
         }
       }
-      const uniqueActivitiesList: IActivitiesDetail[] = [];
-      for (const dayKey in uniqueActivitiesByDay) {
-        uniqueActivitiesList.push(uniqueActivitiesByDay[dayKey]);
-      }
+      // Convert map values back to array
+      const uniqueActivitiesList = Array.from(activityMap.values());
 
       const attend = uniqueActivitiesList.filter(
         (a) => a.activityStatus === "ATTEND" || a.activityStatus === "HOLIDAY"
