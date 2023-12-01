@@ -84,6 +84,13 @@ export class DailyActivityHandler {
       }
       // Convert map values back to array
       const uniqueActivitiesList = Array.from(activityMap.values());
+      for (let id = 0; id < uniqueActivitiesList.length; id++) {
+        uniqueActivitiesList[id] =
+          uniqueActivitiesList[id].verificationStatus === "VERIFIED" &&
+          uniqueActivitiesList[id].activityStatus === null
+            ? "UNVERIFIED"
+            : "VERIFIED";
+      }
 
       const attend = uniqueActivitiesList.filter(
         (a) => a.activityStatus === "ATTEND" || a.activityStatus === "HOLIDAY"
