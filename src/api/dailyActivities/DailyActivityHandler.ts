@@ -87,7 +87,7 @@ export class DailyActivityHandler {
       for (let id = 0; id < uniqueActivitiesList.length; id++) {
         uniqueActivitiesList[id] =
           uniqueActivitiesList[id].verificationStatus === "VERIFIED" &&
-          uniqueActivitiesList[id].activityStatus === null
+          uniqueActivitiesList[id].activityName === null
             ? "UNVERIFIED"
             : "VERIFIED";
       }
