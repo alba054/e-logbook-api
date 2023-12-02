@@ -1171,7 +1171,7 @@ export class StudentHandler {
         return {
           activityStatus: a.Activity?.activityStatus,
           verificationStatus: a.verificationStatus,
-          activityName: a.Activity?.ActivityName?.name,
+          activityName: a.Activity?.ActivityName?.name ?? "",
           detail: a.Activity?.detail,
           location: a.Activity?.location?.name,
           createdAt: a.Activity?.createdAt,
@@ -1194,11 +1194,12 @@ export class StudentHandler {
       const uniqueActivitiesList = Array.from(activityMap.values());
 
       for (let id = 0; id < uniqueActivitiesList.length; id++) {
-        uniqueActivitiesList[id].verificationStatus =
+        if (
           uniqueActivitiesList[id].verificationStatus === "VERIFIED" &&
-          uniqueActivitiesList[id].activityName === null
-            ? "UNVERIFIED"
-            : uniqueActivitiesList[id].verificationStatus;
+          uniqueActivitiesList[id].activityName === ""
+        ) {
+          uniqueActivitiesList[id].verificationStatus = "UNVERIFIED";
+        }
       }
 
       const attend = uniqueActivitiesList.filter(
