@@ -1194,11 +1194,11 @@ export class StudentHandler {
       const uniqueActivitiesList = Array.from(activityMap.values());
 
       for (let id = 0; id < uniqueActivitiesList.length; id++) {
-        uniqueActivitiesList[id] =
+        uniqueActivitiesList[id].verificationStatus =
           uniqueActivitiesList[id].verificationStatus === "VERIFIED" &&
           uniqueActivitiesList[id].activityName === null
             ? "UNVERIFIED"
-            : "VERIFIED";
+            : uniqueActivitiesList[id].verificationStatus;
       }
 
       const attend = uniqueActivitiesList.filter(
