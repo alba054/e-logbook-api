@@ -84,13 +84,6 @@ export class DailyActivityHandler {
       }
       // Convert map values back to array
       const uniqueActivitiesList = Array.from(activityMap.values());
-      for (let id = 0; id < uniqueActivitiesList.length; id++) {
-        uniqueActivitiesList[id] =
-          uniqueActivitiesList[id].verificationStatus === "VERIFIED" &&
-          uniqueActivitiesList[id].activityName === null
-            ? "UNVERIFIED"
-            : "VERIFIED";
-      }
 
       const attend = uniqueActivitiesList.filter(
         (a) => a.activityStatus === "ATTEND" || a.activityStatus === "HOLIDAY"
@@ -160,14 +153,25 @@ export class DailyActivityHandler {
         student?.unitId ?? ""
       );
 
-      let fixWeek = weeks.filter((w) => {
-        return (
-          (((checkInTime ?? 0) >= w.startDate &&
-            (checkInTime ?? 0) <= w.endDate) ||
-            w.startDate >= (checkInTime ?? 0)) &&
-          (checkOutTime === null ? true : w.endDate < (checkOutTime ?? 0))
-        );
-      });
+      let fixWeek = weeks
+        .filter((w) => {
+          return (
+            (((checkInTime ?? 0) >= w.startDate &&
+              (checkInTime ?? 0) <= w.endDate) ||
+              w.startDate >= (checkInTime ?? 0)) &&
+            (checkOutTime === null ? true : w.endDate < (checkOutTime ?? 0))
+          );
+        })
+        .map((w, index) => {
+          return {
+            endDate: w.endDate,
+            startDate: w.startDate,
+            unitId: w.unitId ?? "",
+            weekName: index + 1,
+            status: w.status,
+            id: w.id,
+          };
+        });
 
       let weekNum: number = 0;
       fixWeek.forEach((w, index) => {
@@ -175,6 +179,10 @@ export class DailyActivityHandler {
           weekNum = index + 1;
         }
       });
+
+      if (a.unitId !== student?.unitId || weekNum == 0) {
+        continue;
+      }
 
       if (a.verificationStatus != "VERIFIED")
         listActivities.push({
@@ -185,6 +193,8 @@ export class DailyActivityHandler {
           location: a.Activity?.location?.name,
           studentId: a.Student?.studentId,
           studentName: a.Student?.fullName,
+          s1: a.Activity?.supervisorId,
+          s2: tokenPayload.supervisorId,
           unitName: a.Unit?.name,
           verificationStatus: a.verificationStatus,
           weekNum: weekNum,

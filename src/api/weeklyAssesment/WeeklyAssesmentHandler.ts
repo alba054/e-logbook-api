@@ -179,6 +179,9 @@ export class WeeklyAssesmentHandler {
             weekName: index + 1,
             status: w.status,
             id: w.id,
+            dailyActivities: dailyActivities.filter(
+              (d) => d.day?.weekId == w.id
+            ),
           };
         });
 
@@ -191,44 +194,30 @@ export class WeeklyAssesmentHandler {
         const w = weeklyAssesment[i];
         let startDate: number = 0;
         let endDate: number = 0;
+        let attend: number = 0;
 
         if (weekNumIndex < fixWeek.length) {
           startDate = Number(fixWeek[weekNumIndex].startDate);
           endDate = Number(fixWeek[weekNumIndex].endDate);
         }
+        attend = fixWeek[weekNumIndex].dailyActivities.filter((a) => {
+          return (
+            a.Activity?.activityStatus === "ATTEND" ||
+            a.Activity?.activityStatus === "HOLIDAY"
+          );
+        }).length;
+
+        const differenceInTime =
+          new Date(endDate * 1000).getTime() -
+          new Date(startDate * 1000).getTime();
+        const notAttend = differenceInTime / (1000 * 3600 * 24);
+        attend = attend > notAttend ? notAttend : attend;
 
         weekNumIndex++;
 
-        const unprocessedActivities = dailyActivities.map((a) => ({
-          activityStatus: a.Activity?.activityStatus,
-          createdAt: a.Activity?.createdAt,
-          weekId: a.day?.week?.id,
-          day: a.day?.day,
-        })) as IActivityDetail[];
-
-        const activityMap = new Map();
-
-        for (const activity of unprocessedActivities) {
-          if (
-            !activityMap.has(activity.day) ||
-            (activityMap.get(activity.day).createdAt || 0) <
-              (activity.createdAt || 0)
-          ) {
-            activityMap.set(activity.day, activity);
-          }
-        }
-
-        const uniqueActivitiesList = Array.from(activityMap.values());
-        const weekConfirm = uniqueActivitiesList.filter(
-          (a) => a.weekId === w.weekId
-        );
-        const attend = weekConfirm.filter(
-          (a) => a.activityStatus === "ATTEND" || a.activityStatus === "HOLIDAY"
-        ).length;
-
         listWeeklyAssesment.push({
           attendNum: attend,
-          notAttendNum: weekConfirm.length - attend,
+          notAttendNum: notAttend - attend >= 0 ? notAttend - attend : 0,
           score: w.score,
           verificationStatus: w.verificationStatus,
           weekNum: i + 1, // Update weekNum index

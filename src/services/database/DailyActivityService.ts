@@ -27,11 +27,9 @@ export class DailyActivityService {
 
   async getActivitiesByWeekIdStudentIdUnitId(
     weekId: string,
-    studentId: string,
+    studentId: string
   ) {
-    const student = await this.studentService.getStudentById(
-      studentId ?? ""
-    );
+    const student = await this.studentService.getStudentById(studentId ?? "");
 
     return this.dailyActivityModel.getActivitiesByWeekIdAndStudentIdAndUnitId(
       weekId,
@@ -126,10 +124,10 @@ export class DailyActivityService {
     }
 
     const weeklyAssesment =
-      await this.weeklyAssesmentService.getWeeklyAssesmentByStudentIdAndUnitIdAndWeekNum(
+      await this.weeklyAssesmentService.getWeeklyAssesmentByStudentIdAndUnitIdAndWeekId(
         dailyActivity?.studentId,
         dailyActivity?.unitId,
-        dailyActivity?.day?.week?.weekNum
+        dailyActivity?.day?.week?.id
       );
 
     let weekOp = [];
