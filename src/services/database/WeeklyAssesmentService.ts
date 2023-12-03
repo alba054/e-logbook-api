@@ -5,8 +5,6 @@ import { History } from "../../models/History";
 import { getUnixTimestamp } from "../../utils";
 import { ITokenPayload } from "../../utils/interfaces/TokenPayload";
 
-
-
 export class WeeklyAssesmentService {
   private weeklyAssesmentModel: WeeklyAssesment;
   private historyModel: History;
@@ -16,15 +14,15 @@ export class WeeklyAssesmentService {
     this.historyModel = new History();
   }
 
-  async getWeeklyAssesmentByStudentIdAndUnitIdAndWeekNum(
+  async getWeeklyAssesmentByStudentIdAndUnitIdAndWeekId(
     studentId: string | null | undefined,
     unitId: string | null | undefined,
-    weekNum: number | undefined
+    weekId: string | undefined
   ) {
-    return this.weeklyAssesmentModel.getWeeklyAssesmentByStudentIdAndUnitIdAndWeekNum(
+    return this.weeklyAssesmentModel.getWeeklyAssesmentByStudentIdAndUnitIdAndWeekId(
       studentId,
       unitId,
-      weekNum
+      weekId
     );
   }
 
@@ -38,22 +36,24 @@ export class WeeklyAssesmentService {
     );
   }
 
-  async scoreWeelyAssesmentById(id: string, payload: IPutWeeklyAssesmentScore,tokenPayload: ITokenPayload) {
+  async scoreWeelyAssesmentById(
+    id: string,
+    payload: IPutWeeklyAssesmentScore,
+    tokenPayload: ITokenPayload
+  ) {
     // return this.weeklyAssesmentModel.updateScoreById(id, payload);
     const selected = await this.weeklyAssesmentModel.getWeeklyAssesmentById(id);
-    return (
-       db.$transaction([
-        db.weekAssesment.update({
-          where: {
-            id,
-          },
-          data: {
-            score: payload.score,
-            verificationStatus: "VERIFIED",
-            },
-          }
-        ),
-       this.historyModel.insertHistoryAsync(
+    return db.$transaction([
+      db.weekAssesment.update({
+        where: {
+          id,
+        },
+        data: {
+          score: payload.score,
+          verificationStatus: "VERIFIED",
+        },
+      }),
+      this.historyModel.insertHistoryAsync(
         "WEEKLY_ASSESMENT",
         getUnixTimestamp(),
         selected?.studentId ?? "",
@@ -61,7 +61,7 @@ export class WeeklyAssesmentService {
         id,
         selected?.unitId ?? ""
       ),
-    ],));
+    ]);
   }
 
   async getWeeklyAssesmentByStudentIdAndUnitId(

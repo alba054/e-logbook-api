@@ -2,16 +2,16 @@ import db from "../database";
 import { IPutWeeklyAssesmentScore } from "../utils/interfaces/WeeklyAssesment";
 
 export class WeeklyAssesment {
-  async getWeeklyAssesmentByStudentIdAndUnitIdAndWeekNum(
+  async getWeeklyAssesmentByStudentIdAndUnitIdAndWeekId(
     studentId: string | null | undefined,
     unitId: string | null | undefined,
-    weekNum: number | undefined
+    weekId: string | undefined
   ) {
     return db.weekAssesment.findFirst({
       where: {
         unitId,
         studentId,
-        weekNum,
+        weekId,
       },
     });
   }
