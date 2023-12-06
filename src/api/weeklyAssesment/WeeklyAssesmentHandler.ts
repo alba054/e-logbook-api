@@ -140,14 +140,6 @@ export class WeeklyAssesmentHandler {
       );
       const weekIds = new Map();
 
-      const dailyActivities: { weekId: string; activities: any }[] = [];
-      weekIds.forEach((v, k) => {
-        dailyActivities.push({
-          weekId: k,
-          activities: v,
-        });
-      });
-
       // Get WeekNum
       // 1. Get cico
       let checkInTime: number | null;
@@ -208,6 +200,14 @@ export class WeeklyAssesmentHandler {
         }),
         dailyActivities: [],
       } as IStudentDailyActivities;
+
+      const dailyActivities: { weekId: string; activities: any }[] = [];
+      weekIds.forEach((v, k) => {
+        dailyActivities.push({
+          weekId: k,
+          activities: v,
+        });
+      });
 
       if (dailyActivities !== null) {
         response = {
