@@ -234,9 +234,7 @@ export class WeeklyAssesmentHandler {
                 return {
                   weekId: d.weekId,
                   attendNum: d.activities.filter(
-                    (a: any) =>
-                      a.Activity?.activityStatus === "ATTEND" ||
-                      a.Activity?.activityStatus === "HOLIDAY"
+                    (a: any) => a.Activity?.activityStatus === "ATTEND"
                   ).length,
                   notAttendNum: d.activities.filter(
                     (a: any) => a.Activity?.activityStatus === "NOT_ATTEND"
