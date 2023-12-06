@@ -321,14 +321,14 @@ export class WeeklyAssesmentHandler {
           startDate = Number(fixWeek[weekNumIndex].startDate);
           endDate = Number(fixWeek[weekNumIndex].endDate);
         }
-        let temp = fixDailyActivities.filter(
-          (e) => (e.weekId = fixWeek[weekNumIndex].id)
-        )[0];
-        weekNumIndex++;
 
+        weekNumIndex++;
+        let temp = fixDailyActivities.filter(
+          (e) => e.weekName === weekNumIndex.toString()
+        )[0];
         listWeeklyAssesment.push({
           attendNum: temp.attendNum,
-          notAttendNum: temp.notAttendNum,
+          notAttendNum: temp.notAttendNum ?? 0 + temp.sickNum ?? 0,
           score: w.score,
           verificationStatus: w.verificationStatus,
           weekNum: i + 1, // Update weekNum index
