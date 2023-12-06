@@ -298,16 +298,36 @@ export class StudentHandler {
         finalScore = finalScore + grade;
       });
 
+      let verifiedCase = 0;
+      for (let i = 0; i < caseTypes.length; i++) {
+        const c = caseTypes[i];
+        for (let j = 0; j < cases.length; j++) {
+          const e = cases[j];
+          if (c.id == e.caseTypeId && e.verificationStatus == "VERIFIED") {
+            verifiedCase++;
+            break;
+          }
+        }
+      }
+
+      let verifiedSkill = 0;
+      for (let i = 0; i < skillTypes.length; i++) {
+        const s = skillTypes[i];
+        for (let j = 0; j < skills.length; j++) {
+          const e = skills[j];
+          if (s.id == e.skillTypeId && e.verificationStatus == "VERIFIED") {
+            verifiedSkill++;
+            break;
+          }
+        }
+      }
+
       return res.status(200).json(
         createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
           totalCases: caseTypes?.length ?? 0,
           totalSkills: skillTypes?.length ?? 0,
-          verifiedCases: cases.filter(
-            (c) => c.verificationStatus === "VERIFIED"
-          ).length,
-          verifiedSkills: skills.filter(
-            (s) => s.verificationStatus === "VERIFIED"
-          ).length,
+          verifiedCases: verifiedCase,
+          verifiedSkills: verifiedSkill,
           cases: cases
             .filter((c) => c.verificationStatus === "VERIFIED")
             .map((c) => {
