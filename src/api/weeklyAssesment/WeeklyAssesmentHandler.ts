@@ -324,7 +324,7 @@ export class WeeklyAssesmentHandler {
 
         weekNumIndex++;
         let temp = fixDailyActivities.filter(
-          (e) => e.weekName === weekNumIndex.toString()
+          (e) => e.weekName == weekNumIndex.toString()
         )[0];
         listWeeklyAssesment.push({
           attendNum: temp.attendNum,
