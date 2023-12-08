@@ -328,6 +328,12 @@ export class WeeklyAssesmentHandler {
         let temp = fixDailyActivities.filter(
           (e) => e.weekName == weekNumIndex.toString()
         )[0];
+
+        // !for safety check
+        if (typeof temp === "undefined") {
+          continue;
+        }
+
         listWeeklyAssesment.push({
           attendNum: temp.attendNum,
           notAttendNum: temp.notAttendNum ?? 0 + temp.sickNum ?? 0,
