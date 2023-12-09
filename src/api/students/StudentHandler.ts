@@ -482,11 +482,17 @@ export class StudentHandler {
         activeUnit?.activeUnit.activeUnit?.id ?? ""
       );
 
-    const dailyActivities =
+    const result =
       await this.dailyActivityService.getDailyActivitiesByStudentNimAndUnitId(
         tokenPayload.studentId ?? "",
         activeUnit?.activeUnit.activeUnit?.id ?? ""
       );
+
+    const weeks = await this.weekService.getWeeksByUnitId(
+      student?.unitId ?? ""
+    );
+
+    const weekIds = new Map();
 
     let checkInTime: number | null;
     let checkOutTime: number | null;
@@ -513,11 +519,109 @@ export class StudentHandler {
         }
       }
     });
-    const weeks = await this.weekService.getWeeksByUnitId(
-      student?.unitId ?? ""
-    );
 
-    let fixWeek = weeks
+    result.forEach((r) => {
+      const weekId = r.day?.weekId;
+      if (weekIds.has(weekId)) {
+        const activities: any[] = weekIds.get(weekId);
+        activities.push(r);
+        weekIds.set(weekId, activities);
+      } else {
+        weekIds.set(weekId, [r]);
+      }
+    });
+
+    // INITIAL WEEK
+    let response = {
+      unitName: result[0]?.Unit?.name,
+      weeks: weeks.map((w) => {
+        return {
+          endDate: Number(w.endDate),
+          startDate: Number(w.startDate),
+          unitId: w.unitId,
+          unitName: w.Unit?.name,
+          weekName: w.weekNum,
+          id: w.id,
+          status: w.status,
+          days: w.Day.map((d) => {
+            return {
+              day: d.day,
+              id: d.id,
+            };
+          }),
+        };
+      }),
+      dailyActivities: [],
+    } as IStudentDailyActivities;
+
+    const dailyActivities: { weekId: string; activities: any }[] = [];
+    weekIds.forEach((v, k) => {
+      dailyActivities.push({
+        weekId: k,
+        activities: v,
+      });
+    });
+
+    if (dailyActivities !== null) {
+      response = {
+        unitName: result[0]?.Unit?.name,
+        weeks: weeks.map((w) => {
+          return {
+            endDate: Number(w.endDate),
+            startDate: Number(w.startDate),
+            unitId: w.unitId ?? "",
+            unitName: w.Unit?.name ?? "",
+            weekName: w.weekNum,
+            status: w.status,
+            id: w.id,
+            days: w.Day.map((d) => {
+              return {
+                day: d.day,
+                id: d.id,
+              };
+            }),
+          };
+        }),
+        dailyActivities: Array.isArray(dailyActivities)
+          ? dailyActivities.map((d) => {
+              return {
+                weekId: d.weekId,
+                attendNum: d.activities.filter(
+                  (a: any) =>
+                    a.Activity?.activityStatus === "ATTEND" ||
+                    a.Activity?.activityStatus === "HOLIDAY"
+                ).length,
+                notAttendNum: d.activities.filter(
+                  (a: any) => a.Activity?.activityStatus === "NOT_ATTEND"
+                ).length,
+                sickNum: d.activities.filter(
+                  (a: any) => a.Activity?.activityStatus === "SICK"
+                ).length,
+                activitiesStatus: d.activities
+                  .filter(
+                    (a: any) =>
+                      a.Activity !== null && a.Activity?.activityStatus !== null
+                  )
+                  .map((d: any) => {
+                    return {
+                      id: d.id,
+                      day: d.day?.day,
+                      location: d.Activity?.location?.name,
+                      detail: d.Activity?.detail,
+                      activityStatus: d.Activity?.activityStatus,
+                      activityName: d.Activity?.ActivityName?.name,
+                      verificationStatus: d.verificationStatus,
+                    };
+                  }),
+                dailyActivityId: "",
+                verificationStatus: "",
+              };
+            })
+          : [],
+      };
+    }
+
+    let fixWeek = response.weeks
       .filter((w) => {
         return (
           (((checkInTime ?? 0) >= w.startDate &&
@@ -531,40 +635,61 @@ export class StudentHandler {
           endDate: w.endDate,
           startDate: w.startDate,
           unitId: w.unitId ?? "",
+          unitName: w.unitName,
           weekName: index + 1,
           status: w.status,
           id: w.id,
+          days: w.days,
         };
       });
 
+    let fixDailyActivities: IDailyActivities[] = [];
+    response.dailyActivities.forEach((activities) => {
+      fixWeek.forEach((week) => {
+        if (week.id === activities.weekId) {
+          fixDailyActivities.push({
+            weekId: week.id,
+            weekName: week.weekName,
+            attendNum: activities.attendNum,
+            notAttendNum: activities.notAttendNum,
+            sickNum: activities.sickNum,
+            activitiesStatus: activities.activitiesStatus,
+            dailyActivityId: activities.dailyActivityId,
+            verificationStatus: activities.verificationStatus,
+          });
+        }
+      });
+    });
+
+    let weekNumIndex = 0;
     let listWeeklyAssesment: IWeeklyAssesment[] = [];
-    let weekNum: number = 0;
     weeklyAssesment.sort((a, b) => a.weekNum - b.weekNum);
     fixWeek.sort((a, b) => a.weekName - b.weekName);
-    for (const w of weeklyAssesment) {
-      let startDate: number | null = null;
-      let endDate: number | null = null;
+    for (let i = 0; i < weeklyAssesment.length; i++) {
+      const w = weeklyAssesment[i];
+      let startDate: number = 0;
+      let endDate: number = 0;
 
-      if (weekNum <= fixWeek.length - 1) {
-        startDate = Number(fixWeek[weekNum].startDate);
-        endDate = Number(fixWeek[weekNum].endDate);
+      if (weekNumIndex < fixWeek.length) {
+        startDate = Number(fixWeek[weekNumIndex].startDate);
+        endDate = Number(fixWeek[weekNumIndex].endDate);
       }
-      weekNum += 1;
+
+      weekNumIndex++;
+      let temp = fixDailyActivities.filter(
+        (e) => e.weekName == weekNumIndex.toString()
+      )[0];
+
+      // !for safety check
+      if (typeof temp === "undefined") {
+        continue;
+      }
       listWeeklyAssesment.push({
-        attendNum: dailyActivities
-          .filter((a) => a.day?.week?.id === w.weekId)
-          .filter((a) => a.Activity?.activityStatus === "ATTEND").length,
-        notAttendNum: dailyActivities
-          .filter((a) => a.day?.week?.id === w.weekId)
-          .filter(
-            (a) =>
-              a.Activity?.activityStatus === "NOT_ATTEND" ||
-              a.Activity?.activityStatus === "SICK" ||
-              a.Activity?.activityStatus === "HOLIDAY"
-          ).length,
+        attendNum: temp.attendNum,
+        notAttendNum: temp.notAttendNum ?? 0 + temp.sickNum ?? 0,
         score: w.score,
         verificationStatus: w.verificationStatus,
-        weekNum: weekNum,
+        weekNum: i + 1, // Update weekNum index
         id: w.id,
         startDate: startDate,
         endDate: endDate,
