@@ -52,6 +52,24 @@ export class DailyActivityRouter {
         this.handler.putVerificationStatusOfDailyActivities
       );
 
+    // * get submitted daily activities by supervisor or dpk
+    this.router
+      .route(this.path + "/students/:studentId/v2")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.getSubmittedActivitiesV2
+      )
+      .put(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.putVerificationStatusOfDailyActivitiesV2
+      );
+
     // * get submitted activities of daily activity by supervisor or dpk
     // * verify daily activity per week
     this.router
@@ -70,6 +88,25 @@ export class DailyActivityRouter {
           constants.DPK_ROLE,
         ]),
         this.handler.putVerificationStatusOfDailyActivity
+      );
+
+    // * get submitted activities of daily activity by supervisor or dpk
+    // * verify daily activity per week
+    this.router
+      .route(this.path + "/:id/v2")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.getActivitiesOfDailyActivityV2
+      )
+      .put(
+        AuthorizationBearer.authorize([
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.handler.putVerificationStatusOfDailyActivityV2
       );
 
     // * get activities on week

@@ -61,6 +61,52 @@ export class DailyActivityService {
     return dailyActivities;
   }
 
+  async verifyDailyActivitiesV2(
+    studentId: string,
+    tokenPayload: ITokenPayload,
+    payload: IPutDailyActivityVerificationStatus
+  ) {
+    try {
+      return db.$transaction([
+        db.dailyActivityV2.updateMany({
+          where: {
+            Student: {
+              OR: [
+                {
+                  academicSupervisorId: tokenPayload.supervisorId,
+                },
+                {
+                  supervisingSupervisorId: tokenPayload.supervisorId,
+                },
+                {
+                  examinerSupervisorId: tokenPayload.supervisorId,
+                },
+              ],
+              studentId,
+            },
+          },
+          data: {
+            verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
+          },
+        }),
+        db.checkInCheckOut.updateMany({
+          where: {
+            studentId,
+          },
+          data: {
+            dailyActiviyDone: payload.verified,
+          },
+        }),
+      ]);
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(400, "failed to verify all daily activity");
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
   async verifyDailyActivities(
     studentId: string,
     tokenPayload: ITokenPayload,
@@ -105,6 +151,49 @@ export class DailyActivityService {
         return createErrorObject(500);
       }
     }
+  }
+
+  async verifyDailyActivityV2(
+    id: string,
+    tokenPayload: ITokenPayload,
+    payload: IPutDailyActivityVerificationStatus
+  ) {
+    const dailyActivity = await this.dailyActivityModel.getDailyActivityByIdV2(
+      id
+    );
+
+    if (
+      dailyActivity?.Student?.examinerSupervisorId !==
+        tokenPayload.supervisorId &&
+      dailyActivity?.Student?.supervisingSupervisorId !==
+        tokenPayload.supervisorId &&
+      dailyActivity?.Student?.academicSupervisorId !== tokenPayload.supervisorId
+    ) {
+      return createErrorObject(
+        400,
+        "you are not authorized to verify this self reflection"
+      );
+    }
+
+    return db.$transaction([
+      db.dailyActivityV2.update({
+        where: {
+          id,
+        },
+        data: {
+          verificationStatus: payload.verified ? "VERIFIED" : "UNVERIFIED",
+        },
+      }),
+      db.checkInCheckOut.updateMany({
+        where: {
+          unitId: dailyActivity?.unitId ?? "",
+          studentId: dailyActivity?.studentId ?? "",
+        },
+        data: {
+          dailyActiviyDone: payload.verified,
+        },
+      }),
+    ]);
   }
 
   async verifyDailyActivity(
@@ -174,6 +263,16 @@ export class DailyActivityService {
         dailyActivity?.unitId ?? ""
       ),
     ]);
+  }
+
+  async getActivitiesByStudentIdV2(
+    tokenPayload: ITokenPayload,
+    studentId: string
+  ) {
+    return this.dailyActivityModel.getActivitiesBySupervisorAndStudentIdV2(
+      tokenPayload.supervisorId,
+      studentId
+    );
   }
 
   async getActivitiesByStudentId(
@@ -263,6 +362,36 @@ export class DailyActivityService {
       uuidv4(),
       payload
     );
+  }
+
+  async getActivitiesByDailyActivityIdV2(
+    tokenPayload: ITokenPayload,
+    id: string
+  ) {
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+
+    const dailyActivity = await this.dailyActivityModel.getDailyActivityByIdV2(
+      id
+    );
+
+    if (!dailyActivity) {
+      return createErrorObject(404, "daily activity's not found");
+    }
+
+    // if (
+    //   dailyActivity.studentId !== tokenPayload.studentId &&
+    //   dailyActivity.Student?.examinerSupervisorId !==
+    //     tokenPayload.supervisorId &&
+    //   dailyActivity.Student?.supervisingSupervisorId !==
+    //     tokenPayload.supervisorId &&
+    //   dailyActivity.Student?.academicSupervisorId !== tokenPayload.supervisorId
+    // ) {
+    //   return createErrorObject(400, "daily activity's not for you");
+    // }
+
+    return dailyActivity;
   }
 
   async getActivitiesByDailyActivityId(

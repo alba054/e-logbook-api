@@ -125,6 +125,39 @@ export class DailyActivity {
     });
   }
 
+  async getActivitiesBySupervisorAndStudentIdV2(
+    supervisorId: string | undefined,
+    studentId: string
+  ) {
+    return db.dailyActivityV2.findMany({
+      where: {
+        Student: {
+          OR: [
+            {
+              academicSupervisorId: supervisorId,
+            },
+            {
+              supervisingSupervisorId: supervisorId,
+            },
+            {
+              examinerSupervisorId: supervisorId,
+            },
+          ],
+          studentId,
+        },
+      },
+      include: {
+        Unit: true,
+        activities: {
+          include: {
+            ActivityName: true,
+            location: true,
+          },
+        },
+      },
+    });
+  }
+
   async getActivitiesBySupervisorAndStudentId(
     supervisorId: string | undefined,
     studentId: string
@@ -158,6 +191,41 @@ export class DailyActivity {
       // orderBy: {
       //   weekNum: "asc",
       // },
+    });
+  }
+
+  async getDailyActivitiesByStudentIdAndUnitIdV2(
+    studentId: string,
+    unitId: string
+  ) {
+    return db.dailyActivityV2.findMany({
+      where: {
+        studentId,
+        unitId,
+      },
+      include: {
+        Unit: true,
+        Student: true,
+        // day: {
+        //   include: {
+        //     week: true,
+        //   },
+        // },
+        activities: {
+          include: {
+            location: true,
+            ActivityName: true,
+          },
+        },
+      },
+      orderBy: {
+        weekNum: "asc",
+        // day: {
+        //   week: {
+        //     weekNum: "asc",
+        //   },
+        // },
+      },
     });
   }
 
@@ -290,6 +358,26 @@ export class DailyActivity {
 
         Unit: true,
         day: { include: { week: true } },
+      },
+    });
+  }
+
+  async getDailyActivityByIdV2(id: string) {
+    return db.dailyActivityV2.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        activities: {
+          include: {
+            location: true,
+            ActivityName: true,
+          },
+        },
+        Student: true,
+
+        Unit: true,
+        // day: { include: { week: true } },
       },
     });
   }

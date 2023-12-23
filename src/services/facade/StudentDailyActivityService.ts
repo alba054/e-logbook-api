@@ -10,22 +10,22 @@ export class StudentDailyActivityService {
   }
 
   // !unused the flow has changed
-  /*
+
   async generateDailyActivity(
     studentId: string | undefined,
     unitId: string | undefined
   ) {
     const studentDailyActivity =
-      await this.dailyActivityModel.getDailyActivitiesByStudentIdAndUnitId(
-        studentId,
-        unitId
+      await this.dailyActivityModel.getDailyActivitiesByStudentIdAndUnitIdV2(
+        studentId ?? "",
+        unitId ?? ""
       );
 
     if (!studentDailyActivity.length) {
       for (let i = 0; i < 10; i++) {
         const dailyActivityId = uuidv4();
         db.$transaction([
-          db.dailyActivity.create({
+          db.dailyActivityV2.create({
             data: {
               id: dailyActivityId,
               weekNum: i + 1,
@@ -42,7 +42,7 @@ export class StudentDailyActivityService {
               unitId,
             },
           }),
-          db.activity.createMany({
+          db.activityV2.createMany({
             data: [
               {
                 day: "MONDAY",
@@ -75,5 +75,4 @@ export class StudentDailyActivityService {
       }
     }
   }
-  */
 }
