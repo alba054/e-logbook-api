@@ -37,30 +37,34 @@ export class WeekRouter {
         this.handler.getWeeks
       );
 
-      this.router.route(this.path + "/:id/status").put(AuthorizationBearer.authorize([
-          constants.ER_ROLE,
-          constants.ADMIN_ROLE,
-        ]),
-        this.handler.putWeekStatus)
-
-    // * edit week
-    // * delete week
     this.router
-      .route(this.path + "/:id")
+      .route(this.path + "/:id/status")
       .put(
         AuthorizationBearer.authorize([
           constants.ER_ROLE,
           constants.ADMIN_ROLE,
         ]),
-        this.handler.putWeek
-      )
-      .delete(
-        AuthorizationBearer.authorize([
-          constants.ER_ROLE,
-          constants.ADMIN_ROLE,
-        ]),
-        this.handler.deleteWeek
+        this.handler.putWeekStatus
       );
+
+    // // * edit week
+    // // * delete week
+    // this.router
+    //   .route(this.path + "/:id")
+    //   .put(
+    //     AuthorizationBearer.authorize([
+    //       constants.ER_ROLE,
+    //       constants.ADMIN_ROLE,
+    //     ]),
+    //     this.handler.putWeek
+    //   )
+    //   .delete(
+    //     AuthorizationBearer.authorize([
+    //       constants.ER_ROLE,
+    //       constants.ADMIN_ROLE,
+    //     ]),
+    //     this.handler.deleteWeek
+    //   );
 
     return this.router;
   }

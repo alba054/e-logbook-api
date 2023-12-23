@@ -70,6 +70,7 @@ model Student {
   History                 History[]
   ProblemConsultation     ProblemConsultation[]
   WeekAssesment           WeekAssesment[]
+  DailyActivityV2         DailyActivityV2[]
 
   @@map("students")
 }
@@ -99,6 +100,7 @@ model Supervisor {
   Skill              Skill[]
   Competency         Competency[]
   unitId             String?             @db.VarChar(100)
+  ActivityV2         ActivityV2[]
 
   @@map("supervisors")
 }
@@ -152,6 +154,7 @@ model Unit {
   Topic               Topic[]
   Week                Week[]
   HeadDiv             Supervisor[]          @relation("headDiv")
+  DailyActivityV2     DailyActivityV2[]
 
   @@map("units")
 }
@@ -573,9 +576,10 @@ model Activity {
 }
 
 model ActivityName {
-  id       Int        @id @default(autoincrement())
-  name     String
-  Activity Activity[]
+  id         Int          @id @default(autoincrement())
+  name       String
+  Activity   Activity[]
+  ActivityV2 ActivityV2[]
 }
 
 model ActivityLocation {
@@ -586,8 +590,44 @@ model ActivityLocation {
   ScientificAssesment ScientificAssesment[]
   Supervisor          Supervisor?           @relation(fields: [supervisorId], references: [id])
   supervisorId        String?               @db.VarChar(100)
+  ActivityV2          ActivityV2[]
 
   @@map("activity_locations")
+}
+
+model DailyActivityV2 {
+  id                 String             @id @db.VarChar(100)
+  weekNum            Int                @db.UnsignedTinyInt
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @default(now()) @updatedAt
+  verificationStatus VerificationStatus @default(INPROCESS)
+  Student            Student?           @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId          String?            @db.VarChar(100)
+  Unit               Unit?              @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unitId             String?            @db.VarChar(100)
+  activities         ActivityV2[]
+
+  @@map("daily_activities_v2")
+}
+
+model ActivityV2 {
+  id                 String             @id @db.VarChar(100)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @default(now()) @updatedAt
+  day                String
+  activityStatus     ActivityStatus     @default(NOT_ATTEND)
+  detail             String?            @db.Text
+  supervisor         Supervisor?        @relation(fields: [supervisorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  supervisorId       String?            @db.VarChar(100)
+  location           ActivityLocation?  @relation(fields: [activityLocationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  verificationStatus VerificationStatus @default(INPROCESS)
+  activityLocationId Int?
+  ActivityName       ActivityName?      @relation(fields: [activityNameId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  activityNameId     Int?
+  DailyActivity      DailyActivityV2?   @relation(fields: [dailyActivityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  dailyActivityId    String?            @db.VarChar(100)
+
+  @@map("activities_v2")
 }
 
 model Assesment {

@@ -46,7 +46,76 @@ export class DailyActivityHandler {
       this.putVerificationStatusOfDailyActivities.bind(this);
     this.getActivities = this.getActivities.bind(this);
     this.getStudentActivities = this.getStudentActivities.bind(this);
+    this.getSubmittedActivitiesV2 = this.getSubmittedActivitiesV2.bind(this);
+    this.putVerificationStatusOfDailyActivitiesV2 =
+      this.putVerificationStatusOfDailyActivitiesV2.bind(this);
+    this.getActivitiesOfDailyActivityV2 =
+      this.getActivitiesOfDailyActivityV2.bind(this);
   }
+
+  async getSubmittedActivitiesV2(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const { studentId } = req.params;
+
+    try {
+      const activities =
+        await this.dailyActivityService.getActivitiesByStudentIdV2(
+          tokenPayload,
+          studentId
+        );
+
+      const student = await this.studentService.getStudentByStudentId(
+        studentId
+      );
+      if (student && "error" in student) {
+        switch (student.error) {
+          case 400:
+            throw new BadRequestError(student.message);
+          case 404:
+            throw new NotFoundError(student.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          unitName: activities[0]?.Unit?.name,
+          dailyActivities: activities.map((r) => {
+            return {
+              verificationStatus: r.verificationStatus,
+              weekName: r.weekNum,
+              dailyActivityId: r.id,
+              attendNum: r.activities.filter(
+                (a) => a.activityStatus === "ATTEND"
+              ).length,
+              notAttendNum: r.activities.filter(
+                (a) => a.activityStatus === "NOT_ATTEND"
+              ).length,
+              sickNum: r.activities.filter((a) => a.activityStatus === "SICK")
+                .length,
+              activitiesStatus: r.activities.map((a) => {
+                return {
+                  activityStatus: a.activityStatus,
+                  day: a.day,
+                  verificationStatus: a.verificationStatus,
+                  activityName: a.ActivityName?.name,
+                  location: a.location?.name,
+                  detail: a.detail,
+                } as IActivitiesDetail;
+              }),
+            };
+          }),
+        } as IStudentDailyActivities)
+      );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
   async getStudentActivities(req: Request, res: Response, next: NextFunction) {
     const { studentId, id } = req.params;
     try {
@@ -209,6 +278,57 @@ export class DailyActivityHandler {
       .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, listActivities));
   }
 
+  async putVerificationStatusOfDailyActivitiesV2(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const payload: IPutDailyActivityVerificationStatus = req.body;
+    const { studentId } = req.params;
+
+    try {
+      const validationResult = this.validator.validate(
+        DailyActivityVerificationStatusSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        switch (validationResult.error) {
+          case 400:
+            throw new BadRequestError(validationResult.message);
+          case 404:
+            throw new NotFoundError(validationResult.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      const result = await this.dailyActivityService.verifyDailyActivitiesV2(
+        studentId,
+        tokenPayload,
+        payload
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, result));
+    } catch (error) {
+      return next(error);
+    }
+  }
+
   async putVerificationStatusOfDailyActivities(
     req: Request,
     res: Response,
@@ -255,6 +375,62 @@ export class DailyActivityHandler {
       return res
         .status(200)
         .json(createResponse(constants.SUCCESS_RESPONSE_MESSAGE, result));
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async putVerificationStatusOfDailyActivityV2(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const payload: IPutDailyActivityVerificationStatus = req.body;
+    const { id } = req.params;
+
+    try {
+      const validationResult = this.validator.validate(
+        DailyActivityVerificationStatusSchema,
+        payload
+      );
+
+      if (validationResult && "error" in validationResult) {
+        switch (validationResult.error) {
+          case 400:
+            throw new BadRequestError(validationResult.message);
+          case 404:
+            throw new NotFoundError(validationResult.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      const result = await this.dailyActivityService.verifyDailyActivityV2(
+        id,
+        tokenPayload,
+        payload
+      );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res
+        .status(200)
+        .json(
+          createResponse(
+            constants.SUCCESS_RESPONSE_MESSAGE,
+            "Success verify daily activity"
+          )
+        );
     } catch (error) {
       return next(error);
     }
@@ -311,6 +487,57 @@ export class DailyActivityHandler {
             "Success verify daily activity"
           )
         );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getActivitiesOfDailyActivityV2(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const { id } = req.params;
+
+    try {
+      const result =
+        await this.dailyActivityService.getActivitiesByDailyActivityIdV2(
+          tokenPayload,
+          id
+        );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          alpha: result.activities.filter((a) => a.activityStatus !== "ATTEND")
+            .length,
+          attend: result.activities.filter((a) => a.activityStatus === "ATTEND")
+            .length,
+          weekName: result.weekNum,
+          verificationStatus: result.verificationStatus,
+          activities: result.activities.map((a) => {
+            return {
+              activityStatus: a.activityStatus,
+              day: a.day,
+              verificationStatus: a.verificationStatus,
+              activityName: a.ActivityName?.name,
+              detail: a.detail,
+              location: a.location?.name,
+            } as IActivitiesDetail;
+          }),
+        } as IListActivitiesPerWeek)
+      );
     } catch (error) {
       return next(error);
     }
