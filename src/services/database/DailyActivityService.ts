@@ -298,6 +298,20 @@ export class DailyActivityService {
     return dailyActivities;
   }
 
+  async getDailyActivitiesByStudentIdAndUnitIdV2(tokenPayload: ITokenPayload) {
+    const activeUnit = await this.studentService.getActiveUnit(
+      tokenPayload.studentId ?? ""
+    );
+
+    const dailyActivities =
+      await this.dailyActivityModel.getDailyActivitiesByStudentIdAndUnitIdV2(
+        tokenPayload.studentId ?? "",
+        activeUnit?.activeUnit.activeUnit?.id ?? ""
+      );
+
+    return dailyActivities;
+  }
+
   async getDailyActivitiesByStudentIdAndUnitId(tokenPayload: ITokenPayload) {
     const activeUnit = await this.studentService.getActiveUnit(
       tokenPayload.studentId ?? ""
@@ -310,6 +324,27 @@ export class DailyActivityService {
       );
 
     return dailyActivities;
+  }
+
+  async editDailyActivityActivityV2(
+    tokenPayload: ITokenPayload,
+    id: string,
+    payload: IPutDailyActivityActivity
+  ) {
+    const dailyActivityActivity =
+      await this.dailyActivityModel.getDailyActivityActivityByIdV2(id);
+
+    if (!dailyActivityActivity) {
+      return createErrorObject(404, "activity's not found");
+    }
+
+    if (
+      dailyActivityActivity?.DailyActivity?.studentId !== tokenPayload.studentId
+    ) {
+      return createErrorObject(400, "activity's not for you");
+    }
+
+    return this.dailyActivityModel.editDailyActivityActivityByIdV2(id, payload);
   }
 
   async editDailyActivityActivity(

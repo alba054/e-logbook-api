@@ -156,6 +156,9 @@ export class StudentHandler {
     this.getStudentWeeklyAssesments =
       this.getStudentWeeklyAssesments.bind(this);
     this.getStudentStatistics = this.getStudentStatistics.bind(this);
+    this.getDailyActivitiesV2 = this.getDailyActivitiesV2.bind(this);
+    this.getDailyActivitiesPerWeekV2 =
+      this.getDailyActivitiesPerWeekV2.bind(this);
   }
 
   async getStudentStatistics(req: Request, res: Response, next: NextFunction) {
@@ -923,6 +926,47 @@ export class StudentHandler {
     );
   }
 
+  async getDailyActivitiesV2(req: Request, res: Response, next: NextFunction) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+
+    const result =
+      await this.dailyActivityService.getDailyActivitiesByStudentIdAndUnitIdV2(
+        tokenPayload
+      );
+
+    return res.status(200).json(
+      createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+        unitName: result[0]?.Unit?.name,
+        inprocessDailyActivity: result.filter(
+          (r) => r.verificationStatus === "INPROCESS"
+        ).length,
+        verifiedDailyActivity: result.filter(
+          (r) => r.verificationStatus === "VERIFIED"
+        ).length,
+        unverifiedDailyActivity: result.filter(
+          (r) => r.verificationStatus === "UNVERIFIED"
+        ).length,
+        dailyActivities: result.map((r) => {
+          return {
+            verificationStatus: r.verificationStatus,
+            weekName: r.weekNum,
+            dailyActivityId: r.id,
+            activitiesStatus: r.activities.map((a) => {
+              return {
+                activityStatus: a.activityStatus,
+                day: a.day,
+                verificationStatus: a.verificationStatus,
+                activityName: a.ActivityName?.name,
+                location: a.location?.name,
+                detail: a.detail,
+              } as IActivitiesDetail;
+            }),
+          };
+        }),
+      } as IStudentDailyActivities)
+    );
+  }
+
   async getDailyActivities(req: Request, res: Response, next: NextFunction) {
     const tokenPayload: ITokenPayload = res.locals.user;
     const activeUnit = await this.studentService.getActiveUnit(
@@ -1163,6 +1207,58 @@ export class StudentHandler {
             "successfully fill daily activity"
           )
         );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getDailyActivitiesPerWeekV2(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const tokenPayload: ITokenPayload = res.locals.user;
+    const { id } = req.params;
+
+    try {
+      const result =
+        await this.dailyActivityService.getActivitiesByDailyActivityIdV2(
+          tokenPayload,
+          id
+        );
+
+      if (result && "error" in result) {
+        switch (result.error) {
+          case 400:
+            throw new BadRequestError(result.message);
+          case 404:
+            throw new NotFoundError(result.message);
+          default:
+            throw new InternalServerError();
+        }
+      }
+
+      return res.status(200).json(
+        createResponse(constants.SUCCESS_RESPONSE_MESSAGE, {
+          alpha: result.activities.filter((a) => a.activityStatus !== "ATTEND")
+            .length,
+          attend: result.activities.filter((a) => a.activityStatus === "ATTEND")
+            .length,
+          weekName: result.weekNum,
+          verificationStatus: result.verificationStatus,
+          activities: result.activities.map((a) => {
+            return {
+              activityStatus: a.activityStatus,
+              day: a.day,
+              verificationStatus: a.verificationStatus,
+              activityName: a.ActivityName?.name,
+              detail: a.detail,
+              location: a.location?.name,
+              id: a.id,
+            } as IActivitiesDetail;
+          }),
+        } as IListActivitiesPerWeek)
+      );
     } catch (error) {
       return next(error);
     }
