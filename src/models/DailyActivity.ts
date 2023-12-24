@@ -4,6 +4,17 @@ import { createErrorObject } from "../utils";
 import { IPutDailyActivityActivity } from "../utils/interfaces/DailyActivity";
 
 export class DailyActivity {
+  async getDailyActivityActivityByIdV2(id: string) {
+    return db.activityV2.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        DailyActivity: true,
+      },
+    });
+  }
+
   async getActivitiesByWeekIdAndStudentIdAndUnitId(
     weekId: string,
     studentId: string | undefined,
@@ -284,6 +295,35 @@ export class DailyActivity {
               supervisorId: payload.supervisorId,
             },
           },
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return createErrorObject(
+          400,
+          "failed to update daily activity activity"
+        );
+      } else {
+        return createErrorObject(500);
+      }
+    }
+  }
+
+  async editDailyActivityActivityByIdV2(
+    id: string,
+    payload: IPutDailyActivityActivity
+  ) {
+    try {
+      return db.activityV2.update({
+        where: {
+          id,
+        },
+        data: {
+          activityNameId: payload.activityNameId,
+          activityStatus: payload.activityStatus,
+          activityLocationId: payload.locationId,
+          detail: payload.detail,
+          supervisorId: payload.supervisorId,
         },
       });
     } catch (error) {

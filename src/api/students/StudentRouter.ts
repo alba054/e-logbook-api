@@ -173,10 +173,30 @@ export class StudentRouter {
 
     // * get daily activities
     this.router
+      .route(this.path + "/daily-activities/v2")
+      .get(
+        AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
+        this.studentHandler.getDailyActivitiesV2
+      );
+
+    // * get daily activities
+    this.router
       .route(this.path + "/daily-activities")
       .get(
         AuthorizationBearer.authorize([constants.STUDENT_ROLE]),
         this.studentHandler.getDailyActivities
+      );
+
+    // * get list of activities per week
+    this.router
+      .route(this.path + "/daily-activities/weeks/:id/v2")
+      .get(
+        AuthorizationBearer.authorize([
+          constants.STUDENT_ROLE,
+          constants.SUPERVISOR_ROLE,
+          constants.DPK_ROLE,
+        ]),
+        this.studentHandler.getDailyActivitiesPerWeekV2
       );
 
     // * get list of activities per week
