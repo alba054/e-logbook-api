@@ -136,11 +136,11 @@ export class WeekService {
           });
         }),
       ]);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to insert new week");
       } else {
-        return createErrorObject(500, String(error));
+        return createErrorObject(500, error.message);
       }
     }
   }
