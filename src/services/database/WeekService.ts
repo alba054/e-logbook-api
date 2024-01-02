@@ -140,9 +140,7 @@ export class WeekService {
       if (error instanceof PrismaClientKnownRequestError) {
         return createErrorObject(400, "failed to insert new week");
       } else {
-        console.log(error);
-
-        return createErrorObject(500);
+        return createErrorObject(500, String(error));
       }
     }
   }
