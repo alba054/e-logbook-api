@@ -189,7 +189,7 @@ export class WeekHandler {
           case 404:
             throw new NotFoundError(testError.message);
           default:
-            throw new InternalServerError();
+            throw new InternalServerError(testError.message);
         }
       }
 
